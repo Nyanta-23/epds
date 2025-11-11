@@ -43,14 +43,13 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Super Admin',
             'email' => 'test@example.com',
-            'email_verified_at' => null,
+            'email_verified_at' => '2025-11-06 11:16:04',
             'password' => Hash::make('test@example.com'),
             'remember_token' => Str::random(10),
-            'two_factor_secret' => Str::random(10),
-            'two_factor_recovery_codes' => Str::random(10),
-            'two_factor_confirmed_at' => null,
             'role_id' => Role::where('slug', 'super_admin')->first()->id
         ]);
+
+        // muhamadilhan02404@gmail.com
 
         User::factory()->withRole('admin')->count(3)->create();
         User::factory()->withRole('midwife')->count(10)->create();

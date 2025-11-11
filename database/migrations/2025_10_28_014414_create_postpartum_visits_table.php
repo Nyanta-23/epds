@@ -15,11 +15,39 @@ return new class extends Migration
             $table->uuid('id')->primary();
 
             $table->date('date_filled');
-            $table->enum('sleep_quality', ['good', 'poor', 'frequently_awake']);
-            $table->enum('support_level', ['good', 'fair', 'poor']);
-            $table->boolean('socioeconomic_issues');
+            // $table->enum('sleep_quality', ['good', 'poor', 'frequently_awake']);
+            $table->unsignedTinyInteger('sleep_quality');
+
+            // $table->enum('partner_support', ['good', 'fair', 'poor']);
+            $table->unsignedTinyInteger('partner_support');
+
+            $table->boolean('live_with_partner');
+
+            // $table->enum('family_economy', ['good', 'fair', 'poor']);
+            $table->unsignedTinyInteger('family_economy');
+
             $table->boolean('psych_history');
-            $table->enum('followup_status', ['not_counsuled', 'counsuled', 'refer_psychologist', 'refer_psyichiatrist'])->default('not_counsuled');
+            $table->boolean('psych_treatment');
+            $table->boolean('psych_trauma');
+
+            $table->boolean('last_comp');
+            $table->text('last_comp_note')->nullable();
+
+            $table->boolean('preg_comp_history');
+            // 	1x
+            // 	2x
+            // 	3x
+            // 	Lebih dari 3x
+            $table->unsignedTinyInteger('parity_group');
+            $table->unsignedTinyInteger('parity_count')->nullable();
+
+            $table->boolean('baby_healthy');
+            // 1=Partner, 2=Parents, 3=Family/Nanny, 4=None
+            $table->unsignedTinyInteger('baby_caregiver');
+
+            $table->unsignedTinyInteger('feed_type');
+
+            $table->softDeletes();
 
             $table->foreignUuid('mother_id')
                 ->references('id')

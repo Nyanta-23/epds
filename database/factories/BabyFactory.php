@@ -21,9 +21,11 @@ class BabyFactory extends Factory
             'mother_id' => User::factory(),
             'which_child' => rand(1, 3),
             'date_of_birth' => fake()->date(),
-            'baby_condition' => fake()->randomElement(['healthy', 'premature', 'low_bw', 'nicu']),
-            'breastfeeding_status' => fake()->randomElement(['exclusive', 'mixed', 'not_breastfeeding']),
-            'delivery_complication' => rand(0, 1)
+            // 'baby_condition' => fake()->randomElement(['healthy', 'premature', 'low_bw', 'nicu']),
+            'baby_condition' => fake()->numberBetween(1, 4),
+            // 'typeof_delivery' => fake()->randomElement(['normal', 'caesar', 'forsep']),
+            'typeof_delivery' => fake()->numberBetween(1, 3),
+            'gender' => fake()->randomElement(['male', 'female']),
         ];
     }
 }
