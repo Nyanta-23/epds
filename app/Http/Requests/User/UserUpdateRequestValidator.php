@@ -20,8 +20,11 @@ class UserUpdateRequestValidator extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules($test): array
     {
+
+        // dd($test);
+
         return [
             'name' => [
                 'required',

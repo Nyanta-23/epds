@@ -1,6 +1,6 @@
 
 
-import { Loader2, Pencil, Trash2, Undo2 } from "lucide-react";
+import { Pencil, Trash2, Undo2 } from "lucide-react";
 import { User } from "@/types/resource";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { ButtonConfirmation } from "@/components/button-confirmation";
 import { useUserActions } from "@/hooks/use-user-action";
 import { Filter } from "@/types";
 import { Link } from "@inertiajs/react";
+import { Spinner } from "@/components/ui/spinner";
 
 
 interface UserTableProps {
@@ -58,7 +59,7 @@ export default function UserTable({ data, filter }: UserTableProps) {
                       <Button
                         disabled={processingId === user.id}
                         className="cursor-pointer">
-                        {processingId == user.id ? <Loader2 className="animate-spin" /> : <Trash2 />}
+                        {processingId == user.id ? <Spinner /> : <Trash2 />}
                       </Button>
                     </ButtonConfirmation>
                   </>

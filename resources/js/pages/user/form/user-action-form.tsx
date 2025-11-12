@@ -1,7 +1,8 @@
 import { ButtonConfirmation } from "@/components/button-confirmation";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Link } from "@inertiajs/react";
-import { Loader2, Save } from "lucide-react";
+import { Save } from "lucide-react";
 
 interface UserActionFormProps {
   process: boolean;
@@ -10,10 +11,13 @@ interface UserActionFormProps {
 
 export default function UserActionForm({ process, action }: UserActionFormProps) {
 
-
   return (
     <div className="flex items-center justify-start space-x-3 pt-6">
-      {process ? <Loader2 className="animate-spin" /> : (<>
+      {process ? (
+        <div className="flex items-center gap-2">
+          <Spinner /> Loading...
+        </div>
+      ) : (<>
         <Link href={route('user')}>
           <Button className="rounded-md border px-6 py-2 text-sm font-medium cursor-pointer bg-transparent text-foreground border-foreground hover:bg-accent">
             Cancel
