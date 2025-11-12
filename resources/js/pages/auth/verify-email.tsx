@@ -8,6 +8,16 @@ import { send } from '@/routes/verification';
 import { Form, Head } from '@inertiajs/react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
+
+    const minutes = 300000;
+    const timerResendEmail = setTimeout(() => {
+        
+    }, minutes);
+
+
+
+
+
     return (
         <AuthLayout
             title="Verify email"
@@ -25,14 +35,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Form {...send.form()} className="space-y-6 text-center">
                 {({ processing }) => (
                     <>
-                        <Button disabled={processing} variant="secondary">
+                        <Button disabled={processing} variant="secondary" className="cursor-pointer">
                             {processing && <Spinner />}
                             Resend verification email
                         </Button>
 
                         <TextLink
                             href={logout()}
-                            className="mx-auto block text-sm"
+                            className="mx-auto block text-sm cursor-pointer"
                         >
                             Log out
                         </TextLink>

@@ -15,9 +15,15 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->integer('which_child');
             $table->date('date_of_birth');
-            $table->enum('baby_condition', ['healthy', 'premature', 'low_bw', 'nicu']);
-            $table->enum('breastfeeding_status', ['exclusive', 'mixed', 'not_breastfeeding']);
-            $table->boolean('delivery_complication');
+            // $table->enum('baby_condition', ['healthy', 'premature', 'low_bw', 'nicu'])->comment('To explain status baby condition');
+            $table->unsignedTinyInteger('baby_condition')->comment('To explain status baby condition');
+            // $table->enum('typeof_delivery', ['normal', 'caesar', 'forsep'])->comment('To explain type of delivery');
+            $table->unsignedTinyInteger('typeof_delivery')->comment('To explain type of delivery');
+
+            $table->enum('gender', ['male', 'female']);
+
+            $table->softDeletes();
+
 
             $table->foreignUuid('mother_id')
                 ->references('id')
