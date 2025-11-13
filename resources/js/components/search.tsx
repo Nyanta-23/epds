@@ -1,8 +1,9 @@
 import { SearchIcon } from "lucide-react";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { router } from "@inertiajs/react";
 import { Filter } from "@/types";
+import { Button } from "./ui/button";
 
 interface SearchProps {
   filter: Filter;
@@ -11,71 +12,53 @@ interface SearchProps {
 }
 
 export default function Search({ total, filter, link }: SearchProps) {
-  const { only_trash, search, filter_list } = filter;
-  const { select_filter, checkbox_filter } = filter_list ?? {};
+  const { only_trash, filter_list } = filter;
+  const { select_filter } = filter_list ?? {};
   const { role } = select_filter ?? {};
 
-  const [querySearch, setQuerySearch] = useState<string>(search ?? "");
+  const [querySearch, setQuerySearch] = useState<string>(filter.search ?? "");
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  useEffect(() => {
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault(); // cegah reload halaman jika submit form
+    setIsSearching(true);
 
-    const delayDebounce = setTimeout(() => {
-      if (querySearch !== "") {
-        setIsSearching(true);
-        router.get(
-          route(link),
-          {
-            search: querySearch,
-            only_trash,
-            role
-          },
-          {
-            preserveState: true,
-            replace: true,
-            onFinish: () => {
-              setIsSearching(false);
-            }
-          }
-        )
-      } else {
-        router.get(
-          route(link),
-          {
-            search: "",
-            only_trash,
-            role
-          },
-          {
-            preserveState: true,
-            replace: true
-          }
-        );
-
+    router.get(
+      route(link),
+      {
+        search: querySearch,
+        only_trash,
+        role,
+      },
+      {
+        preserveState: true,
+        replace: true,
+        onFinish: () => setIsSearching(false),
       }
-
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-
-  }, [querySearch]);
-
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuerySearch(e.target.value);
-  }
+    );
+  };
 
   return (
-    <InputGroup>
-      <InputGroupInput placeholder="Search..." value={querySearch} onChange={handleSearch} />
-      <InputGroupAddon>
-        <SearchIcon />
-      </InputGroupAddon>
-      {querySearch.length > 0 && (
+    <form onSubmit={handleSearch}>
+      <InputGroup>
+        <InputGroupInput
+          placeholder="Search..."
+          value={querySearch}
+          onChange={(e) => setQuerySearch(e.target.value)}
+        />
         <InputGroupAddon align="inline-end">
           {isSearching ? "Searching..." : `${total} results`}
         </InputGroupAddon>
-      )}
-    </InputGroup>
+        <InputGroupAddon align="inline-end">
+          <Button
+            type="submit" // <--- tombol submit form
+            className="cursor-pointer w-fit h-fit rounded-none"
+            variant="ghost"
+          >
+            <SearchIcon />
+          </Button>
+        </InputGroupAddon>
+      </InputGroup>
+    </form>
   );
 }

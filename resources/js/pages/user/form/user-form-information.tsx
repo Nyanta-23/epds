@@ -9,7 +9,7 @@ import { Role } from "@/types/resource";
 type Errors = Partial<Record<keyof FormUser, string>>;
 
 
-interface UserFormInput {
+interface UserFormInformationProps {
   roles: Role[];
   data: FormUser;
   errors: Errors;
@@ -19,7 +19,7 @@ interface UserFormInput {
   withoutAuth?: boolean;
 }
 
-export default function UserFormInformation({ roles, data, errors, process, handleInputChange, action, withoutAuth }: UserFormInput) {
+export default function UserFormInformation({ roles, data, errors, process, handleInputChange, action, withoutAuth }: UserFormInformationProps) {
 
   const identityErrorClassName = (field: keyof Errors) => {
     return errors[field] ? 'border-red-500 focus:ring-red-500' : '';

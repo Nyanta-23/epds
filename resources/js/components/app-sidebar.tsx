@@ -27,6 +27,11 @@ const mainNavItems: NavItem[] = [
         href: '/user',
         icon: LayoutGrid,
     },
+    {
+        title: 'Patient',
+        href: '/patient',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

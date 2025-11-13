@@ -18,14 +18,11 @@ export default function UserMainContent({ user, extra, page_prop }: UserMainCont
 
 
   const { roles } = extra;
-
-
-
+  
 
   return (
     <>
-
-      <UserAction role={roles} filter={filter} meta={meta} />
+      <UserAction roles={roles.data} filter={filter} meta={meta} />
 
       <section className="grid auto-rows-min gap-4">
         <section className="w-full">

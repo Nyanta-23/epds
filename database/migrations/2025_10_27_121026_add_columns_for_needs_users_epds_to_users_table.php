@@ -17,13 +17,21 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('job', 255)->nullable();
             $table->enum('married_status', ['married', 'not_married', 'divorced'])->nullable();
-            $table->string('highest_education', 10)->nullable(); // enum SD / SMP / SMA / D3 / S1 / ETC
+            // $table->unsignedTinyInteger('married_status')->nullable();
+            $table->string('highest_education', 10)->nullable(); 
+
+            $table->string('province_id', 50)->nullable();
+            $table->string('city_or_district_id', 50)->nullable();
+            $table->string('subdistrict_id', 50)->nullable();
+            $table->string('village_id', 50)->nullable();
+
             $table->string('province', 50)->nullable();
             $table->string('city_or_district', 50)->nullable();
             $table->string('subdistrict', 50)->nullable();
             $table->string('village', 50)->nullable();
             $table->text('address')->nullable();
-            $table->boolean('verified')->nullable();
+            $table->boolean('is_verified')->nullable();
+            $table->boolean('is_can_visit')->nullable();
         });
     }
 
@@ -45,7 +53,13 @@ return new class extends Migration
                 'subdistrict',
                 'village',
                 'address',
-                'verified'
+                'province_id',
+                'city_or_district_id',
+                'subdistrict_id',
+                'village_id',
+                'address',
+                'is_verified',
+                'is_can_visit'
             ]);
         });
     }

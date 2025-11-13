@@ -1,18 +1,18 @@
-import SelectFilter from "@/components/select-filter";
 import Search from "@/components/search";
 import { Button } from "@/components/ui/button";
 import { Extra, Filter, Meta } from "@/types";
 import { Link } from "@inertiajs/react";
 import { History, PlusSquare } from "lucide-react";
 import { Role } from "@/types/resource";
+import SelectFilterRole from "@/components/utils/select-filter-role";
 
 interface UserActionProps {
   filter: Filter;
   meta: Meta;
-  role: Role[];
+  roles: Role[];
 }
 
-export default function UserAction({ filter, meta, role }: UserActionProps) {
+export default function UserAction({ filter, meta, roles }: UserActionProps) {
 
   const { only_trash, filter_list } = filter;
 
@@ -27,7 +27,7 @@ export default function UserAction({ filter, meta, role }: UserActionProps) {
             <Search total={total} link={'user'} filter={filter} />
           </div>
           <div>
-            <SelectFilter title="Role" options={role} link={'user'} filter={filter} />
+            <SelectFilterRole filter={filter} link={'user'} roles={roles} />
           </div>
 
           {/* <div> */}

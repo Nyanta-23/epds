@@ -39,6 +39,12 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        // dd(session('success'));
+        // dd(session('error'));
+        // dd(session('warning'));
+        // dd(session('info'));
+
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -47,17 +53,25 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'ziggy' => fn(): array => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url()
-            ],
+            // 'ziggy' => fn(): array => [
+            //     ...(new Ziggy)->toArray(),
+            //     'location' => $request->url()
+            // ],
+            // 'ziggy' => fn() => array_merge((new Ziggy)->toArray(), [
+            //     'location' => $request->url()
+            // ]),
+            // 'ziggy' => fn() => array_merge((new Ziggy)->toArray(), ['location' => $request->url()]),
+            'ziggy' => function () use ($request) {
+                return array_merge((new Ziggy)->toArray(), [
+                    'location' => $request->url()
+                ]);
+            },
             'flash' => [
-                'success' => session('success'),
-                'error' => session('error'),
-                'warning' => session('warning'),
-                'info' => session('info'),
-            ]
-
+                'success' => $request->session()->get('success'),
+                'error'   => $request->session()->get('error'),
+                'info'    => $request->session()->get('info'),
+                'warning' => $request->session()->get('warning'),
+            ],
         ];
     }
 }

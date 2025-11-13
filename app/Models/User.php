@@ -26,7 +26,24 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'phone_number',
+        'birthplace',
+        'date_of_birth',
+        'job',
+        'married_status',
+        'highest_education',
+        'province',
+        'city_or_district',
+        'subdistrict',
+        'village',
+        'province_id',
+        'city_or_district_id',
+        'subdistrict_id',
+        'village_id',
+        'address',
+        'is_verified',
+        'is_can_visit'
     ];
 
     /**
@@ -82,10 +99,4 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Followup::class);
     }
 
-
-    // Feature
-    public function scopeTakeOnlyTrashedConditional($query, $runThis = true)
-    {
-        return $runThis ? $query->onlyTrashed() : $query;
-    }
 }

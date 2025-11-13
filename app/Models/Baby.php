@@ -11,6 +11,8 @@ class Baby extends Model
 {
     use HasFactory, HasUuids;
 
+    
+
     public function mother(): BelongsTo
     {
         return $this->belongsTo(User::class);

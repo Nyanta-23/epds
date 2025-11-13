@@ -70,8 +70,9 @@ class UserFactory extends Factory
             'city_or_district' => fake()->city(),
             'subdistrict' => fake()->streetName(),
             'village' => fake()->streetName(),
-            'address' => fake()->address(),
-            'verified' => rand(0, 1)
+            'address' => fake()->streetAddress(),
+            'is_verified' => rand(0, 1),
+            'is_can_visit' => rand(0, 1)
         ]);
     }
 

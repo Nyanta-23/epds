@@ -17,45 +17,31 @@ class UserService
 
   public function index($whoAmI, $filters)
   {
-
     $role = $filters['filter_list']['select_filter']['role'];
+    $search = $filters['search'];
+    $onlyTrash = $filters['only_trash'];
 
     $query = User::with('role')
-      ->whereNot('id', $whoAmI->id)
-      ->when($whoAmI->role->slug == 'super_admin', function ($query) {
-        $query->whereHas('role', function ($q) {
-          $q->whereNot('slug', 'super_admin');
-        });
+      ->where('id', '!=', $whoAmI->id)
+      ->when($whoAmI->role->slug === 'super_admin', function ($q) {
+        $q->whereHas('role', fn($r) => $r->where('slug', '!=', 'super_admin'));
       })
-      ->when($whoAmI->role->slug == 'admin', function ($query) {
-        $query->whereHas('role', function ($q) {
-          $q->whereNotIn('role', ['super_admin', 'admin']);
-        });
+      ->when($whoAmI->role->slug === 'admin', function ($q) {
+        $q->whereHas('role', fn($r) => $r->whereNotIn('slug', ['super_admin', 'admin']));
       })
-      ->when($whoAmI->role->slug == 'midwife', function ($query) {
-        $query->whereHas('role', function ($q) {
-          $q->whereNotIn('role', ['super_admin', 'admin', 'midwife']);
-        });
+      ->when($whoAmI->role->slug === 'midwife', function ($q) {
+        $q->whereHas('role', fn($r) => $r->whereNotIn('slug', ['super_admin', 'admin', 'midwife']));
       })
-      ->when($role, function ($query, $filter) {
-        $query->whereHas('role', function ($q) use ($filter) {
-          $q->where('id', $filter);
-        });
+      ->when($role, function ($q, $role) {
+        $q->whereHas('role', fn($r) => $r->where('slug', $role));
       })
-      ->when($filters['search'], function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $searchTerms = '%' . $search . '%';
-          $q->where('name', 'like', $searchTerms);
-        });
+      ->when($search, function ($q, $search) {
+        $q->where('name', 'like', "%{$search}%");
       })
-      ->when($filters['only_trash'], function ($q) {
-        $q->onlyTrashed();
-      })
+      ->when($onlyTrash, fn($q) => $q->onlyTrashed())
       ->latest();
 
-
-    return $query->paginate(10)
-      ->withQueryString();
+    return $query->paginate(10)->withQueryString();
   }
 
 

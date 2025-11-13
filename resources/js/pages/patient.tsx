@@ -2,20 +2,19 @@ import MainHeader from '@/components/main/main-header';
 import AppLayout from '@/layouts/app-layout';
 import { Extra, PageProp, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { type User } from '@/types/resource';
-import { UserData } from '@/types/data';
-import UserMainContent from './user/user-main-content';
+import { PatientData } from '@/types/data';
+import PatientMainContent from './patient/patient-main-content';
 
 interface UserProps {
-    users: UserData;
+    patients: PatientData;
     extra: Extra;
     page_prop: PageProp;
 }
 
-export default function User({ users, extra, page_prop }: UserProps) {
+export default function Patient({ patients, extra, page_prop }: UserProps) {
 
-    const title: string = 'User';
-    const link: string = '/user';
+    const title: string = 'Patient';
+    const link: string = '/patient';
 
     const subtitle = `${title} Management`;
     const desc = `Manage your ${title}`;
@@ -34,7 +33,7 @@ export default function User({ users, extra, page_prop }: UserProps) {
             <section className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
 
                 <MainHeader subtitle={subtitle} desc={desc} />
-                <UserMainContent user={users} page_prop={page_prop} extra={extra} />
+                <PatientMainContent patient={patients} page_prop={page_prop} extra={extra} />
 
             </section>
         </AppLayout>

@@ -128,3 +128,10 @@ export type Extra<T = any> = Record<string, { data: T[] }>;
 // export interface PageProp {
 
 // }
+
+
+enum MarriedStatus {
+    Married = "married",
+    Not_Married = "not_married",
+    Divorced = "divorced"
+}
