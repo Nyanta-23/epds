@@ -79,6 +79,7 @@ export interface MetaLink {
 export interface PageProp {
     page: string;
     filter: Filter;
+    enums: Enums;
 }
 
 export interface Filter {
@@ -101,6 +102,13 @@ export interface SelectFilter {
 export interface ChecbockFilter {
     [key: string]: any;
 }
+
+export interface EnumOption<T = string | number> {
+  value: T;
+  label: string;
+}
+
+export type Enums<T = any> = Record<string, EnumOption<T>[]>;
 
 export type Extra<T = any> = Record<string, { data: T[] }>;
 

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum MarriedStatus: int
+enum MarriedStatusEnum: int
 {
   case MARRIED = 0;
   case NOT_MARRIED = 1;
@@ -25,5 +25,13 @@ enum MarriedStatus: int
       self::NOT_MARRIED => 'Belum Menikah',
       self::DIVORCED => 'Janda'
     };
+  }
+
+   public static function options(): array
+  {
+    return collect(self::cases())->map(fn($case) => [
+      'value' => $case->value,
+      'label' => $case->label(),
+    ])->toArray();
   }
 }

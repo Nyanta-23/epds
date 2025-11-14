@@ -2,14 +2,14 @@
 
 namespace App\Enums;
 
-enum BabyCondition: int
+enum BabyConditionEnum: int
 {
   case HEALTHY = 0;
   case PREMATURE = 1;
   case LOW_BW = 2;
   case NICU = 3;
 
-  public function lable(): string
+  public function label(): string
   {
     return match ($this) {
       self::HEALTHY => "Healthy",
@@ -19,7 +19,7 @@ enum BabyCondition: int
     };
   }
 
-  public function lable_id(): string
+  public function label_id(): string
   {
     return match ($this) {
       self::HEALTHY => "Sehat",
@@ -27,5 +27,14 @@ enum BabyCondition: int
       self::LOW_BW => "Berat Badan Rendah",
       self::NICU => "NICU"
     };
+  }
+
+
+  public static function options(): array
+  {
+    return collect(self::cases())->map(fn($case) => [
+      'value' => $case->value,
+      'label' => $case->label(),
+    ])->toArray();
   }
 }

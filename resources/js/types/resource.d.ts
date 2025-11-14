@@ -32,7 +32,7 @@ export interface Patient {
   city_or_district: string;
   subdistrict: string;
   village: string;
-  
+
   province_id: string;
   city_or_district_id: string;
   subdistrict_id: string;
@@ -41,4 +41,18 @@ export interface Patient {
   address: string;
   is_verified: boolean;
   is_can_visit: boolean;
+
+  // babies: Baby[];
+}
+
+export interface Baby {
+  id: string;
+  which_child: number | null;
+  date_of_birth: string;
+  baby_condition: string;
+  baby_condition_label: string;
+  typeof_delivery: string;
+  typeof_delivery_label: string;
+  gender: string;
+  mother: Patient;
 }

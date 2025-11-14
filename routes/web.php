@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BabyController;
 use App\Http\Controllers\MidwifeController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\UserController;
@@ -38,7 +39,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 
-    
+    Route::prefix('baby')->group(function () {
+        Route::get('/', [BabyController::class, 'index'])->name('baby');
+        Route::get('/create', [BabyController::class, 'create'])->name('baby.create');
+        Route::get('{baby}/edit', [BabyController::class, 'edit'])->name('baby.edit');
+        Route::get('/{baby}', [BabyController::class, 'show'])->name('baby.show');
+        Route::post('/', [BabyController::class, 'store'])->name('baby.store');
+        Route::put('/{baby}', [BabyController::class, 'update'])->name('baby.update');
+        Route::delete('/{baby}', [BabyController::class, 'destroy'])->name('baby.destroy');
+    });
 });
 
 

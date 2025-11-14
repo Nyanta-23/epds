@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum TypeOfDelivery: int
+enum BabyTypeOfDeliveryEnum: int
 {
   case NORMAL = 0;
   case C_SECTION = 1;
@@ -25,5 +25,13 @@ enum TypeOfDelivery: int
       self::C_SECTION => "Caesar",
       self::FORSEP => "Forsep",
     };
+  }
+
+  public static function options(): array
+  {
+    return collect(self::cases())->map(fn($case) => [
+      'value' => $case->value,
+      'label' => $case->label(),
+    ])->toArray();
   }
 }

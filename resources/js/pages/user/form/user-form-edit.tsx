@@ -1,6 +1,6 @@
 import UserFormInformation from "./user-form-information";
 import { Extra } from "@/types";
-import { useUserActions } from "@/hooks/use-user-action";
+import { useUserAction } from "@/hooks/use-user-action";
 import { User } from "@/types/resource";
 
 interface UserFormEditProps {
@@ -18,7 +18,7 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
     handleInputChange,
     updateUser,
     processing
-  } = useUserActions(user);
+  } = useUserAction(user);
 
 
   return (

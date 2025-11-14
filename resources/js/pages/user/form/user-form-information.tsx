@@ -25,6 +25,7 @@ export default function UserFormInformation({ roles, data, errors, process, hand
     return errors[field] ? 'border-red-500 focus:ring-red-500' : '';
   }
 
+  console.log(data);
 
   return (
     <div className="space-y-4 p-6">

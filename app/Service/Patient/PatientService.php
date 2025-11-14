@@ -34,6 +34,18 @@ class PatientService
       ->withQueryString();
   }
 
+  public function getPatients()
+  {
+    $results = User::with('role')
+      ->whereHas('role', function ($query) {
+        $query->where('slug', 'patient');
+      })
+      ->latest()
+      ->get();
+
+    return $results;
+  }
+
 
   public function update(PatientUpdateAttributeRequest $request, string $id)
   {

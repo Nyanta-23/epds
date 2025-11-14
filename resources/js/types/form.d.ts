@@ -22,3 +22,13 @@ export interface FormPatient {
   address: string; // text
   [key: string]: any;
 }
+
+export interface FormBaby {
+  which_child: number;
+  date_of_birth: string;
+  baby_condition: string;
+  typeof_delivery: string;
+  gender: string;
+  mother_id: string;
+  [key: string]: any;
+}
