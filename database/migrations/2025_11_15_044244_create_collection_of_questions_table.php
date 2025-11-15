@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('questions', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->integer('number_question')->unique();
-            $table->text('question');
-            $table->timestamps();
+        Schema::table('collection_of_questions', function (Blueprint $table) {
+            $table->string('name');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('questions');
+        Schema::table('collection_of_questions', function (Blueprint $table) {
+            //
+        });
     }
 };

@@ -10,6 +10,11 @@ class Question extends Model
 {
     use HasUuids;
 
+    protected $fillable = [
+        'question'
+    ];
+
+
     public function optionQuestions(): HasMany
     {
         return $this->hasMany(OptionQuestion::class);

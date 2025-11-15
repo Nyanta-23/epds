@@ -42,12 +42,12 @@ export interface Patient {
   is_verified: boolean;
   is_can_visit: boolean;
 
-  // babies: Baby[];
+  babies: Baby[];
 }
 
 export interface Baby {
   id: string;
-  which_child: number | null;
+  which_child: number;
   date_of_birth: string;
   baby_condition: string;
   baby_condition_label: string;
@@ -55,4 +55,21 @@ export interface Baby {
   typeof_delivery_label: string;
   gender: string;
   mother: Patient;
+}
+
+export interface Question {
+  id: string;
+  number_question: string;
+  question: string;
+
+  options: OptionQuestion[];
+}
+
+export interface OptionQuestion {
+  id: string;
+  option: string;
+  option_text: string;
+  value: number;
+
+  question: Question;
 }

@@ -3,6 +3,8 @@
 use App\Http\Controllers\BabyController;
 use App\Http\Controllers\MidwifeController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\QuestionOptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -42,12 +44,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('baby')->group(function () {
         Route::get('/', [BabyController::class, 'index'])->name('baby');
         Route::get('/create', [BabyController::class, 'create'])->name('baby.create');
-        Route::get('{baby}/edit', [BabyController::class, 'edit'])->name('baby.edit');
+        Route::get('/{baby}/edit', [BabyController::class, 'edit'])->name('baby.edit');
         Route::get('/{baby}', [BabyController::class, 'show'])->name('baby.show');
         Route::post('/', [BabyController::class, 'store'])->name('baby.store');
         Route::put('/{baby}', [BabyController::class, 'update'])->name('baby.update');
         Route::delete('/{baby}', [BabyController::class, 'destroy'])->name('baby.destroy');
     });
+
+
+    Route::prefix('question')->group(function () {
+        Route::get('/', [QuestionController::class, 'index'])->name('question');
+        Route::get('/{question}/edit', [QuestionController::class, 'edit'])->name('question.edit');
+        Route::put('{question}', [QuestionController::class, 'update'])->name('question.update');
+
+        Route::prefix('option')->group(function () {
+            Route::put('/{option}', [QuestionOptionController::class, 'update'])->name('question.option.update');
+        });
+    });
+
+
 });
 
 

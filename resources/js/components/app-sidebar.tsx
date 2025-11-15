@@ -37,6 +37,16 @@ const mainNavItems: NavItem[] = [
         href: '/baby',
         icon: LayoutGrid,
     },
+    {
+        title: 'Question',
+        href: '/question',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Pospartum Screening',
+        href: '/question',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

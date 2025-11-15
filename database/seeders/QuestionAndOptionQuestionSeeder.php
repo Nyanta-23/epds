@@ -16,7 +16,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
 
         $questions = [
             [
-                'number' => 1,
+                'number_question' => 1,
                 'question' => 'Saya mampu tertawa dan merasakan hal-hal yang menyenangkan',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Sebanyak yang saya bisa', 'value' => 0],
@@ -26,7 +26,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 2,
+                'number_question' => 2,
                 'question' => 'Saya melihat segala sesuatunya kedepan sangat menyenangkan',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Sebanyak sebelumnya', 'value' => 0],
@@ -36,7 +36,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 3,
+                'number_question' => 3,
                 'question' => 'Saya menyalahkan diri saya sendiri saat sesuatu terjadi tidak sebagaimana mestinya',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, setiap saat', 'value' => 3],
@@ -46,7 +46,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 4,
+                'number_question' => 4,
                 'question' => 'Saya merasa cemas atau merasa kuatir tanpa alasan yang jelas',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Tidak pernah sama sekali', 'value' => 0],
@@ -56,7 +56,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 5,
+                'number_question' => 5,
                 'question' => 'Saya merasa takut atau panik tanpa alasan yang jelas',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, cukup sering', 'value' => 3],
@@ -66,7 +66,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 6,
+                'number_question' => 6,
                 'question' => 'Segala sesuatunya terasa sulit untuk dikerjakan',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, hampir setiap saat saya tidak mampu menanganinya', 'value' => 3],
@@ -76,7 +76,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 7,
+                'number_question' => 7,
                 'question' => 'Saya merasa tidak bahagia sehingga mengalami kesulitan untuk tidur',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, setiap saat', 'value' => 3],
@@ -86,7 +86,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 8,
+                'number_question' => 8,
                 'question' => 'Saya merasa sedih dan merasa diri saya menyedihkan',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, setiap saat', 'value' => 3],
@@ -96,7 +96,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 9,
+                'number_question' => 9,
                 'question' => 'Saya merasa tidak bahagia sehingga menyebabkan saya menangis',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, setiap saat', 'value' => 3],
@@ -106,7 +106,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
                 ],
             ],
             [
-                'number' => 10,
+                'number_question' => 10,
                 'question' => 'Muncul pikiran untuk menyakiti diri saya sendiri',
                 'options' => [
                     ['option' => 'a', 'option_text' => 'Ya, cukup sering', 'value' => 3],
@@ -120,7 +120,7 @@ class QuestionAndOptionQuestionSeeder extends Seeder
 
         foreach ($questions as $data) {
             $question = Question::create([
-                'number' => $data['number'],
+                'number_question' => $data['number_question'],
                 'question' => $data['question']
             ]);
 

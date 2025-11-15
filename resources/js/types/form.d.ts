@@ -32,3 +32,16 @@ export interface FormBaby {
   mother_id: string;
   [key: string]: any;
 }
+
+export interface FormQuestion {
+  number_question: string;
+  question: string;
+  [key: string]: any;
+}
+
+export interface FormOptionQuestion {
+  option: string;
+  option_text: string;
+  value: number;
+  [key: string]: any;
+}
