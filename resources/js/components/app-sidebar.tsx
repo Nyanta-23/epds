@@ -44,7 +44,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Pospartum Screening',
-        href: '/question',
+        href: '/postpartum',
         icon: LayoutGrid,
     },
 ];

@@ -1,3 +1,11 @@
+import { FollowUpStatusEnum } from "./enum";
+
+export interface Enum {
+  value: number;
+  label: string;
+  label_id: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -71,5 +79,51 @@ export interface OptionQuestion {
   option_text: string;
   value: number;
 
+  question: Question;
+}
+
+
+export interface PostpartumVisit {
+  id: string;
+  visit_number: number;
+  date_filled: string;
+
+  sleep_quality: Enum;
+  partner_support: Enum;
+  live_with_partner: boolean;
+  family_economy: Enum;
+
+  psych_history: boolean;
+  psych_treatment: boolean;
+  psych_trauma: boolean;
+
+  parity_count: string;
+  preg_comp_history: boolean;
+
+  last_comp: boolean;
+  last_comp_note: string | null;
+
+  baby_healthy: boolean;
+  baby_caregiver: string;
+
+  feed_type: string;
+
+  mother: Patient;
+  result: Result;
+  answers: Answer[];
+
+}
+
+export interface Result {
+  id: string;
+  total_score: number;
+  followup_status: Enum;
+  postpartum_visit: PostpartumVisit;
+}
+
+export interface Answer {
+  id: string;
+  answer: string;
+  postpartum_visit: PostpartumVisit;
   question: Question;
 }

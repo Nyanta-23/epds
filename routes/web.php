@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\BabyController;
-use App\Http\Controllers\MidwifeController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PostpartumVisitController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuestionOptionController;
 use App\Http\Controllers\UserController;
@@ -63,6 +63,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 
+    Route::prefix('postpartum')->group(function () {
+        Route::get('/', [PostpartumVisitController::class, 'index'])->name('postpartum');
+        Route::get('{postpartum}', [PostpartumVisitController::class, 'show'])->name('postpartum.show');
+        Route::get('{postpartum}/edit', [PostpartumVisitController::class, 'edit'])->name('postpartum.edit');
+    });
 });
 
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('job', 255)->nullable();
             $table->enum('married_status', ['married', 'not_married', 'divorced'])->nullable();
-            // $table->unsignedTinyInteger('married_status')->nullable();
+            // $table->unsignedTinyInteger('married_status')->nullable()->comment('0: married, 1: not_married, 2: divorced');
             $table->string('highest_education', 10)->nullable(); 
 
             $table->string('province_id', 50)->nullable();

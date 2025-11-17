@@ -1,5 +1,5 @@
 import { Link, Meta } from ".";
-import { Baby, Patient, Question, User } from "./resource";
+import { Baby, Patient, PostpartumVisit, Question, User } from "./resource";
 
 export interface UserData {
   data: User[];
@@ -14,10 +14,17 @@ export interface PatientData {
 }
 
 export interface BabyData {
-  data: Baby[]; 
+  data: Baby[];
   meta: Meta;
   link: Link;
 }
+
+export interface PostpartumVisitData {
+  data: PostpartumVisit[];
+  meta: Meta;
+  link: Link;
+}
+
 
 export interface QuestionData {
   data: Question[];
@@ -40,3 +47,6 @@ export interface BabySingleData {
   data: Baby;
 }
 
+export interface PostpartumVisitSingleData {
+  data: PostpartumVisit;
+}

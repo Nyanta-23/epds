@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FollowUpStatusEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Result extends Model
 {
     use HasUuids, HasFactory;
+
+    protected $casts = [
+        'followup_status' => FollowUpStatusEnum::class
+    ];
 
     public function postpartumVisit(): BelongsTo
     {
