@@ -104,9 +104,9 @@ export interface PostpartumVisit {
   last_comp_note: string | null;
 
   baby_healthy: boolean;
-  baby_caregiver: string;
+  baby_caregiver: Enum;
 
-  feed_type: string;
+  feed_type: Enum;
 
   mother: Patient;
   result: Result;

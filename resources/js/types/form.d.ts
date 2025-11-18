@@ -45,3 +45,30 @@ export interface FormOptionQuestion {
   value: number;
   [key: string]: any;
 }
+
+export interface FormPostpartumVisit {
+    visit_number: number;
+    date_filled: string;
+  
+    sleep_quality: string;
+    partner_support: string;
+    live_with_partner: boolean;
+    family_economy: string;
+  
+    psych_history: boolean;
+    psych_treatment: boolean;
+    psych_trauma: boolean;
+  
+    parity_count: string;
+    preg_comp_history: boolean;
+  
+    last_comp: boolean;
+    last_comp_note: string | null;
+  
+    baby_healthy: boolean;
+    baby_caregiver: string;
+  
+    feed_type: string;
+
+    [key: string]: any;
+}

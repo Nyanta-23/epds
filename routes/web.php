@@ -67,6 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [PostpartumVisitController::class, 'index'])->name('postpartum');
         Route::get('{postpartum}', [PostpartumVisitController::class, 'show'])->name('postpartum.show');
         Route::get('{postpartum}/edit', [PostpartumVisitController::class, 'edit'])->name('postpartum.edit');
+        Route::put('{postpartum}', [PostpartumVisitController::class, 'update'])->name('postpartum.update');
     });
 });
 

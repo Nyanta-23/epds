@@ -30,8 +30,6 @@ export default function BabyFormInformation({ data, errors, process, handleInput
 
   const { baby_conditions, baby_typeof_deliveries } = enums;
 
-  console.log(data);
-
   return (
     <div className="space-y-4 p-6">
 
@@ -169,7 +167,7 @@ export default function BabyFormInformation({ data, errors, process, handleInput
           <RadioGroup
             value={data.gender}
             onValueChange={(value) => handleInputChange('gender', value)}
-            className={`flex ${identityErrorClassName("typeof_delivery")}`}
+            className={`flex ${identityErrorClassName("gender")}`}
           >
             <div className={`flex items-center gap-3`}>
               <RadioGroupItem value="male" className="cursor-pointer" id="r1" />

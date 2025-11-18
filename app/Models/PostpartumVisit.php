@@ -27,6 +27,31 @@ class PostpartumVisit extends Model
         'feed_type' => FeedTyperEnum::class,
     ];
 
+    protected $fillable = [
+        'visit_number',
+        'date_filled',
+
+        'sleep_quality',
+        'partner_support',
+        'live_with_partner',
+        'family_economy',
+
+        'psych_history',
+        'psych_treatment',
+        'psych_trauma',
+
+        'parity_count',
+        'preg_comp_history',
+
+        'last_comp',
+        'last_comp_note',
+
+        'baby_healthy',
+        'baby_caregiver',
+
+        'feed_type',
+    ];
+
     public function mother(): BelongsTo
     {
         return $this->belongsTo(User::class);
