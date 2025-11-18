@@ -14,7 +14,9 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
 
   const { from, to, total, current_page, last_page, path, per_page } = meta;
 
-  const { only_trash } = filter;
+  const { only_trash, filter_list } = filter;
+  const { select_filter } = filter_list ?? {};
+  const { role, is_verified, is_can_visit } = select_filter ?? {};
 
   const siblingCount = 2;
 
@@ -38,7 +40,10 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
           disabled={isCurrentPage}
           onClick={() => router.get(path, {
             page: i,
-            only_trash
+            only_trash,
+            role,
+            is_verified,
+            is_can_visit
           }, {
             preserveScroll: true,
             preserveState: true,

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
 
             $table->integer('total_score');
-            $table->enum('followup_status', ['not_counsuled', 'counsuled', 'refer_psychologist', 'refer_psyichiatrist'])->default('not_counsuled');
+            // $table->enum('followup_status', ['not_counsuled', 'counsuled', 'refer_psychologist', 'refer_psyichiatrist'])->default('not_counsuled');
+            $table->unsignedTinyInteger('followup_status')->comment('0: not_counsuled, 1: counsuled, 2: refer_psychologist, 3: refer_psyichiatrist');
 
             $table->foreignUuid('postpartum_visit_id')
                 ->references('id')

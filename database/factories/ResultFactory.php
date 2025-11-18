@@ -19,7 +19,8 @@ class ResultFactory extends Factory
         return [
             'postpartum_visit_id' => PostpartumVisit::factory(),
             'total_score' => fake()->numberBetween(0, 30),
-            'followup_status' => fake()->randomElement(['not_counsuled', 'counsuled', 'refer_psychologist', 'refer_psyichiatrist']),
+            // 'followup_status' => fake()->randomElement(['not_counsuled', 'counsuled', 'refer_psychologist', 'refer_psyichiatrist']),
+            'followup_status' => rand(0, 3)
         ];
     }
 }

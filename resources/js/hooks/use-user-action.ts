@@ -3,7 +3,7 @@ import { User } from "@/types/resource";
 import { useForm } from "@inertiajs/react";
 import { useState } from "react";
 
-export function useUserActions(user?: User) {
+export function useUserAction(user?: User) {
 
   const { data, setData, reset, errors, clearErrors, post, put, delete: destory, processing } = useForm<FormUser>({
     name: user?.name || '',

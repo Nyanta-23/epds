@@ -1,6 +1,6 @@
 import UserFormInformation from "./user-form-information";
 import { Extra } from "@/types";
-import { useUserActions } from "@/hooks/use-user-action";
+import { useUserAction } from "@/hooks/use-user-action";
 
 interface UserFormCreateProps {
   extra: Extra;
@@ -17,7 +17,7 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
     handleInputChange,
     createUser,
     processing
-  } = useUserActions();
+  } = useUserAction();
 
 
   return (

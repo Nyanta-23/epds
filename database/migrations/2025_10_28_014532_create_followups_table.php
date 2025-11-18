@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('followups', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->enum('type', ['education', 'reference', 'monitoring']);
+            // $table->enum('type', ['education', 'reference', 'monitoring']);
+            $table->unsignedTinyInteger('type')->comment('0: education, 1: reference, 2: monitoring');
             // $table->enum('followup_status', ['not_counsuled', 'counsuled', 'refer_psychologist', 'refer_psyichiatrist'])->default('not_counsuled');
             $table->text('notes');
             $table->dateTime('date_filled');

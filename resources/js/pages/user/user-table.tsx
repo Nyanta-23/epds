@@ -5,7 +5,7 @@ import { User } from "@/types/resource";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ButtonConfirmation } from "@/components/button-confirmation";
-import { useUserActions } from "@/hooks/use-user-action";
+import { useUserAction } from "@/hooks/use-user-action";
 import { Filter } from "@/types";
 import { Link } from "@inertiajs/react";
 import { Spinner } from "@/components/ui/spinner";
@@ -18,7 +18,7 @@ interface UserTableProps {
 
 export default function UserTable({ data, filter }: UserTableProps) {
 
-  const { deleteUser, processingId } = useUserActions();
+  const { deleteUser, processingId } = useUserAction();
   const { only_trash } = filter;
 
   return (

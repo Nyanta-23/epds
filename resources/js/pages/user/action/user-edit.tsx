@@ -26,7 +26,7 @@ export default function UserEdit({ extra, user }: UserEditProps) {
     },
     {
       title: `Edit`,
-      href: `${link}/edit`
+      href: `${link}/${user.data.id}/edit`
     }
   ];
 

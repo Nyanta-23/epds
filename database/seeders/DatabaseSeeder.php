@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Answer;
 use App\Models\Baby;
 use App\Models\Permission;
 use App\Models\PostpartumVisit;
+use App\Models\Question;
 use App\Models\Role;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -114,20 +116,26 @@ class DatabaseSeeder extends Seeder
 
             $postpartums->each(function ($visit) {
 
+                $questions = Question::orderBy('number_question')->get();
+
+                $questions->each(function ($q) use ($visit) {
+                    Answer::factory()->create([
+                        'postpartum_visit_id' => $visit->id,
+                        'question_id' => $q->id,
+                        'answer' => fake()->randomElement(['a', 'b', 'c', 'd']),
+                    ]);
+                });
+
+
                 $result = $visit->result()->create([
                     'total_score' => rand(0, 30),
-                    'followup_status' => fake()->randomElement([
-                        'not_counsuled',
-                        'counsuled',
-                        'refer_psychologist',
-                        'refer_psyichiatrist'
-                    ]),
+                    'followup_status' => rand(0, 3)
                 ]);
 
 
 
                 $result->followUp()->create([
-                    'type' => fake()->randomElement(['education', 'reference', 'monitoring']),
+                    'type' => rand(0, 2),
                     'notes' => fake()->text(),
                     'date_filled' => fake()->dateTime(),
                     'midwife_id' => User::inRandomOrder()->whereHas('role', fn($q) => $q->where('slug', 'midwife'))->first()->id

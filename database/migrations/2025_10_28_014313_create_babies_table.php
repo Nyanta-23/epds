@@ -16,9 +16,9 @@ return new class extends Migration
             $table->integer('which_child');
             $table->date('date_of_birth');
             // $table->enum('baby_condition', ['healthy', 'premature', 'low_bw', 'nicu'])->comment('To explain status baby condition');
-            $table->unsignedTinyInteger('baby_condition')->comment('To explain status baby condition');
+            $table->unsignedTinyInteger('baby_condition')->comment('0: healthy, 1: premature, 2: low_bw, 3: nicu');
             // $table->enum('typeof_delivery', ['normal', 'caesar', 'forsep'])->comment('To explain type of delivery');
-            $table->unsignedTinyInteger('typeof_delivery')->comment('To explain type of delivery');
+            $table->unsignedTinyInteger('typeof_delivery')->comment('0: normal, 1: c_section, 2: forsep');
 
             $table->enum('gender', ['male', 'female']);
 

@@ -10,6 +10,11 @@ class OptionQuestion extends Model
 {
     use HasUuids;
 
+    protected $fillable = [
+        'option_text',
+        'value'
+    ];
+    
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);

@@ -19,7 +19,8 @@ class FollowupFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => fake()->randomElement(['education', 'reference', 'monitoring']),
+            // 'type' => fake()->randomElement(['education', 'reference', 'monitoring']),
+            'type' => rand(0, 2),
             'notes' => fake()->text(),
             'date_filled' => fake()->dateTime(),
             'midwife_id' => User::factory(),

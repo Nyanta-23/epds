@@ -22,9 +22,9 @@ class BabyFactory extends Factory
             'which_child' => rand(1, 3),
             'date_of_birth' => fake()->date(),
             // 'baby_condition' => fake()->randomElement(['healthy', 'premature', 'low_bw', 'nicu']),
-            'baby_condition' => fake()->numberBetween(1, 4),
+            'baby_condition' => fake()->numberBetween(0, 3),
             // 'typeof_delivery' => fake()->randomElement(['normal', 'caesar', 'forsep']),
-            'typeof_delivery' => fake()->numberBetween(1, 3),
+            'typeof_delivery' => fake()->numberBetween(0, 2),
             'gender' => fake()->randomElement(['male', 'female']),
         ];
     }

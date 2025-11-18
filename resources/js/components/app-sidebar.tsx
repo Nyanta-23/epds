@@ -27,6 +27,26 @@ const mainNavItems: NavItem[] = [
         href: '/user',
         icon: LayoutGrid,
     },
+    {
+        title: 'Patient',
+        href: '/patient',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Patient Baby',
+        href: '/baby',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Question',
+        href: '/question',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Pospartum Screening',
+        href: '/postpartum',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
