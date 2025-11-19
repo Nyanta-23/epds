@@ -7,6 +7,7 @@ use App\Http\Controllers\PostpartumVisitController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuestionOptionController;
 use App\Http\Controllers\UserController;
+use App\Models\Result;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -76,6 +77,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('{followup}', [FollowUpController::class, 'update'])->name('followup.update');
     });
 });
+
+
+Route::get('/test-followup', function () {
+
+    // ambil 1 result yang punya followup_id tidak null
+    $result = Result::whereNotNull('followup_id')->first();
+
+    if (!$result) {
+        return 'Tidak ada result dengan followup_id.';
+    }
+
+    return [
+        'result_id'      => $result->id,
+        'followup_id'    => $result->followup_id,
+        'followup_model' => $result->followUp, // harusnya muncul data followup
+    ];
+});
+
 
 
 

@@ -1,14 +1,15 @@
-import { FollowUp } from "@/types/resource"
 import FollowupFormInformation from "../form/followup-form-information";
 import { Enums } from "@/types";
 import { useFollowUpAction } from "@/hooks/use-followup-action";
+import { Result } from "@/types/resource";
 
 interface FollowUpCreateProps {
-  follow_up: FollowUp | undefined;
+  result: Result | undefined;
   enums: Enums;
+  onSuccess: () => void;
 }
 
-export default function FollowUpCreate({ follow_up, enums }: FollowUpCreateProps) {
+export default function FollowUpCreate({ enums, result, onSuccess }: FollowUpCreateProps) {
 
   const {
     data,
@@ -16,7 +17,7 @@ export default function FollowUpCreate({ follow_up, enums }: FollowUpCreateProps
     handleInputChange,
     storeFollowUp,
     processing
-  } = useFollowUpAction(follow_up);
+  } = useFollowUpAction(result, onSuccess);
 
   return (
     <section className="px-2">

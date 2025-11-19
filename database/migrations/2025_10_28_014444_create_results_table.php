@@ -19,8 +19,18 @@ return new class extends Migration
             $table->unsignedTinyInteger('followup_status')->comment('0: not_counsuled, 1: counsuled, 2: refer_psychologist, 3: refer_psyichiatrist');
 
             $table->foreignUuid('postpartum_visit_id')
+                ->unique()
                 ->references('id')
                 ->on('postpartum_visits')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+
+
+            $table->foreignUuid('followup_id')
+                ->unique()
+                ->nullable()
+                ->references('id')
+                ->on('followups')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 

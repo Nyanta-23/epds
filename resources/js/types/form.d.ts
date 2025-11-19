@@ -81,8 +81,6 @@ export interface FormResult {
 export interface FormFollowUp {
   type: number;
   notes: string;
-  date_filled: string;
   followup_status: number;
-  // result_id: string;
-  // mother_id: string;
+  result_id: string;
 }

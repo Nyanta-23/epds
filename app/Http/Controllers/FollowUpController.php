@@ -21,6 +21,8 @@ class FollowUpController extends Controller
     {
         try {
 
+            $user = auth()->user();
+
             $request->validated();
 
             $followUpReq = new FollowUpStoreAttributeRequest();
@@ -29,8 +31,7 @@ class FollowUpController extends Controller
             $followUpReq->notes = $request->post('notes');
             $followUpReq->type = $request->post('type');
             $followUpReq->result_id = $request->post('result_id');
-            $followUpReq->midiwfe_id = $request->post('midiwfe_id');
-
+            $followUpReq->midwife_id = $user->id;
 
             $this->followUpService->store($followUpReq);
 
@@ -71,7 +72,7 @@ class FollowUpController extends Controller
             $followUpReq->followup_status = $request->post('followup_status');
             $followUpReq->notes = $request->post('notes');
             $followUpReq->type = $request->post('type');
-            $followUpReq->midiwfe_id  = $user->id;
+            $followUpReq->midwife_id  = $user->id;
             $followUpReq->result_id = $followup->result->id;
 
 

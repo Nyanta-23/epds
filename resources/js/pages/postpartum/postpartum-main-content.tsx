@@ -3,6 +3,7 @@ import { PostpartumVisitData } from "@/types/data";
 import MainPagination from "@/components/main/main-pagination";
 import PostpartumAction from "./postpartum-action";
 import PostpartumTable from "./postpartum-table";
+import PostpartumFollowedAction from "./postpartum-followed-action";
 
 export interface PostpartumMainContentProps {
   postpartum: PostpartumVisitData;
@@ -22,7 +23,8 @@ export default function PostpartumMainContent({ postpartum, extra, page_prop }: 
 
       <section className="grid auto-rows-min gap-4">
         <section className="w-full">
-          <PostpartumTable data={data}  enums={enums}/>
+          <PostpartumFollowedAction filter={filter} link={"postpartum"} />
+          <PostpartumTable data={data} enums={enums} />
 
           <MainPagination meta={meta} filter={filter} />
         </section>

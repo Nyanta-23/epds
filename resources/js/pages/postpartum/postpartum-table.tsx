@@ -1,7 +1,7 @@
 
 
 import { Clipboard, ClipboardPenLine, Eye, Pencil } from "lucide-react";
-import { FollowUp, PostpartumVisit } from "@/types/resource";
+import { PostpartumVisit, Result } from "@/types/resource";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Enums } from "@/types";
@@ -10,7 +10,6 @@ import { useState } from "react";
 import FormDialog from "@/components/form-dialog-version-two";
 import FollowUpCreate from "../followup/action/followup-create";
 import FollowUpEdit from "../followup/action/followup-edit";
-import { useFollowUpAction } from "@/hooks/use-followup-action";
 
 
 interface PostpartumTableProps {
@@ -22,7 +21,9 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [followup, setFollowup] = useState<FollowUp>();
+  const [result, setResult] = useState<Result>();
+
+  console.log(data);
 
   return (
     <section className='rounded-b-md border-t-0 border overflow-hidden'>
@@ -58,7 +59,7 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
 
                 <Button className="cursor-pointer" onClick={() => {
                   setOpenDialog(true);
-                  setFollowup(postpartum.result.follow_up);
+                  setResult(postpartum.result);
                 }} >
                   {!postpartum.result.follow_up ? (
                     <Clipboard />
@@ -78,12 +79,12 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
         open={openDialog}
         onOpenChange={setOpenDialog}
         title="Form Checkup"
-        description={!followup ? 'Fill data postpartum checkup.' : 'Edit data postpartum checkup.'}
+        description={!result?.follow_up ? 'Fill data postpartum checkup.' : 'Edit data postpartum checkup.'}
       >
-        {!followup ? (
-          <FollowUpCreate enums={enums} follow_up={followup} />
+        {!result?.follow_up ? (
+          <FollowUpCreate enums={enums} result={result} onSuccess={() => setOpenDialog(false)} />
         ) : (
-          <FollowUpEdit enums={enums} follow_up={followup} />
+          <FollowUpEdit enums={enums} result={result} onSuccess={() => setOpenDialog(false)} />
         )}
       </FormDialog>
 

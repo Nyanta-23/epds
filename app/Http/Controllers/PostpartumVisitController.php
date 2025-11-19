@@ -30,11 +30,12 @@ class PostpartumVisitController extends Controller
         $filters = [
             'search' => $request->input('search'),
             'only_trash' => $request->boolean('only_trash', false),
+            'is_followed' => $request->boolean('is_followed', false),
             'filter_list' => [
                 'select_filter' => [
                     // 'role' => $request->input('role')
                     'is_verified' => $request->input('is_verified'),
-                    'is_can_visit' => $request->input('is_can_visit')
+                    'is_can_visit' => $request->input('is_can_visit'),
                 ],
                 // 'checkbox_filter' => []
             ]
@@ -42,6 +43,7 @@ class PostpartumVisitController extends Controller
 
 
         $postpartumVisits = $this->postpartumVisitService->index($filters);
+
 
         return Inertia::render('postpartum', [
             'postpartums' => PostpartumVisitResource::collection($postpartumVisits),

@@ -23,6 +23,7 @@ class FollowUpStoreRequestValidator extends FormRequest
     {
         return [
             'type' => ['integer', 'in:0,1,2'],
+            'notes' => ['required', 'string'],
         ];
     }
 }

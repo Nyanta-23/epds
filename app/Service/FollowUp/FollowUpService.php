@@ -13,18 +13,21 @@ class FollowUpService
   public function store(FollowUpStoreAttributeRequest $request)
   {
 
-    return DB::transaction(function () use ($request) {
+    $now = now();
+
+    return DB::transaction(function () use ($now, $request) {
       $result = Result::findOrFail($request->result_id);
 
-      Followup::create([
+      $followUp = Followup::create([
         'type' => $request->type,
         'notes' => $request->notes,
-        'midwife_id' => $request->midiwfe_id,
-        'result_id' => $request->result_id
+        'midwife_id' => $request->midwife_id,
+        'date_filled' => $now,
       ]);
 
       $result->update([
-        'followup_status' => $request->followup_status
+        'followup_status' => $request->followup_status,
+        'followup_id' => $followUp->id
       ]);
     });
   }

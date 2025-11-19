@@ -85,6 +85,7 @@ export interface PageProp {
 export interface Filter {
     search?: string | null;
     only_trash?: boolean | null;
+    is_followed?: boolean | null;
     filter_list?: FilterList;
 }
 
@@ -104,8 +105,8 @@ export interface ChecbockFilter {
 }
 
 export interface EnumOption<T = string | number> {
-  value: T;
-  label: string;
+    value: T;
+    label: string;
 }
 
 export type Enums<T = any> = Record<string, EnumOption<T>[]>;

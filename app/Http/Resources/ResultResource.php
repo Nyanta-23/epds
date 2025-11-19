@@ -23,7 +23,7 @@ class ResultResource extends JsonResource
                 'label_id' => $this->followup_status->label_id(),
             ],
             'postpartum_visit' => new PostpartumVisitResource($this->whenLoaded('postpartumVisit')),
-            'follow_up' => new FollowUpResource($this->whenLoaded('followUp')),
+            'follow_up' => new FollowUpResource($this->whenLoaded('followup')),
         ];
     }
 }

@@ -1,29 +1,52 @@
 import { FormFollowUp } from "@/types/form";
-import { FollowUp } from "@/types/resource";
+import { Result } from "@/types/resource";
 import { useForm } from "@inertiajs/react";
 
-export function useFollowUpAction(followup?: FollowUp) {
+export function useFollowUpAction(result?: Result, onSuccessCallBack?: () => void) {
 
   const { data, setData, reset, errors, clearErrors, put, post, processing } = useForm<FormFollowUp>({
-    type: followup?.type.value || 0,
-    followup_status: followup?.result?.followup_status.value || 0,
-    notes: followup?.notes || '',
-    date_filled: followup?.date_filled || '',
+    type: result?.follow_up?.type.value || 0,
+    followup_status: result?.followup_status.value || 0,
+    notes: result?.follow_up?.notes || '',
+    result_id: result?.id || ''
   });
 
-  const storeFollowUp = () => {
-    post(route('followup.store', {
-      onSuccess: () => reset(
-        'type',
-        'notes',
-        'date_filled'
-      ),
+  // const storeFollowUp = () => {
+  //   post(route('followup.store', {
+  //     onSuccess: () => {
+  //       reset(
+  //         'type',
+  //         'notes',
+  //         'followup_status',
+  //         'result_id'
+  //       );
+  //       if (onSuccessCallBack) onSuccessCallBack();
+  //     },
 
-      onError: (err: Record<string, string[]>) => {
+  //     onError: (err: Record<string, string[]>) => {
+  //       console.log(err);
+  //     }
+  //   }));
+  // }
+
+  const storeFollowUp = () => {
+    post(route('followup.store'), {
+      onSuccess: () => {
+        reset(
+          'type',
+          'notes',
+          'followup_status',
+          'result_id'
+        );
+        if (onSuccessCallBack) onSuccessCallBack();
+      },
+
+      onError: (err) => {
         console.log(err);
       }
-    }));
-  }
+    });
+  };
+
 
 
   const updateFollowUp = (id?: string) => {
@@ -31,17 +54,14 @@ export function useFollowUpAction(followup?: FollowUp) {
     if (!id) return;
 
     put(route('followup.update', id), {
-      onSuccess: () => reset(
-        'type',
-        'notes',
-        'date_filled'
-      ),
-
-      onError: (err) => {
-        console.log(err);
-      }
+      onSuccess: () => {
+        reset('type', 'notes');
+        if (onSuccessCallBack) onSuccessCallBack();
+      },
+      onError: (err) => console.log(err)
     });
-  }
+  };
+
 
   const handleInputChange = (field: keyof FormFollowUp, value: string | number | null) => {
     setData((prev: FormFollowUp) => {
