@@ -17,6 +17,10 @@ class Result extends Model
         'followup_status' => FollowUpStatusEnum::class
     ];
 
+    protected $fillable = [
+        'followup_status'
+    ];
+
     public function postpartumVisit(): BelongsTo
     {
         return $this->belongsTo(PostpartumVisit::class);

@@ -24,7 +24,7 @@ class RoleSeeder extends Seeder
         ]);
 
         Role::create([
-            'name' => 'midwife',
+            'name' => 'Midwife',
             'slug' => 'midwife'
         ]);
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BabyController;
+use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PostpartumVisitController;
 use App\Http\Controllers\QuestionController;
@@ -68,6 +69,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{postpartum}', [PostpartumVisitController::class, 'show'])->name('postpartum.show');
         Route::get('{postpartum}/edit', [PostpartumVisitController::class, 'edit'])->name('postpartum.edit');
         Route::put('{postpartum}', [PostpartumVisitController::class, 'update'])->name('postpartum.update');
+    });
+
+    Route::prefix('followup')->group(function () {
+        Route::post('/', [FollowUpController::class, 'store'])->name('followup.store');
+        Route::put('{followup}', [FollowUpController::class, 'update'])->name('followup.update');
     });
 });
 

@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
         $mothers->each(function ($mother) {
             Baby::factory()->count(rand(1, 3))->create(['mother_id' => $mother->id]);
 
-            $postpartums = PostpartumVisit::factory()->count(rand(0, 5))->create(['mother_id' => $mother->id]);
+            $postpartums = PostpartumVisit::factory()->count(1)->create(['mother_id' => $mother->id]);
 
 
             $postpartums->each(function ($visit) {
@@ -127,19 +127,20 @@ class DatabaseSeeder extends Seeder
                 });
 
 
-                $result = $visit->result()->create([
+                $visit->result()->create([
                     'total_score' => rand(0, 30),
-                    'followup_status' => rand(0, 3)
+                    // 'followup_status' => rand(0, 3)
+                    'followup_status' => 0
                 ]);
 
 
 
-                $result->followUp()->create([
-                    'type' => rand(0, 2),
-                    'notes' => fake()->text(),
-                    'date_filled' => fake()->dateTime(),
-                    'midwife_id' => User::inRandomOrder()->whereHas('role', fn($q) => $q->where('slug', 'midwife'))->first()->id
-                ]);
+                // $result->followUp()->create([
+                //     'type' => rand(0, 2),
+                //     'notes' => fake()->text(),
+                //     'date_filled' => fake()->dateTime(),
+                //     'midwife_id' => User::inRandomOrder()->whereHas('role', fn($q) => $q->where('slug', 'midwife'))->first()->id
+                // ]);
             });
         });
     }

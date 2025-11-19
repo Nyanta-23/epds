@@ -6,9 +6,12 @@ use App\DTO\Request\PostpartumVisit\PostpartumVisitUpdateAttributeRequest;
 use App\Enums\BabyCaregiverEnum;
 use App\Enums\FamilyEconomyEnum;
 use App\Enums\FeedTyperEnum;
+use App\Enums\FollowUpStatusEnum;
+use App\Enums\FollowUpTypeEnum;
 use App\Enums\PartnerSupportEnum;
 use App\Enums\SleepQualityEnum;
 use App\Http\Requests\PostpartumVisit\PostpartumVisitUpdateRequestValidator;
+use App\Http\Resources\PatientResource;
 use App\Http\Resources\PostpartumVisitResource;
 use App\Models\PostpartumVisit;
 use App\Service\PostpartumVisit\PostpartumVisitService;
@@ -44,7 +47,11 @@ class PostpartumVisitController extends Controller
             'postpartums' => PostpartumVisitResource::collection($postpartumVisits),
             'page_prop' => [
                 'main_link' => '',
-                'filter' => $filters
+                'filter' => $filters,
+                'enums' => [
+                    'followup_types' => FollowUpTypeEnum::options(),
+                    'followup_status' => FollowUpStatusEnum::options()
+                ]
             ]
         ]);
     }

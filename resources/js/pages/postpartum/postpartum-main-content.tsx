@@ -12,9 +12,8 @@ export interface PostpartumMainContentProps {
 
 export default function PostpartumMainContent({ postpartum, extra, page_prop }: PostpartumMainContentProps) {
 
-  const { filter } = page_prop;
+  const { filter, enums } = page_prop;
   const { meta, data } = postpartum;
-
 
 
   return (
@@ -23,11 +22,9 @@ export default function PostpartumMainContent({ postpartum, extra, page_prop }: 
 
       <section className="grid auto-rows-min gap-4">
         <section className="w-full">
-
-          <PostpartumTable filter={filter} data={data} />
+          <PostpartumTable data={data}  enums={enums}/>
 
           <MainPagination meta={meta} filter={filter} />
-
         </section>
       </section>
     </>

@@ -15,7 +15,16 @@ class FollowUpResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            
+            'id' => $this->id,
+            'type' => [
+                'value' => $this->type,
+                'label' => $this->type->label(),
+                'label_id' => $this->type->label_id(),
+            ],
+            'notes' => $this->notes,
+            'date_filled' => $this->date_filled,
+            'midiwfe' => new PatientResource($this->whenLoaded('mother')),
+            'result' => new ResultResource($this->whenLoaded('result')),
         ];
     }
 }
