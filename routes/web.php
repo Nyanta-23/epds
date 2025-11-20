@@ -6,6 +6,8 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PostpartumVisitController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuestionOptionController;
+use App\Http\Controllers\RecomendationRuleController;
+use App\Http\Controllers\RecomendationVariationController;
 use App\Http\Controllers\UserController;
 use App\Models\Result;
 use Illuminate\Support\Facades\Route;
@@ -57,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('question')->group(function () {
         Route::get('/', [QuestionController::class, 'index'])->name('question');
         Route::get('/{question}/edit', [QuestionController::class, 'edit'])->name('question.edit');
-        Route::put('{question}', [QuestionController::class, 'update'])->name('question.update');
+        Route::put('/{question}', [QuestionController::class, 'update'])->name('question.update');
 
         Route::prefix('option')->group(function () {
             Route::put('/{option}', [QuestionOptionController::class, 'update'])->name('question.option.update');
@@ -67,33 +69,36 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('postpartum')->group(function () {
         Route::get('/', [PostpartumVisitController::class, 'index'])->name('postpartum');
-        Route::get('{postpartum}', [PostpartumVisitController::class, 'show'])->name('postpartum.show');
-        Route::get('{postpartum}/edit', [PostpartumVisitController::class, 'edit'])->name('postpartum.edit');
-        Route::put('{postpartum}', [PostpartumVisitController::class, 'update'])->name('postpartum.update');
+        Route::get('/{postpartum}', [PostpartumVisitController::class, 'show'])->name('postpartum.show');
+        Route::get('/{postpartum}/edit', [PostpartumVisitController::class, 'edit'])->name('postpartum.edit');
+        Route::put('/{postpartum}', [PostpartumVisitController::class, 'update'])->name('postpartum.update');
     });
 
     Route::prefix('followup')->group(function () {
         Route::post('/', [FollowUpController::class, 'store'])->name('followup.store');
-        Route::put('{followup}', [FollowUpController::class, 'update'])->name('followup.update');
+        Route::put('/{followup}', [FollowUpController::class, 'update'])->name('followup.update');
+    });
+
+    Route::prefix('recomendation')->group(function () {
+
+        Route::prefix('variation')->group(function () {
+            Route::get('/', [RecomendationVariationController::class, 'index'])->name('variation');
+        });
+
+        Route::prefix('rule')->group(function () {
+            Route::get('/', [RecomendationRuleController::class, 'index'])->name('rule');
+            // Route::get('/create', [RecomendationRuleController::class, 'create'])->name('rule.create');
+            Route::get('/{rule}/edit', [RecomendationRuleController::class, 'edit'])->name('rule.edit');
+            Route::delete('/{rule}', [RecomendationRuleController::class, 'destroy'])->name('rule.destroy');
+            Route::put('/{rule}', [RecomendationRuleController::class, 'update'])->name('rule.update');
+            // Route::post('/', [RecomendationRuleController::class, 'store'])->name('rule.store');
+        });
     });
 });
 
 
-Route::get('/test-followup', function () {
 
-    // ambil 1 result yang punya followup_id tidak null
-    $result = Result::whereNotNull('followup_id')->first();
 
-    if (!$result) {
-        return 'Tidak ada result dengan followup_id.';
-    }
-
-    return [
-        'result_id'      => $result->id,
-        'followup_id'    => $result->followup_id,
-        'followup_model' => $result->followUp, // harusnya muncul data followup
-    ];
-});
 
 
 

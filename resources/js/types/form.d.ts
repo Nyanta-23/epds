@@ -84,3 +84,11 @@ export interface FormFollowUp {
   followup_status: number;
   result_id: string;
 }
+
+export interface FormRecomendationRule {
+  name: string;
+  description: string;
+  min_score: number;
+  max_score: number;
+  [key: string]: any;
+}

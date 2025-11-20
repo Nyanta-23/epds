@@ -1,20 +1,20 @@
 import MainFormHeader from "@/components/main/main-form-header";
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Extra } from "@/types";
+import { BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
-import UserFormEdit from "../form/user-form-edit";
-import { UserSingleData } from "@/types/data";
+import { ToneCategorySingleData } from "@/types/data";
+import ToneCategoryFormEdit from "../form/tone-category-form-edit";
 
 
-interface UserEditProps {
-  user: UserSingleData;
-  extra: Extra;
+interface ToneCategoryEditProps {
+  tone_category: ToneCategorySingleData;
+
 }
 
-export default function UserEdit({ extra, user }: UserEditProps) {
+export default function ToneCategoryEdit({ tone_category }: ToneCategoryEditProps) {
 
-  const title: string = 'User';
-  const link: string = '/user';
+  const title: string = 'Tone Category';
+  const link: string = '/tone';
 
   const subtitle = `Edit ${title}`;
   const desc = `Add your ${title}`;
@@ -26,7 +26,7 @@ export default function UserEdit({ extra, user }: UserEditProps) {
     },
     {
       title: `Edit`,
-      href: `${link}/${user.data.id}/edit`
+      href: `${link}/${tone_category.data.id}/edit`
     }
   ];
 
@@ -36,7 +36,7 @@ export default function UserEdit({ extra, user }: UserEditProps) {
 
       <section className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
         <MainFormHeader subtitle={subtitle} desc={desc} />
-        <UserFormEdit extra={extra} user={user.data} />
+        <ToneCategoryFormEdit tone_category={tone_category.data} />
       </section>
     </AppLayout>
   );

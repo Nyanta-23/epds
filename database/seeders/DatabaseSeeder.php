@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             PermissionSeeder::class,
             QuestionAndOptionQuestionSeeder::class,
-            ToneCategoryAndRecomendationRuleSeeder::class,
+            RecomendationRuleSeeder::class,
             RecomendationVariationSeeder::class
         ]);
 

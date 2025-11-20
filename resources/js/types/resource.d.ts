@@ -138,3 +138,20 @@ export interface FollowUp {
   mdiwife: Patient;
   result: Result;
 }
+
+
+export interface RecomendationRule {
+  id: string;
+  name: string;
+  description: string;
+  min_score: number;
+  max_score: number;
+  // tambahin type
+}
+
+export interface RecomendationVariation {
+  id: string;
+  recomendation_text: string;
+  generated_at: string;
+  recomendation_rule: RecomendationRule;
+}

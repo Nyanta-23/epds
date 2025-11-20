@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tone_categories', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name', 255);
-            $table->text('description')->nullable();
-            $table->timestamps();
+        Schema::table('recomendation_rules', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tone_categories');
+        Schema::table('recomendation_rules', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

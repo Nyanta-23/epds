@@ -14,7 +14,7 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
 
   const { from, to, total, current_page, last_page, path, per_page } = meta;
 
-  const { only_trash, filter_list } = filter;
+  const { only_trash, filter_list, is_followed } = filter;
   const { select_filter } = filter_list ?? {};
   const { role, is_verified, is_can_visit } = select_filter ?? {};
 
@@ -43,7 +43,8 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
             only_trash,
             role,
             is_verified,
-            is_can_visit
+            is_can_visit,
+            is_followed
           }, {
             preserveScroll: true,
             preserveState: true,
@@ -104,8 +105,8 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
                 disabled={current_page === 1 || current_page <= siblingCount}
                 onClick={() => router.get(
                   path,
-                  { page: 1, only_trash },
-                  { preserveState: true, preserveScroll: true, replace: true }
+                  { page: 1, only_trash, is_followed },
+                  { preserveState: true, preserveScroll: true, replace: true, }
                 )}
               >
                 <span className="sr-only">Go to first page </span>
@@ -119,7 +120,7 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
                 disabled={current_page === 1}
                 onClick={() => router.get(
                   path,
-                  { page: current_page - 1, only_trash },
+                  { page: current_page - 1, only_trash, is_followed },
                   { preserveState: true, preserveScroll: true, replace: true }
                 )}
               >
@@ -136,7 +137,7 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
                 disabled={current_page === last_page}
                 onClick={() => router.get(
                   path,
-                  { page: current_page + 1, only_trash },
+                  { page: current_page + 1, only_trash, is_followed },
                   { preserveState: true, preserveScroll: true, replace: true }
                 )}
               >
@@ -147,11 +148,11 @@ export default function MainPagination({ meta, filter }: MainPaginationProps) {
               <Button
                 variant="outline"
                 size="icon"
-                className={`size-8 cursor-pointer lg:flex ${(current_page === last_page) || (current_page >= siblingCount) ? '!hidden' : ''}`}
+                className={`size-8 cursor-pointer lg:flex ${(current_page === last_page) || (totalPages == siblingCount) || (current_page >= siblingCount) ? '!hidden' : ''}`}
                 disabled={current_page === last_page || current_page >= siblingCount}
                 onClick={() => router.get(
                   path,
-                  { page: last_page, only_trash },
+                  { page: last_page, only_trash, is_followed },
                   { preserveState: true, preserveScroll: true, replace: true }
                 )}
               >
