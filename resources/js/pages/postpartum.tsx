@@ -27,14 +27,11 @@ export default function Postpartum({ postpartums, extra, page_prop }: Postpartum
         },
     ];
 
-    console.log(postpartums);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
 
             <section className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-
                 <MainHeader subtitle={subtitle} desc={desc} />
                 <PostpartumMainContent postpartum={postpartums} extra={extra} page_prop={page_prop} />
             </section>

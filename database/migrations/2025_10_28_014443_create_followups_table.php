@@ -20,11 +20,11 @@ return new class extends Migration
             $table->text('notes');
             $table->dateTime('date_filled');
 
-            $table->foreignUuid('result_id')
-                ->references('id')
-                ->on('results')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+            // $table->foreignUuid('result_id')
+            //     ->references('id')
+            //     ->on('results')
+            //     ->onUpdate('cascade')
+            //     ->onDelete('cascade');
 
             $table->foreignUuid('midwife_id')
                 ->references('id')

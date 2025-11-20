@@ -13,20 +13,30 @@ class PostpartumVisitService
     $search = $filters['search'];
     $verified = filter_var($filters['filter_list']['select_filter']['is_verified'], FILTER_VALIDATE_BOOLEAN);
     $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'], FILTER_VALIDATE_BOOLEAN);
+    $isFollowed = filter_var($filters['is_followed'], FILTER_VALIDATE_BOOLEAN);
 
     $query = PostpartumVisit::with([
       'mother',
       'result',
+      'result.followup',
+      'answers',
+      'answers.question',
       'answers.question.optionQuestions'
     ])
-      ->whereHas('mother.role', function ($query) {
-        $query->where('slug', 'patient');
-      })
       ->when($search, function ($query, $search) {
         $query->where(function ($q) use ($search) {
           $searchTerms = '%' . $search . '%';
-          $q->where('name', 'like', $searchTerms);
+
+          $q->whereHas('mother', function ($q) use ($searchTerms) {
+            $q->where('name', 'like', $searchTerms);
+          });
         });
+      })
+      ->when($isFollowed, function ($q) {
+        $q->whereHas('result', fn($r) => $r->whereNotNull('followup_id'));
+      })
+      ->when(!$isFollowed, function ($q) {
+        $q->whereHas('result', fn($r) => $r->whereNull('followup_id'));
       })
       ->when($verified, fn($q) => $q->where('is_verified', $verified))
       ->when($canVisit, fn($q) => $q->where('is_can_visit', $canVisit))

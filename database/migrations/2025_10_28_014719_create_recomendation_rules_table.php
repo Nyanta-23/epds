@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('recomendation_rules', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->string('name');
+            $table->string('description')->nullable();
             $table->integer('min_score')->nullable();
             $table->integer('max_score')->nullable();
 

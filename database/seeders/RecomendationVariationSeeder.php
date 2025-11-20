@@ -15,17 +15,17 @@ class RecomendationVariationSeeder extends Seeder
     public function run(): void
     {
         RecomendationVariation::create([
-            'recomendation_rule_id' => RecomendationRule::where('min_score', 0)->where('max_score', 9)->get()->first()->id,
+            'recomendation_rule_id' => RecomendationRule::where('max_score', 9)->get()->first()->id,
             'recomendation_text' => 'Ibu dalam kondisi emosional baik. Lanjutkan dukungan keluarga dan pastikan waktu istirahat cukup.',
             'generated_at' => fake()->dateTime(),
         ]);
         RecomendationVariation::create([
-            'recomendation_rule_id' => RecomendationRule::where('min_score', 0)->where('max_score', 9)->get()->first()->id,
+            'recomendation_rule_id' => RecomendationRule::where('max_score', 9)->get()->first()->id,
             'recomendation_text' => 'Tidak diperlukan intervensi khusus. Tetap pantau kondisi emosi dan aktivitas sehari-hari secara rutin.',
             'generated_at' => fake()->dateTime()
         ]);
         RecomendationVariation::create([
-            'recomendation_rule_id' => RecomendationRule::where('min_score', 0)->where('max_score', 9)->get()->first()->id,
+            'recomendation_rule_id' => RecomendationRule::where('max_score', 9)->get()->first()->id,
             'recomendation_text' => 'Berikan edukasi umum mengenai kesehatan mental pasca persalinan untuk menjaga kesejahteraan ibu.',
             'generated_at' => fake()->dateTime()
         ]);

@@ -47,28 +47,48 @@ export interface FormOptionQuestion {
 }
 
 export interface FormPostpartumVisit {
-    visit_number: number;
-    date_filled: string;
-  
-    sleep_quality: string;
-    partner_support: string;
-    live_with_partner: boolean;
-    family_economy: string;
-  
-    psych_history: boolean;
-    psych_treatment: boolean;
-    psych_trauma: boolean;
-  
-    parity_count: string;
-    preg_comp_history: boolean;
-  
-    last_comp: boolean;
-    last_comp_note: string | null;
-  
-    baby_healthy: boolean;
-    baby_caregiver: string;
-  
-    feed_type: string;
+  visit_number: number;
+  date_filled: string;
 
-    [key: string]: any;
+  sleep_quality: string;
+  partner_support: string;
+  live_with_partner: boolean;
+  family_economy: string;
+
+  psych_history: boolean;
+  psych_treatment: boolean;
+  psych_trauma: boolean;
+
+  parity_count: string;
+  preg_comp_history: boolean;
+
+  last_comp: boolean;
+  last_comp_note: string | null;
+
+  baby_healthy: boolean;
+  baby_caregiver: string;
+
+  feed_type: string;
+
+  [key: string]: any;
+}
+
+
+export interface FormResult {
+  followup_status: string;
+}
+
+export interface FormFollowUp {
+  type: number;
+  notes: string;
+  followup_status: number;
+  result_id: string;
+}
+
+export interface FormRecomendationRule {
+  name: string;
+  description: string;
+  min_score: number;
+  max_score: number;
+  [key: string]: any;
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Answer;
 use App\Models\Baby;
+use App\Models\Followup;
 use App\Models\Permission;
 use App\Models\PostpartumVisit;
 use App\Models\Question;
@@ -38,7 +39,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             PermissionSeeder::class,
             QuestionAndOptionQuestionSeeder::class,
-            ToneCategoryAndRecomendationRuleSeeder::class,
+            RecomendationRuleSeeder::class,
             RecomendationVariationSeeder::class
         ]);
 
@@ -111,7 +112,7 @@ class DatabaseSeeder extends Seeder
         $mothers->each(function ($mother) {
             Baby::factory()->count(rand(1, 3))->create(['mother_id' => $mother->id]);
 
-            $postpartums = PostpartumVisit::factory()->count(rand(0, 5))->create(['mother_id' => $mother->id]);
+            $postpartums = PostpartumVisit::factory()->count(1)->create(['mother_id' => $mother->id]);
 
 
             $postpartums->each(function ($visit) {
@@ -127,19 +128,32 @@ class DatabaseSeeder extends Seeder
                 });
 
 
+                // $visit->result()->create([
+                //     'total_score' => rand(0, 30),
+                //     // 'followup_status' => rand(0, 3)
+                //     'followup_status' => 0
+                // ]);
+
                 $result = $visit->result()->create([
                     'total_score' => rand(0, 30),
-                    'followup_status' => rand(0, 3)
+                    'followup_status' => 0,
                 ]);
 
+                if (rand(0, 1) === 1) {
 
+                    $followup = Followup::create([
+                        'type' => rand(0, 2),
+                        'notes' => fake()->text(),
+                        'date_filled' => fake()->dateTime(),
+                        'midwife_id' => User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))
+                            ->inRandomOrder()
+                            ->first()->id
+                    ]);
 
-                $result->followUp()->create([
-                    'type' => rand(0, 2),
-                    'notes' => fake()->text(),
-                    'date_filled' => fake()->dateTime(),
-                    'midwife_id' => User::inRandomOrder()->whereHas('role', fn($q) => $q->where('slug', 'midwife'))->first()->id
-                ]);
+                    $result->update([
+                        'followup_id' => $followup->id
+                    ]);
+                }
             });
         });
     }

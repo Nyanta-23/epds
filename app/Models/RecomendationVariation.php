@@ -10,6 +10,13 @@ class RecomendationVariation extends Model
 {
     use HasUuids;
 
+    protected $fillable = [
+        'recomendation_text',
+        'generated_at',
+        'recomendation_rule_id',
+    ];
+
+
     public function recomendationRule(): BelongsTo
     {
         return $this->belongsTo(RecomendationRule::class);

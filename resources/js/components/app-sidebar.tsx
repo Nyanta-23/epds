@@ -33,7 +33,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Patient Baby',
+        title: 'Patient Baby Management',
         href: '/baby',
         icon: LayoutGrid,
     },
@@ -45,6 +45,16 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Pospartum Screening',
         href: '/postpartum',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Recomendation Rule',
+        href: '/recomendation/rule',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Recomendation Variation',
+        href: '/recomendation/variation',
         icon: LayoutGrid,
     },
 ];

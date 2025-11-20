@@ -119,6 +119,7 @@ export interface Result {
   total_score: number;
   followup_status: Enum;
   postpartum_visit: PostpartumVisit;
+  follow_up: FollowUp;
 }
 
 export interface Answer {
@@ -126,4 +127,31 @@ export interface Answer {
   answer: string;
   postpartum_visit: PostpartumVisit;
   question: Question;
+}
+
+
+export interface FollowUp {
+  id: string;
+  type: Enum;
+  notes: string;
+  date_filled: string;
+  mdiwife: Patient;
+  result: Result;
+}
+
+
+export interface RecomendationRule {
+  id: string;
+  name: string;
+  description: string;
+  min_score: number;
+  max_score: number;
+  // tambahin type
+}
+
+export interface RecomendationVariation {
+  id: string;
+  recomendation_text: string;
+  generated_at: string;
+  recomendation_rule: RecomendationRule;
 }

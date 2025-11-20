@@ -17,7 +17,7 @@ export default function UserEdit({ extra, user }: UserEditProps) {
   const link: string = '/user';
 
   const subtitle = `Edit ${title}`;
-  const desc = `Add your ${title}`
+  const desc = `Add your ${title}`;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {

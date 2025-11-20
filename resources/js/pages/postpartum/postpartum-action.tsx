@@ -23,7 +23,7 @@ export default function PostpartumAction({ filter, meta }: PostpartumActionProps
       <div className="me-4 flex justify-between">
         <div className="flex items-center gap-5">
           <div>
-            <Search total={total} link={'user'} filter={filter} />
+            <Search total={total} link={'postpartum'} filter={filter} />
           </div>
           <div>
             

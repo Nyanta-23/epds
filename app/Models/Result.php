@@ -17,14 +17,19 @@ class Result extends Model
         'followup_status' => FollowUpStatusEnum::class
     ];
 
+    protected $fillable = [
+        'followup_status',
+        'followup_id'
+    ];
+
     public function postpartumVisit(): BelongsTo
     {
         return $this->belongsTo(PostpartumVisit::class);
     }
 
-    public function followUp(): HasOne
+    public function followup(): BelongsTo
     {
-        return $this->hasOne(Followup::class);
+        return $this->belongsTo(Followup::class);
     }
 
     public function autoRecomendation(): HasOne

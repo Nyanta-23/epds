@@ -4,13 +4,13 @@ import { router } from "@inertiajs/react";
 import { Archive, ArchiveRestore } from "lucide-react";
 
 
-interface PostpartumTrashActionProps {
+interface RecomendationVariationTrashActionProps {
   filter: Filter;
   link: string;
 }
 
 
-export default function PostpartumTrashAction({ filter, link }: PostpartumTrashActionProps) {
+export default function RecomendationVariationTrashAction({ filter, link }: RecomendationVariationTrashActionProps) {
 
   const { only_trash, search } = filter;
 

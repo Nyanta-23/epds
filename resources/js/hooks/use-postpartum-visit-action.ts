@@ -1,4 +1,4 @@
-import { FormPatient, FormPostpartumVisit } from "@/types/form";
+import { FormPostpartumVisit } from "@/types/form";
 import { PostpartumVisit } from "@/types/resource";
 import { useForm } from "@inertiajs/react";
 
