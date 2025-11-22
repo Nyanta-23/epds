@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\BabyController;
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\PatientController;
@@ -96,6 +97,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
 
 
