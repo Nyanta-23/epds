@@ -3,10 +3,14 @@
 namespace App\Service\Auth;
 
 use App\DTO\Request\Auth\LoginRequestData;
+use App\DTO\Request\Auth\RegisterRequestData;
 use App\DTO\Response\Auth\LoginResponse;
+use App\DTO\Response\Auth\RegisterResponse;
 use App\Models\User;
 use Auth;
+use DB;
 use Exception;
+use Illuminate\Auth\Events\Registered;
 use Log;
 
 class AuthService
@@ -35,6 +39,36 @@ class AuthService
       return $response;
     } catch (Exception $error) {
       Log::info($error->getMessage());
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
+  }
+
+  public function register(RegisterRequestData $request): RegisterResponse
+  {
+    try {
+      $findUser = User::where(['email' => $request->email])->first();
+
+      if ($findUser)
+        throw new Exception('email sudah terdaftar', 400);
+
+      $user = User::create([
+        'email' => $request->email,
+        'name' => $request->name,
+        'password' => $request->password,
+        'role_id' => '019aa123-7994-7340-a45f-920bae6c31fa'
+      ]);
+
+      event(new Registered($user));
+
+      $response = new RegisterResponse();
+      $response->id = $user->id;
+      $response->name = $user->name;
+      $response->email = $user->email;
+
+      return $response;
+
+    } catch (Exception $error) {
+      Log::error('register_error_message', ['error' => $error->getMessage()]);
       throw new Exception($error->getMessage(), $error->getCode());
     }
   }
