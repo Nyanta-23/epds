@@ -1,98 +1,139 @@
-"use client"
-
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import * as React from "react"
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export const description = "An area chart with a legend"
-
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+interface ChartLineScreeningProps {
+  screening_days: any[];
+  screening_weeks: any[];
+  screening_months: any[];
+}
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  postpartum: {
+    label: "Screening Postpartum",
     color: "var(--chart-1)",
   },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-2)",
-  },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function ChartLineScreening() {
+export default function ChartLineScreening({
+  screening_days,
+  screening_weeks,
+  screening_months,
+}: ChartLineScreeningProps) {
+
+  const [timeRange, setTimeRange] = React.useState("days");
+
+  // pilih data berdasarkan opsi user
+  const chartData = React.useMemo(() => {
+    switch (timeRange) {
+      case "days":
+        return screening_days.map(d => ({
+          label: d.date,
+          total: d.total,
+        }));
+
+      case "weeks":
+        return screening_weeks.map(w => ({
+          label: w.week,
+          total: w.total,
+        }));
+
+      case "months":
+        return screening_months.map(m => ({
+          label: m.month,
+          total: m.total,
+        }));
+
+      default:
+        return [];
+    }
+  }, [timeRange, screening_days, screening_weeks, screening_months]);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Screening Postpartum Tren</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
+    <Card className="pt-0">
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1">
+          <CardTitle>Screening Postpartum</CardTitle>
+          <CardDescription>
+            Screening summary by days, weeks, or months
+          </CardDescription>
+        </div>
+
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex cursor-pointer">
+            <SelectValue placeholder="Select" />
+          </SelectTrigger>
+
+          <SelectContent className="rounded-xl">
+            <SelectItem value="days" className="rounded-lg cursor-pointer">Last 7 Days</SelectItem>
+            <SelectItem value="weeks" className="rounded-lg cursor-pointer">Last 4 Weeks</SelectItem>
+            <SelectItem value="months" className="rounded-lg cursor-pointer">Last 3 Months</SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}  
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
+
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="fillPostpartum" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.1} />
+              </linearGradient>
+            </defs>
+
             <CartesianGrid vertical={false} />
+
             <XAxis
-              dataKey="month"
+              dataKey="label"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              minTickGap={32}
             />
+
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(label) => label}
+                  indicator="dot"
+                />
+              }
             />
+
             <Area
-              dataKey="mobile"
+              dataKey="total"
               type="natural"
-              fill="var(--color-mobile)"
-              fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
+              fill="url(#fillPostpartum)"
+              stroke="var(--chart-1)"
             />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="var(--color-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-              stackId="a"
-            />
-            <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
