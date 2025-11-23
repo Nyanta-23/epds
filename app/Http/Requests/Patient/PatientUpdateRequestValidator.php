@@ -23,6 +23,7 @@ class PatientUpdateRequestValidator extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => ['string', 'string', 'max:100'],
             'phone_number' => ['required', 'string', 'max:50'],
             'birthplace' => ['required', 'string', 'max:50'],
             'date_of_birth' => ['date'],

@@ -4,6 +4,7 @@ namespace App\Service\Patient;
 
 use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class PatientService
@@ -49,9 +50,12 @@ class PatientService
 
   public function update(PatientUpdateAttributeRequest $request, string $id)
   {
+    try {
+      $user = User::find($id);
 
-    return DB::transaction(function () use ($request, $id) {
-      User::findOrFail($id)->update([
+      if(!$user) throw new Exception("pengguna tidak ditemukan", 404);
+
+      User::where('id', '=', $id)->update([
         'name' => $request->name,
         'phone_number' => $request->phone_number,
         'birthplace' => $request->birthplace,
@@ -71,7 +75,10 @@ class PatientService
 
         'address' => $request->address,
       ]);
-    });
+
+    }catch(Exception $error) {
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
   }
 
   public function verification(string $id)
