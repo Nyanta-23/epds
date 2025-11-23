@@ -16,4 +16,5 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('patient')->group(function () {
     Route::put('/{id}', [PatientController::class, 'update']);
+    Route::get('/{id?}', [PatientController::class, 'show']);
 })->middleware('auth:sanctum');

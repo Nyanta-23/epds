@@ -8,6 +8,7 @@ use App\Http\Requests\Patient\PatientUpdateRequestValidator;
 use App\Service\Patient\PatientService;
 use Exception;
 use Log;
+use Request;
 
 class PatientController extends Controller
 {
@@ -15,6 +16,22 @@ class PatientController extends Controller
   {
 
   }
+
+  public function show(Request $request, ?string $id = null) 
+{
+  try {
+    $response = $this->patientService->getPatients($id);
+
+    return response()->json([
+      'message' => 'data found',
+      'data' => $id == null ? $response : $response[0]
+    ]);
+  } catch(Exception $error) {
+    return response()->json([
+        'message' => $error->getMessage()
+      ], $error->getCode());
+  }
+}
 
   public function update(PatientUpdateRequestValidator $request, string $id)
   {
