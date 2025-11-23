@@ -35,16 +35,25 @@ class PatientService
       ->withQueryString();
   }
 
-  public function getPatients()
+  public function getPatients(?string $id = null)
   {
+    try {
     $results = User::with('role')
       ->whereHas('role', function ($query) {
         $query->where('slug', 'patient');
-      })
-      ->latest()
-      ->get();
+      })->latest();
 
-    return $results;
+      if($id) {
+        $results->where('id', '=', $id);
+      }
+      $results = $results->get();
+
+      if($id && sizeof($results) == 0) throw new Exception('user not found', 404);
+      
+      return $results;
+    }catch(Exception $error) {
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
   }
 
 
