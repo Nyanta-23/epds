@@ -23,4 +23,5 @@ Route::prefix('patient')->group(function () {
 Route::prefix('baby')->group(function() {
     Route::post('/', [BabyController::class, 'store']);
     Route::get('/{id?}', [BabyController::class, 'find']);
+    Route::put('/{id?}', [BabyController::class, 'update']);
 })->middleware('auth:sanctum');
