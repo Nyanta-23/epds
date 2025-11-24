@@ -43,7 +43,7 @@ export default function ChartLineScreening({
 
   const [timeRange, setTimeRange] = React.useState("days");
 
-  // pilih data berdasarkan opsi user
+
   const chartData = React.useMemo(() => {
     switch (timeRange) {
       case "days":
