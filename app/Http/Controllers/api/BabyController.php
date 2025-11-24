@@ -42,4 +42,20 @@ class BabyController extends Controller
             ],$error->getCode());
         }
     }
+
+    public function find(Request $request, ?string $id) 
+    {
+        try {
+            $response = $this->babyService->find($id);
+
+            return response()->json([
+                'message' => 'data bayi ditemukan',
+                'data' => $response
+            ], 200);
+        } catch(Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage()
+            ], $error->getCode());
+        }
+    }
 }
