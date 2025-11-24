@@ -6,6 +6,7 @@ use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Log;
 
 class PatientService
 {
@@ -38,7 +39,7 @@ class PatientService
   public function getPatients(?string $id = null)
   {
     try {
-    $results = User::with('role')
+    $results = User::with('role')->with('babies')
       ->whereHas('role', function ($query) {
         $query->where('slug', 'patient');
       })->latest();

@@ -87,7 +87,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function babies(): HasMany
     {
-        return $this->hasMany(Baby::class);
+        return $this->hasMany(Baby::class, 'mother_id');
     }
 
     public function postpartumVisits(): HasMany
