@@ -2,6 +2,7 @@
 
 namespace App\Service\Dashboard;
 
+use App\Models\Followup;
 use App\Models\PostpartumVisit;
 use Illuminate\Support\Facades\DB;
 
@@ -72,6 +73,86 @@ class DashboardService
 
     return array_reverse($results);
   }
+
+
+  public function followUp()
+  {
+    $unFollowUp = PostpartumVisit::all()->count();
+    $followUp = Followup::all()->count();
+
+    $result = $followUp / ($followUp + $unFollowUp) * 100;
+
+    return [
+      'label' => 'Follow Up',
+      'data' => round($result)
+    ];
+  }
+
+  public function unFollowUp()
+  {
+    $unFollowUp = PostpartumVisit::all()->count();
+    $followUp = Followup::all()->count();
+
+    $result = $unFollowUp / ($followUp + $unFollowUp) * 100;
+
+    return [
+      'label' => 'Un Follow Up',
+      'data' => round($result)
+    ];
+  }
+
+  public function riskDistribution()
+  {
+    $visits = PostpartumVisit::with('result')
+      ->whereDate('date_filled', now())
+      ->get();
+
+    $normal = 0;
+    $low = 0;
+    $high = 0;
+
+    foreach ($visits as $visit) {
+      if (!$visit->result) continue;
+
+      $score = $visit->result->total_score;
+      $category = category_score($score);
+
+      if ($category === "Normal") {
+        $normal++;
+      } elseif ($category === "Low Risk") {
+        $low++;
+      } else {
+        $high++;
+      }
+    }
+
+    return [
+      ['label' => 'Normal', 'value' => $normal],
+      ['label' => 'Low Risk', 'value' => $low],
+      ['label' => 'High Risk', 'value' => $high],
+    ];
+  }
+
+
+
+  public function latestPostpartumData()
+  {
+    $visits = PostpartumVisit::with(['mother', 'result'])
+      ->orderBy('created_at', 'desc')
+      ->take(6)
+      ->get();
+
+    return $visits->map(function ($visit) {
+      return [
+        'name' => $visit->mother?->name ?? '-',
+        'date_filled' => $visit->date_filled,
+        'risk' => $visit->result
+          ? category_score($visit->result->total_score)
+          : 'No Result',
+      ];
+    })->toArray();
+  }
+
 
 
   // public function postpartumScreeningLineMonth()
