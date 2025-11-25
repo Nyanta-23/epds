@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\Request\Baby\BabyStoreAttributeRequest;
+use App\DTO\Request\Baby\BabyUpdateAttributeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Baby\BabyStoreRequestValidator;
+use App\Http\Requests\Baby\BabyUpdateRequestValidator;
 use App\Service\Baby\BabyService;
 use Exception;
 use Illuminate\Http\Request;
@@ -40,6 +42,49 @@ class BabyController extends Controller
             return response()->json([
                 'message' => $error->getMessage(),
             ],$error->getCode());
+        }
+    }
+
+    public function find(Request $request, ?string $id) 
+    {
+        try {
+            $response = $this->babyService->find($id);
+
+            return response()->json([
+                'message' => 'data bayi ditemukan',
+                'data' => $response
+            ], 200);
+        } catch(Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage()
+            ], $error->getCode());
+        }
+    }
+
+    public function update(BabyUpdateRequestValidator $request, ?string $id = null) 
+    {
+        try {
+            $validated = $request->validated();
+
+            $request = new BabyUpdateAttributeRequest();
+
+            $request->which_child = (int) $validated['which_child'];
+            $request->date_of_birth = $validated['date_of_birth'];
+            $request->baby_condition = (int) $validated['baby_condition'];
+            $request->typeof_delivery = (int) $validated['typeof_delivery'];
+            $request->gender = $validated['gender'];
+            $request->mother_id = $validated['mother_id'];
+
+            $response = $this->babyService->update($request, $id);
+
+            return response()->json([
+                'message' => 'data bayi berhasil diupdate',
+                'data' => $response
+            ], 200);
+        }catch(Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage()
+            ], $error->getCode());
         }
     }
 }

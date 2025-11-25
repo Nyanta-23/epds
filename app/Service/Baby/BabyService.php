@@ -5,6 +5,7 @@ namespace App\Service\Baby;
 use App\DTO\Request\Baby\BabyStoreAttributeRequest;
 use App\DTO\Request\Baby\BabyUpdateAttributeRequest;
 use App\Models\Baby;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class BabyService
@@ -63,5 +64,18 @@ class BabyService
       $baby = Baby::findOrFail($id);
       return $baby->delete();
     });
+  }
+
+  public function find(?string $id = null)
+  {
+    try {
+      $find = Baby::where('id', '=', $id)->first();
+
+      if(!$find) throw new Exception('data bayi tidak ditemukan', 404);
+
+      return $find;
+    } catch(Exception $error) {
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
   }
 }

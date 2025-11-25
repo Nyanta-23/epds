@@ -25,7 +25,7 @@ class BabyUpdateRequestValidator extends FormRequest
             'which_child' => ['sometimes', 'integer', 'min:1'],
             'date_of_birth' => ['sometimes', 'date'],
             'baby_condition' => ['sometimes', 'integer', 'between:0,3'],
-            'type_of_delivery' => ['sometimes', 'integer', 'between:0,2'],
+            'typeof_delivery' => ['sometimes', 'integer', 'between:0,2'],
             'gender' => ['sometimes', 'in:male,female'],
             'mother_id' => ['sometimes', 'uuid', 'exists:users,id'],
         ];
