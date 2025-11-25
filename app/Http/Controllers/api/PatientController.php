@@ -69,4 +69,21 @@ class PatientController extends Controller
       ], $error->getCode());
     }
   }
+
+  public function getPostpartumChart(Request $request, ?string $id = null)
+  {
+    try {
+      $response = $this->patientService->getPostpartumChart($id);
+
+      return response()->json([
+        'message' => 'data found',
+        'data' => $response
+      ]);
+    }catch(Exception $error) {
+      return response()->json([
+        'message' => $error->getMessage(),
+        'data' => null
+      ], $error->getCode());
+    }
+  }
 }
