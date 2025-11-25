@@ -3,6 +3,7 @@
 namespace App\Service\Patient;
 
 use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
+use App\Models\PostpartumVisit;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +89,44 @@ class PatientService
 
     }catch(Exception $error) {
       throw new Exception($error->getMessage(), $error->getCode());
+    }
+  }
+
+  public function getPostpartumChart(?string $id = null)
+  {
+    try {
+      $postpartums = PostpartumVisit::with([
+        'result'
+      ])->where('mother_id', '=', $id)->orderBy('visit_number', 'asc')->get();
+      
+      $mappingData = [];
+
+      if(sizeof($postpartums) == 0) {
+        throw new Exception('data kosong', 404);
+      }
+
+      foreach($postpartums as $postpartum) {
+        $mappingData[] = [
+          "parameter" => "KF" . $postpartum['visit_number'],
+          'value' => $this->classificationPostpartumScore($postpartum['result']['total_score'])     
+        ];
+      }
+      return $mappingData;
+    } catch(Exception $error) {
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
+  }
+
+  private function classificationPostpartumScore(int $score) 
+  {
+    if($score >= 0 && $score <= 6) {
+      return 1;
+    } else if($score >= 7 && $score <= 13) {
+      return 2;
+    } else if($score >= 14 && $score <= 19) {
+      return 3;
+    } else {
+      return 4;
     }
   }
 

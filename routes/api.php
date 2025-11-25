@@ -18,6 +18,7 @@ Route::prefix('auth')->group(function () {
 Route::prefix('patient')->group(function () {
     Route::put('/{id}', [PatientController::class, 'update']);
     Route::get('/{id?}', [PatientController::class, 'show']);
+    Route::get('/{id?}/postpartum/chart', [PatientController::class, 'getPostpartumChart']);
 })->middleware('auth:sanctum');
 
 Route::prefix('baby')->group(function() {
