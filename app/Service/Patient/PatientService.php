@@ -108,7 +108,9 @@ class PatientService
       foreach($postpartums as $postpartum) {
         $mappingData[] = [
           "parameter" => "KF" . $postpartum['visit_number'],
-          'value' => $this->classificationPostpartumScore($postpartum['result']['total_score'])     
+          'value' => $this->classificationPostpartumScore($postpartum['result']['total_score']),
+          'risk_category' => category_score($postpartum['result']['total_score']),
+          'date_filled' => $postpartum['date_filled']
         ];
       }
       return $mappingData;
