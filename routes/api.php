@@ -15,14 +15,15 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::prefix('patient')->group(function () {
+Route::middleware('auth:sanctum')->prefix('patient')->group(function () {
     Route::put('/{id}', [PatientController::class, 'update']);
     Route::get('/{id?}', [PatientController::class, 'show']);
     Route::get('/{id?}/postpartum/chart', [PatientController::class, 'getPostpartumChart']);
-})->middleware('auth:sanctum');
+});
 
-Route::prefix('baby')->group(function() {
+Route::middleware('auth:sanctum')->prefix('baby')->group(function () {
     Route::post('/', [BabyController::class, 'store']);
     Route::get('/{id?}', [BabyController::class, 'find']);
     Route::put('/{id?}', [BabyController::class, 'update']);
-})->middleware('auth:sanctum');
+    Route::delete('/{id?}', [BabyController::class, 'destroy']);
+});
