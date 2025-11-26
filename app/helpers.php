@@ -13,3 +13,53 @@ if (!function_exists('category_score')) {
     }
   }
 }
+
+if (!function_exists('category_baby_condition')) {
+  function category_baby_condition($value)
+  {
+    if ($value == 0) {
+      return [
+        'value' => $value,
+        'cateogry' => 'Sehat'
+      ];
+    } else if ($value == 1) {
+      return [
+        'value' => $value,
+        'category' => "Prematur"
+      ];
+    } else if ($value == 2) {
+      return [
+        'value' => $value,
+        'category' => "Berat badan rendah"
+      ];
+    } else if ($value == 3) {
+      return [
+        'value' => $value,
+        'category' => 'Neonatal Intesive Care Unit'
+      ];
+    }
+  }
+
+  if (!function_exists('category_typeof_delivery')) {
+    function category_typeof_delivery($value)
+    {
+      switch ($value) {
+        case 0:
+          return [
+            'value' => $value,
+            'category' => "normal"
+          ];
+        case 1:
+          return [
+            'value' => $value,
+            'category' => 'operasi caesar'
+          ];
+        case 2:
+          return [
+            'value' => $value,
+            'category' => 'forsep'
+          ];
+      }
+    }
+  }
+}

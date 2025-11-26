@@ -10,6 +10,7 @@ use App\Http\Requests\Baby\BabyUpdateRequestValidator;
 use App\Service\Baby\BabyService;
 use Exception;
 use Illuminate\Http\Request;
+use Log;
 
 class BabyController extends Controller
 {
@@ -18,7 +19,7 @@ class BabyController extends Controller
 
     }
 
-    public function store(BabyStoreRequestValidator $request) 
+    public function store(BabyStoreRequestValidator $request)
     {
         try {
             $request->validated();
@@ -41,11 +42,11 @@ class BabyController extends Controller
         } catch (Exception $error) {
             return response()->json([
                 'message' => $error->getMessage(),
-            ],$error->getCode());
+            ], $error->getCode());
         }
     }
 
-    public function find(Request $request, ?string $id) 
+    public function find(Request $request, ?string $id)
     {
         try {
             $response = $this->babyService->find($id);
@@ -54,14 +55,14 @@ class BabyController extends Controller
                 'message' => 'data bayi ditemukan',
                 'data' => $response
             ], 200);
-        } catch(Exception $error) {
+        } catch (Exception $error) {
             return response()->json([
                 'message' => $error->getMessage()
             ], $error->getCode());
         }
     }
 
-    public function update(BabyUpdateRequestValidator $request, ?string $id = null) 
+    public function update(BabyUpdateRequestValidator $request, ?string $id = null)
     {
         try {
             $validated = $request->validated();
@@ -81,7 +82,8 @@ class BabyController extends Controller
                 'message' => 'data bayi berhasil diupdate',
                 'data' => $response
             ], 200);
-        }catch(Exception $error) {
+        } catch (Exception $error) {
+            Log::error('update-baby-error', ['error' => $error->getMessage()]);
             return response()->json([
                 'message' => $error->getMessage()
             ], $error->getCode());

@@ -17,25 +17,23 @@ class PatientResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'email' => $this->email,
             'phone_number' => $this->phone_number,
             'birthplace' => $this->birthplace,
             'date_of_birth' => $this->date_of_birth,
             'job' => $this->job,
             'married_status' => $this->married_status,
             'highest_education' => $this->highest_education,
-            'province' => $this->province,
-            'city_or_district' => $this->city_or_district,
-            'subdistrict' => $this->subdistrict,
-            'village' => $this->village,
-
             'province_id' => $this->province_id,
             'city_or_district_id' => $this->city_or_district_id,
             'subdistrict_id' => $this->subdistrict_id,
             'village_id' => $this->village_id,
-
+            'province' => $this->province,
+            'city_or_district' => $this->city_or_district,
+            'subdistrict' => $this->subdistrict,
+            'village' => $this->village,
             'address' => $this->address,
-            'is_verified' => $this->is_verified,
-            'is_can_visit' => $this->is_can_visit
+            'babies' => BabyResource::collection($this->babies),
         ];
     }
 }
