@@ -89,4 +89,20 @@ class BabyController extends Controller
             ], $error->getCode());
         }
     }
+
+    public function destroy(Request $request, ?string $id = null)
+    {
+        try {
+            $this->babyService->softDelete($id);
+
+            return response()->json([
+                'message' => 'Data Berhasil dihapus',
+
+            ]);
+        } catch (Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage()
+            ], $error->getCode());
+        }
+    }
 }
