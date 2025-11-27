@@ -59,10 +59,13 @@ class PatientController extends Controller
       $request->village_id = $validated['village_id'];
       $request->address = $validated['address'];
 
-      $this->patientService->update($request, $id);
+      $response = $this->patientService->update($request, $id);
+
+      Log::info('data', ['data' => $response]);
 
       return response()->json([
-        'message' => 'update successfully'
+        'message' => 'update successfully',
+        'data' => $response
       ], 200);
 
     } catch (Exception $error) {
