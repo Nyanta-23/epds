@@ -138,4 +138,32 @@ class PostpartumVisitController extends Controller
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
+
+
+    public function previousPostpartumVisit()
+    {
+        try {
+            $thisIsMy = auth()->user();
+
+            
+            $hasPrevious = $this->postpartumVisitService->hasPrevious($thisIsMy);
+
+            if ($hasPrevious) {
+                $previousPostpartumVisit = $this->postpartumVisitService->previousDataFromUser($thisIsMy);
+            } else {
+                $previousPostpartumVisit = null;
+            }
+
+            return response()->json([
+                'message' => 'Previous postpartum visit fetched successfully.',
+                'data' => $previousPostpartumVisit
+            ], 200);
+        } catch (\Exception $err) {
+
+            return response()->json([
+                'message' => 'An error occurred.',
+                'error' => $err->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -6,6 +6,7 @@ use App\DTO\Request\Auth\LoginRequestData;
 use App\DTO\Request\Auth\RegisterRequestData;
 use App\DTO\Response\Auth\LoginResponse;
 use App\DTO\Response\Auth\RegisterResponse;
+use App\Models\Role;
 use App\Models\User;
 use Auth;
 use DB;
@@ -55,7 +56,7 @@ class AuthService
         'email' => $request->email,
         'name' => $request->name,
         'password' => $request->password,
-        'role_id' => '019aa123-7994-7340-a45f-920bae6c31fa'
+        'role_id' => Role::where('slug', 'patient')->first()->id,
       ]);
 
       event(new Registered($user));

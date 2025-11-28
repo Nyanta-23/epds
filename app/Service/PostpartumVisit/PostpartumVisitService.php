@@ -2,9 +2,12 @@
 
 namespace App\Service\PostpartumVisit;
 
+use App\DTO\Request\PostpartumVisit\PostpartumVisitStoreAttributeRequest;
 use App\DTO\Request\PostpartumVisit\PostpartumVisitUpdateAttributeRequest;
 use App\Models\PostpartumVisit;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PostpartumVisitService
 {
@@ -75,5 +78,51 @@ class PostpartumVisitService
           'feed_type'         => $request->feed_type,
         ]);
     });
+  }
+
+  // Api
+
+  public function store(PostpartumVisitStoreAttributeRequest $request)
+  {
+    return DB::transaction(function () use ($request) {
+      return PostpartumVisit::create([
+        'visit_number'      => $request->visit_number,
+        'date_filled'       => $request->date_filled,
+
+        'sleep_quality'     => $request->sleep_quality,
+        'partner_support'   => $request->partner_support,
+        'live_with_partner' => $request->live_with_partner,
+        'family_economy'    => $request->family_economy,
+
+        'psych_history'     => $request->psych_history,
+        'psych_treatment'   => $request->psych_treatment,
+        'psych_trauma'      => $request->psych_trauma,
+
+        'parity_count'      => $request->parity_count,
+        'preg_comp_history' => $request->preg_comp_history,
+
+        'last_comp'         => $request->last_comp,
+        'last_comp_note'    => $request->last_comp_note,
+
+        'baby_healthy'      => $request->baby_healthy,
+        'baby_caregiver'    => $request->baby_caregiver,
+
+        'feed_type'         => $request->feed_type,
+        'mother_id'         => $request->mother_id
+      ]);
+    });
+  }
+
+  public function previousDataFromUser(User $user)
+  {
+    return PostpartumVisit::with(['answers', 'result'])
+      ->where('mother_id', $user->id)
+      ->latest('date_filled')
+      ->first();
+  }
+
+  public function hasPrevious(User $user): bool
+  {
+    return PostpartumVisit::where('mother_id', $user->id)->exists();
   }
 }

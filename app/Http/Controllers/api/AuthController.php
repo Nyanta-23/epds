@@ -17,10 +17,7 @@ use Log;
 
 class AuthController extends Controller
 {
-  public function __construct(private AuthService $authService)
-  {
-
-  }
+  public function __construct(private AuthService $authService) {}
 
   public function login(LoginRequest $request)
   {
@@ -70,8 +67,10 @@ class AuthController extends Controller
           'name' => $response->name
         ]
       ], 201);
-
     } catch (Exception $error) {
+
+      Log::error($error);
+
       return response()->json([
         'message' => $error->getMessage(),
       ], $error->getCode());
