@@ -50,6 +50,7 @@ class PostpartumVisit extends Model
         'baby_caregiver',
 
         'feed_type',
+        'mother_id'
     ];
 
     public function mother(): BelongsTo

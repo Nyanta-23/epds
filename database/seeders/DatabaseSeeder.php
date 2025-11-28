@@ -52,6 +52,43 @@ class DatabaseSeeder extends Seeder
             'role_id' => Role::where('slug', 'super_admin')->first()->id
         ]);
 
+
+        User::create([
+            'id' => Str::uuid(), // karena primary key UUID
+            'name' => 'Yami Chan',
+            'email' => 'yami@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('yami@example.com'),
+            'remember_token' => Str::random(10),
+
+            // kolom tambahan
+            'phone_number'        => '081234567890',
+            'birthplace'          => 'Bandung',
+            'date_of_birth'       => '1999-01-12',
+            'job'                 => 'Software Developer',
+            'married_status'      => 'not_married', // married / not_married / divorced
+            'highest_education'   => 'S1',
+
+            'province_id'         => '32',
+            'city_or_district_id' => '3273',
+            'subdistrict_id'      => '327301',
+            'village_id'          => '32730101',
+
+            'province'            => 'Jawa Barat',
+            'city_or_district'    => 'Kota Bandung',
+            'subdistrict'         => 'Antapani',
+            'village'             => 'Antapani Wetan',
+
+            'address'             => 'Jl. Contoh No. 123',
+
+            'is_verified'         => true,
+            'is_can_visit'        => true,
+
+            // role jika ada
+            'role_id'             => Role::where('slug', 'patient')->first()->id,
+        ]);
+
+
         // muhamadilhan02404@gmail.com
 
         User::factory()->withRole('admin')->count(3)->create();
