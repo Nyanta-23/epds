@@ -17,7 +17,9 @@ use Log;
 
 class AuthController extends Controller
 {
-  public function __construct(private AuthService $authService) {}
+  public function __construct(private AuthService $authService)
+  {
+  }
 
   public function login(LoginRequest $request)
   {
@@ -102,5 +104,14 @@ class AuthController extends Controller
       'name' => $user->name,
       'deepLink' => $deepLink
     ]);
+  }
+
+  public function logout(Request $request)
+  {
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json([
+      'message' => 'logout berhasil'
+    ], 200);
   }
 }
