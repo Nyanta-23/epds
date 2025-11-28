@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Patient\PatientUpdateRequestValidator;
+use App\Http\Resources\PatientResource;
 use App\Service\Patient\PatientService;
 use Exception;
 use Log;
@@ -17,21 +18,23 @@ class PatientController extends Controller
 
   }
 
-  public function show(Request $request, ?string $id = null) 
-{
-  try {
-    $response = $this->patientService->getPatients($id);
+  public function show(Request $request, ?string $id = null)
+  {
+    try {
+      $response = $this->patientService->getPatients($id);
 
-    return response()->json([
-      'message' => 'data found',
-      'data' => $id == null ? $response : $response[0]
-    ]);
-  } catch(Exception $error) {
-    return response()->json([
+      $resource = PatientResource::collection($response);
+
+      return response()->json([
+        'message' => 'data found',
+        'data' => $id ? $resource[0] : $resource
+      ]);
+    } catch (Exception $error) {
+      return response()->json([
         'message' => $error->getMessage()
       ], $error->getCode());
+    }
   }
-}
 
   public function update(PatientUpdateRequestValidator $request, string $id)
   {
@@ -56,16 +59,36 @@ class PatientController extends Controller
       $request->village_id = $validated['village_id'];
       $request->address = $validated['address'];
 
-      $this->patientService->update($request, $id);
+      $response = $this->patientService->update($request, $id);
+
+      Log::info('data', ['data' => $response]);
 
       return response()->json([
-        'message' => 'update successfully'
+        'message' => 'update successfully',
+        'data' => $response
       ], 200);
 
-    } catch(Exception $error) {
+    } catch (Exception $error) {
       Log::error('update_patient_error', ['error' => $error->getMessage()]);
       return response()->json([
         'message' => $error->getMessage()
+      ], $error->getCode());
+    }
+  }
+
+  public function getPostpartumChart(Request $request, ?string $id = null)
+  {
+    try {
+      $response = $this->patientService->getPostpartumChart($id);
+
+      return response()->json([
+        'message' => 'data found',
+        'data' => $response
+      ]);
+    } catch (Exception $error) {
+      return response()->json([
+        'message' => $error->getMessage(),
+        'data' => null
       ], $error->getCode());
     }
   }
