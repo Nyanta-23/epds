@@ -14,6 +14,23 @@ if (!function_exists('category_score')) {
   }
 }
 
+
+if (!function_exists('interpreted_score')) {
+  function interpreted_score($score)
+  {
+    if ($score <= 9) {
+      return "No depression / Normal";
+    } elseif ($score >= 10 && $score <= 12) {
+      return "Further monitoring needed";
+    } elseif ($score >= 13 && $score <= 19) {
+      return "Consider referral to psychologist/psychiatrist";
+    } else {
+      return "Immediate referral to mental health professional";
+    }
+  }
+}
+
+
 if (!function_exists('category_baby_condition')) {
   function category_baby_condition($value)
   {
@@ -63,3 +80,4 @@ if (!function_exists('category_baby_condition')) {
     }
   }
 }
+

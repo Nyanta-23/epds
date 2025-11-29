@@ -21,16 +21,21 @@ class AiPostpartumResultService
     $prompt = $this->buildPrompt($data);
 
     $result = $client
-      ->generativeModel(model: 'gemini-1.5-flash')
+      ->generativeModel('gemini-flash-latest')
       ->generateContent($prompt);
 
-    dd($result);
+
+    // dd($result);
+
+    return $result->candidates[0]->content->parts[0]->text;
+
+
   }
 
   private function buildPrompt(array $data)
   {
     $qaText = "";
-    foreach ($data['answers'] as $item) {
+    foreach ($data['question_and_answer'] as $item) {
       $qaText .= "- {$item['question']} : {$item['answer']}\n";
     }
 

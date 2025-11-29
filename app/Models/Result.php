@@ -18,6 +18,8 @@ class Result extends Model
     ];
 
     protected $fillable = [
+        'total_score',
+        'postpartum_visit_id',
         'followup_status',
         'followup_id'
     ];

@@ -13,9 +13,9 @@ class AnswerService
   {
     return DB::transaction(function () use ($request) {
 
-      Answer::create([
+      return Answer::create([
         'answer' => $request->answer,
-        'postartum_visit_id' => $request->postpartum_visit_id,
+        'postpartum_visit_id' => $request->postpartum_visit_id,
         'question_id' => $request->question_id,
       ]);
     });
@@ -25,13 +25,22 @@ class AnswerService
   {
 
     return DB::transaction(function () use ($requests) {
-      foreach ($requests as $req) {
-        Answer::create([
-          'answer' => $req->answer,
-          'postpartum_visit_id' => $req->postpartum_visit_id,
-          'question_id' => $req->question_id
-        ]);
+
+      $results = [];
+
+      foreach ($requests as $request) {
+        $results[] = $this->store($request);
       }
+
+      return $results;
     });
+  }
+
+
+  public function getAnswersByPostpartumVisitId(string $id)
+  {
+    return Answer::where('postpartum_visit_id', $id)
+      ->with('question.optionQuestions')
+      ->get();
   }
 }
