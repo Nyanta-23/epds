@@ -125,4 +125,16 @@ class PostpartumVisitService
   {
     return PostpartumVisit::where('mother_id', $user->id)->exists();
   }
+
+
+  public function getPostpartumVisitById(string $id)
+  {
+    return PostpartumVisit::with([
+      'answers',
+      'answers.question',
+      'answers.question.optionQuestions',
+      'result',
+      'result.followup'
+    ])->findOrFail($id);
+  }
 }

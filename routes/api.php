@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BabyController;
 use App\Http\Controllers\Api\PatientController;
@@ -58,5 +59,10 @@ Route::prefix('v1')->group(function () {
             //     lad('asd');
             // });
         });
+
+        Route::prefix('ai')->group(function () {
+            Route::get('/test', [AiController::class, 'test']);
+        });
+
     });
 });

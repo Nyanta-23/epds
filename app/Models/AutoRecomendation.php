@@ -8,7 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AutoRecomendation extends Model
 {
-    use HasUuids;
+
+        // protected $table = 'auto_recomendations';
+
+    // protected $primaryKey = ['recomendation_variation_id', 'result_id'];
+
+    protected $fillable = [
+        'recomendation_variation_id',
+        'result_id'
+    ];
 
     public function recomendationVariation(): BelongsTo
     {

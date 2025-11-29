@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\DTO\Request\Answer\AnswerPostAttributeRequest;
 use App\DTO\Request\PostpartumVisit\PostpartumVisitStoreAttributeRequest;
+use App\DTO\Request\Result\ResultPostAttributeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\PostpartumVisitAnswerStoreRequest;
+use App\Models\AutoRecomendation;
+use App\Models\RecomendationRule;
+use App\Models\RecomendationVariation;
+use App\Service\AiPostpartumResultService;
 use App\Service\Answer\AnswerService;
 use App\Service\PostpartumVisit\PostpartumVisitService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Service\Result\ResultService;
 
 class PostpartumVisitAnswerController extends Controller
 {
@@ -17,7 +21,9 @@ class PostpartumVisitAnswerController extends Controller
 
     public function __construct(
         private PostpartumVisitService $postpartumVisitService,
-        private AnswerService $answerService
+        private AnswerService $answerService,
+        private ResultService $resultService,
+        private AiPostpartumResultService $aiService
     ) {}
 
     public function store(PostpartumVisitAnswerStoreRequest $request)
@@ -61,19 +67,11 @@ class PostpartumVisitAnswerController extends Controller
 
             $postpartumVisit = $this->postpartumVisitService->store($postpartumVisitReq);
 
-            // dd($postpartumVisit);
-
-            // Log::info('DEBUG ID', [$postpartumVisit->id]);
-
-
-            // dump($postpartumVisit);
-
-
 
             $postpartumVisitId = $postpartumVisit->id;
 
-            // Log::info('asd', [$postpartumVisit]);
 
+            $answerReq = [];
 
             foreach ($request->answers as $ans) {
 
@@ -86,17 +84,107 @@ class PostpartumVisitAnswerController extends Controller
             }
 
 
-            // dump($answerReq);
+            $answers = $this->answerService->storeMany($answerReq);
 
 
-            $this->answerService->storeMany($answerReq);
+            $questionAnswereds = $this->answerService->getAnswersByPostpartumVisitId($postpartumVisitId);
 
+
+            $totalScore = 0;
+
+
+            $questionAndAnswer = [];
+
+            foreach ($questionAnswereds as $answer) {
+
+                $userAnswer = strtolower($answer->answer);
+
+                $matchedOption = $answer->question->optionQuestions
+                    ->firstWhere('option', $userAnswer);
+
+
+                $questionAndAnswer[] = [
+                    'question' => $answer->question->question,
+                    'answer' => $matchedOption->option_text
+                ];
+
+                if ($matchedOption) {
+                    $totalScore += $matchedOption->value;
+                }
+            }
+
+            $result = new ResultPostAttributeRequest();
+            $result->total_score = $totalScore;
+            $result->followup_status = 0;
+            $result->postpartum_visit_id = $postpartumVisitId;
+
+            $postpartum = $this->postpartumVisitService->getPostpartumVisitById($postpartumVisitId);
+
+            $result =  $this->resultService->store($result);
+
+            $dataAi = [
+                'total_score' => $totalScore,
+                'result_epds' => interpreted_score($totalScore),
+                'partner_support' => $postpartum->partner_support->label_id(),
+                'family_economy' => $postpartum->family_economy->label_id(),
+                'feed_type' => $postpartum->feed_type->label_id(),
+                'sleep_quality' => $postpartum->sleep_quality->label_id(),
+
+                'psych_history' => $postpartum->psych_history ? 'Ya' : 'Tidak',
+                'baby_healthy'  => $postpartum->baby_healthy ? 'Sehat' : 'Tidak Sehat',
+                'question_and_answer' => $questionAndAnswer
+            ];
+
+
+            $rule = RecomendationRule::where(function ($q) use ($totalScore) {
+                $q->where('min_score', '<=', $totalScore)
+                    ->orWhereNull('min_score');
+            })
+                ->where(function ($q) use ($totalScore) {
+                    $q->where('max_score', '>=', $totalScore)
+                        ->orWhereNull('max_score');
+                })
+                ->first();
+
+
+            // if ($rule && $rule->recommendationVariations->count() > 0) {
+
+            //     // CASE A — PAKAI DB (random variation)
+            //     $variation = $rule->recommendationVariations->random();
+
+            //     AutoRecommendation::create([
+            //         'result_id' => $result->id,
+            //         'recommendation_variation_id' => $variation->id,
+            //     ]);
+
+            //     $finalRecommendationText = $variation->recommendation_text;
+            // } else {
+
+            // CASE B — TIDAK ADA RULE → GENERATE AI
+            $aiText = $this->aiService->analyze($dataAi);
+
+            $variation = RecomendationVariation::create([
+                'recomendation_rule_id' => $rule?->id,
+                'recomendation_text' => $aiText,
+                'generated_at' => now(),
+            ]);
+
+            $aiResult = AutoRecomendation::create([
+                'result_id' => $result->id,
+                'recomendation_variation_id' => $variation->id,
+            ]);
+
+            // }
+
+
+            $result->load('autoRecomendation.recomendationVariation');
 
 
             return  response()->json([
                 'message' => 'Successfully store data',
                 'postpartum_visit' => $postpartumVisitReq,
-                'answers' => $answerReq
+                'answers' => $answers,
+                'result' => $result
             ]);
         } catch (\Exception $e) {
             return response()->json([
