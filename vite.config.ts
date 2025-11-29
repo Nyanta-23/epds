@@ -22,9 +22,11 @@ export default defineConfig({
         }),
     ],
     server: {
-        host: '0.0.0.0',
+        strictPort: true,
+        host: 'localhost',
+        port: 5173,
         hmr: {
-            host: '10.19.236.189',
+            host: 'localhost',
         },
         cors: {
             origin: '*',
