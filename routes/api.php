@@ -54,14 +54,6 @@ Route::prefix('v1')->group(function () {
         Route::prefix('postpartum')->group(function () {
             Route::get('/', [PostpartumVisitController::class, 'previousPostpartumVisit']);
             Route::post('/answer', [PostpartumVisitAnswerController::class, 'store']);
-
-            // Route::post('/answer', function () {
-            //     lad('asd');
-            // });
-        });
-
-        Route::prefix('ai')->group(function () {
-            Route::get('/test', [AiController::class, 'test']);
         });
 
     });
