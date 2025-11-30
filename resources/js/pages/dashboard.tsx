@@ -26,7 +26,9 @@ interface DashboardProps {
 
 export default function Dashboard({ screenings, followups, risk_distributions, latest_postpartum_datas }: DashboardProps) {
 
-    console.log(latest_postpartum_datas);
+    // console.log(latest_postpartum_datas);
+
+    // console.log(risk_distributions)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

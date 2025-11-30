@@ -18,7 +18,7 @@ interface DashboardTableNewDataProps {
 
 export default function DashboardTableNewData({ latest_data }: DashboardTableNewDataProps) {
 
-  console.log(latest_data);
+  // console.log(latest_data);
 
   return (
     <Card className="flex flex-col gap-5">

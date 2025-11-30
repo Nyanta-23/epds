@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { Award, Baby, BookOpen, FileQuestion, FileText, Folder, LayoutGrid, ScanHeart, UserRoundCog, UserRoundPlus, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -25,37 +25,42 @@ const mainNavItems: NavItem[] = [
     {
         title: 'User',
         href: '/user',
-        icon: LayoutGrid,
+        icon: Users,
+    },
+    {
+        title: 'Role',
+        href: '/role',
+        icon: UserRoundCog,
     },
     {
         title: 'Patient',
         href: '/patient',
-        icon: LayoutGrid,
+        icon: UserRoundPlus,
     },
     {
         title: 'Patient Baby Management',
         href: '/baby',
-        icon: LayoutGrid,
+        icon: Baby,
     },
     {
         title: 'Question',
         href: '/question',
-        icon: LayoutGrid,
+        icon: FileQuestion,
     },
     {
         title: 'Pospartum Screening',
         href: '/postpartum',
-        icon: LayoutGrid,
+        icon: ScanHeart,
     },
     {
         title: 'Recomendation Rule',
         href: '/recomendation/rule',
-        icon: LayoutGrid,
+        icon: Award,
     },
     {
         title: 'Recomendation Variation',
         href: '/recomendation/variation',
-        icon: LayoutGrid,
+        icon: FileText,
     },
 ];
 
@@ -92,7 +97,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
