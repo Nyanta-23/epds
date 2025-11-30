@@ -87,6 +87,7 @@ class PatientService
         'village_id' => $request->village_id,
 
         'address' => $request->address,
+        'number_patient' => $request->number_patient
       ]);
 
       $user->save();

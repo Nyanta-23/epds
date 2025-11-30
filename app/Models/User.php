@@ -44,7 +44,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'village_id',
         'address',
         'is_verified',
-        'is_can_visit'
+        'is_can_visit',
+        'number_patient'
     ];
 
     /**

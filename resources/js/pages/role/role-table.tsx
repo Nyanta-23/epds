@@ -1,58 +1,62 @@
 
 
-import { Trash2, Undo2 } from "lucide-react";
-import { RecomendationVariation } from "@/types/resource";
+import { Pencil, Trash2, Undo2 } from "lucide-react";
+import { Role } from "@/types/resource";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ButtonConfirmation } from "@/components/button-confirmation";
+import { useUserAction } from "@/hooks/use-user-action";
 import { Filter } from "@/types";
+import { Link } from "@inertiajs/react";
 import { Spinner } from "@/components/ui/spinner";
-import { useRecomendationVariationAction } from "@/hooks/use-recomendation-variation-action";
 
 
-interface RecomendationVariationTableProps {
-  data: RecomendationVariation[];
-  filter: Filter;
+interface RoleTableProps {
+  data: Role[];
 }
 
-export default function RecomendationVariationTable({ data, filter }: RecomendationVariationTableProps) {
+export default function RoleTable({ data }: RoleTableProps) {
 
-  const { deleteRecomendationVariation, processingId } = useRecomendationVariationAction();
-
-  const { only_trash } = filter;
+  const { deleteUser, processingId } = useUserAction();
+  // const { only_trash } = filter;
 
   return (
     <section className='rounded-b-md border-t-0 border overflow-hidden'>
       <Table>
         <TableHeader className='bg-accent'>
           <TableRow>
-            <TableHead>Generated At</TableHead>
-            <TableHead>Text Recomendation</TableHead>
+            <TableHead>Name</TableHead>
+            {/* <TableHead>Email</TableHead> */}
+            {/* <TableHead>Role</TableHead> */}
             {/* <TableHead className="text-right">Action</TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((variation) => (
-            <TableRow key={variation.id}>
-              <TableCell className="font-medium">{variation.generated_at}</TableCell>
-              <TableCell className="font-medium whitespace-normal break-words max-w-[600px]">{variation.recomendation_text}</TableCell>
+          {data.map((role) => (
+            <TableRow key={role.id}>
+              <TableCell className="font-medium">{role.name}</TableCell>
 
               {/* <TableCell className="flex justify-end gap-2">
-                
+
                 {!only_trash ? (
                   <>
+                    <Link href={route('user.edit', user.id)}>
+                      <Button className="cursor-pointer">
+                        <Pencil />
+                      </Button>
+                    </Link>
 
                     <ButtonConfirmation
                       content={{
                         title: 'Are you sure?',
-                        description: 'Deleting this recomendation rule.'
+                        description: 'Deleting this user'
                       }}
-                      onConfirm={() => deleteRecomendationVariation(variation.id)}
+                      onConfirm={() => deleteUser(user.id)}
                     >
                       <Button
-                        disabled={processingId === variation.id}
+                        disabled={processingId === user.id}
                         className="cursor-pointer">
-                        {processingId == variation.id ? <Spinner /> : <Trash2 />}
+                        {processingId == user.id ? <Spinner /> : <Trash2 />}
                       </Button>
                     </ButtonConfirmation>
                   </>
@@ -70,6 +74,7 @@ export default function RecomendationVariationTable({ data, filter }: Recomendat
           ))}
         </TableBody>
       </Table>
+
     </section>
   );
 }

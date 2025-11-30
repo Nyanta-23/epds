@@ -33,6 +33,7 @@ class PatientResource extends JsonResource
             'subdistrict' => $this->subdistrict,
             'village' => $this->village,
             'address' => $this->address,
+            'number_patient' => $this->number_patient,
             'babies' => BabyResource::collection($this->babies),
         ];
     }

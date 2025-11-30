@@ -50,6 +50,8 @@ export interface Patient {
   is_verified: boolean;
   is_can_visit: boolean;
 
+  number_patient: string;
+
   babies: Baby[];
 }
 

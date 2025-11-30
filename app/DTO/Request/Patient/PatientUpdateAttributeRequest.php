@@ -21,5 +21,7 @@ class PatientUpdateAttributeRequest
   public string $subdistrict_id;
   public string $village_id;
 
+  public string $number_patient;
+
   public ?string $address = null;
 }

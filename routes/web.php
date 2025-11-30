@@ -10,6 +10,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuestionOptionController;
 use App\Http\Controllers\RecomendationRuleController;
 use App\Http\Controllers\RecomendationVariationController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Models\Result;
 use Illuminate\Support\Facades\Route;
@@ -94,14 +95,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Route::post('/', [RecomendationRuleController::class, 'store'])->name('rule.store');
         });
     });
+
+
+    Route::prefix('role')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('role');
+    });
+
 });
 
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
-
-
-
 
 
 

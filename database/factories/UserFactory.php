@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -59,12 +60,20 @@ class UserFactory extends Factory
 
     public function patient(): static
     {
+
+        $increment = User::count() + 1;
+        $rand = strtoupper(Str::random(6));
+
+        $numberPatient = "P-$rand-$increment";
+
         return $this->state(fn(array $attributes) => [
+            'number_patient' => $numberPatient,
             'phone_number' => fake()->phoneNumber(),
             'birthplace' => fake()->city(),
             'date_of_birth' => fake()->date(),
             'job' => fake()->sentence(),
             'married_status' => fake()->randomElement(['married', 'not_married', 'divorced']),
+            // 'married_status' => rand(0, 2),
             'highest_education' => Str::random(10),
             'province' => fake()->state(),
             'city_or_district' => fake()->city(),

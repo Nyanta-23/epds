@@ -104,17 +104,23 @@ class DashboardService
   public function riskDistribution()
   {
     $visits = PostpartumVisit::with('result')
-      ->whereDate('date_filled', now())
+      // ->whereDate('date_filled', [now()->startOfWeek(), now()->endOfWeek()])
+      ->whereBetween('date_filled', [
+        now()->startOfWeek()->toDateString(),
+        now()->endOfWeek()->toDateString(),
+      ])
       ->get();
 
     $normal = 0;
     $low = 0;
     $high = 0;
 
+
     foreach ($visits as $visit) {
       if (!$visit->result) continue;
 
       $score = $visit->result->total_score;
+
       $category = category_score($score);
 
       if ($category === "Normal") {
@@ -144,7 +150,8 @@ class DashboardService
 
     return $visits->map(function ($visit) {
       return [
-        'name' => $visit->mother?->name ?? '-',
+        'number_patient' => $visit->mother?->number_patient,
+        'name' => $visit->mother?->name,
         'date_filled' => $visit->date_filled,
         'risk' => $visit->result
           ? category_score($visit->result->total_score)
