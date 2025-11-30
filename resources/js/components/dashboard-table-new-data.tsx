@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 
 interface DashboardTableNewDataProps {
   latest_data: {
+    number_patient: string;
     name: string;
     date_filled: string;
     risk: string;
@@ -31,7 +32,8 @@ export default function DashboardTableNewData({ latest_data }: DashboardTableNew
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[150px]">Name</TableHead>
+              <TableHead>Number Patient</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Date Filled</TableHead>
               <TableHead>Risk</TableHead>
             </TableRow>
@@ -40,7 +42,8 @@ export default function DashboardTableNewData({ latest_data }: DashboardTableNew
           <TableBody>
             {latest_data.map((item, index) => (
               <TableRow key={index}>
-                <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell className="font-medium">{item.number_patient}</TableCell>
+                <TableCell >{item.name}</TableCell>
                 <TableCell>{item.date_filled}</TableCell>
                 <TableCell>{item.risk}</TableCell>
               </TableRow>

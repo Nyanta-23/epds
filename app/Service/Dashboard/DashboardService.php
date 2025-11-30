@@ -150,7 +150,8 @@ class DashboardService
 
     return $visits->map(function ($visit) {
       return [
-        'name' => $visit->mother?->name ?? '-',
+        'number_patient' => $visit->mother?->number_patient,
+        'name' => $visit->mother?->name,
         'date_filled' => $visit->date_filled,
         'risk' => $visit->result
           ? category_score($visit->result->total_score)
