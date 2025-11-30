@@ -13,10 +13,7 @@ use Request;
 
 class PatientController extends Controller
 {
-  public function __construct(private PatientService $patientService)
-  {
-
-  }
+  public function __construct(private PatientService $patientService) {}
 
   public function show(Request $request, ?string $id = null)
   {
@@ -41,6 +38,21 @@ class PatientController extends Controller
     try {
       $validated = $request->validated();
 
+
+      $user = User::find($id);
+
+      if (!$user) {
+        throw new Exception("pengguna tidak ditemukan", 404);
+      }
+
+      $patientNumber = $user->patient_number;
+
+      if (!$patientNumber) {
+        $random = strtoupper(Str::random(6));
+        $increment = User::count() + 1;
+        $numberPatient = "P-$random-$increment";
+      }
+
       $request = new PatientUpdateAttributeRequest();
       $request->name = $validated['name'];
       $request->phone_number = $validated['phone_number'];
@@ -59,6 +71,8 @@ class PatientController extends Controller
       $request->village_id = $validated['village_id'];
       $request->address = $validated['address'];
 
+      $request->number_patient = $numberPatient;
+
       $response = $this->patientService->update($request, $id);
 
       Log::info('data', ['data' => $response]);
@@ -67,7 +81,6 @@ class PatientController extends Controller
         'message' => 'update successfully',
         'data' => $response
       ], 200);
-
     } catch (Exception $error) {
       Log::error('update_patient_error', ['error' => $error->getMessage()]);
       return response()->json([

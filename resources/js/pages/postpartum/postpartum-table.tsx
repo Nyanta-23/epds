@@ -40,7 +40,7 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
         <TableBody>
           {data.map((postpartum) => (
             <TableRow key={postpartum.id}>
-              <TableCell className="font-medium">{postpartum.mother.id}</TableCell>
+              <TableCell className="font-medium">{postpartum.mother.number_patient}</TableCell>
               <TableCell className="font-medium">{postpartum.mother.name}</TableCell>
               <TableCell>{postpartum.visit_number}</TableCell>
               <TableCell>{postpartum.result.followup_status.label}</TableCell>
