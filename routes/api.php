@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BabyController;
 use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\PostpartumVisitAnswerController;
+use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\PostpartumVisitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,12 +20,13 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
-
         Route::get('/user', function (Request $request) {
             return $request->user();
         });
 
-
+        Route::prefix('question')->group(function() {
+            Route::get('/', [QuestionController::class, 'index']);
+        });
 
         Route::prefix('patient')->group(function () {
             Route::put('/{id}', [PatientController::class, 'update']);
@@ -36,6 +38,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [BabyController::class, 'store']);
             Route::get('/{id?}', [BabyController::class, 'find']);
             Route::put('/{id?}', [BabyController::class, 'update']);
+            Route::delete('/{id?}', [BabyController::class, 'destroy']);
         });
 
 
