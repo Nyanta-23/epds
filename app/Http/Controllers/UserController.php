@@ -40,7 +40,7 @@ class UserController extends Controller
         ];
 
         $users = $this->userService->index($whoAmI, $filters);
-        $roles = $this->roleService->getAllRoles();
+        $roles = $this->roleService->getAllRoles($whoAmI);
 
         return Inertia::render('user', [
             'users' => UserResource::collection($users),
@@ -57,7 +57,11 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = $this->roleService->getAllRoles();
+
+        $whoAmI = auth()->user();
+
+
+        $roles = $this->roleService->getAllRoles($whoAmI);
 
         // Nanti ubah agar tidak dengan super admin
 
@@ -93,7 +97,10 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = $this->roleService->getAllRoles();
+
+        $whoAmI = auth()->user();
+
+        $roles = $this->roleService->getAllRoles($whoAmI);
 
         // Nanti ubah agar tidak dengan super admin
         $user->load('role');

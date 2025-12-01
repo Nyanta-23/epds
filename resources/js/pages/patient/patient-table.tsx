@@ -18,8 +18,6 @@ export default function PatientTable({ data }: PatientTableProps) {
 
   const { visitingId, verificationId, updateStatusCanVisit, updateStatusVerified } = usePatientAction();
 
-  console.log(data);
-
   return (
     <section className='rounded-b-md border-t-0 border overflow-hidden'>
       <Table>

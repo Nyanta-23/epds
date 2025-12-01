@@ -12,18 +12,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    Route::get('/', function (Request $request) {
-        return response()->json([
-            'message' => 'Hello Everynyan'
-        ]);
-    });
-
-    Route::get('/test', function (Request $request) {
-        return response()->json([
-            'message' => 'Hello Auothed Nyan'
-        ]);
-    })->middleware('auth:sanctum');
-
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/register', [AuthController::class, 'register']);
