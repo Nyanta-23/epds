@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Award, Baby, BookOpen, FileQuestion, FileText, Folder, LayoutGrid, ScanHeart, UserRoundCog, UserRoundPlus, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -78,6 +78,18 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+
+    const { auth } = usePage().props as any;
+
+
+    const userRole = auth.user.role.slug;
+
+    let filteredNavItems = [...mainNavItems];
+
+    if (!['super_admin', 'admin'].includes(userRole)) {
+        filteredNavItems = filteredNavItems.filter(item => item.title !== 'Role');
+    }
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -93,7 +105,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={filteredNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

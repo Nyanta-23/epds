@@ -17,7 +17,7 @@ class RoleController extends Controller
     public function index()
     {
 
-        $roles = $this->roleService->getAllRoles();
+        $roles = $this->roleService->index();
 
         return Inertia::render('role', [
             'roles' => RoleResource::collection($roles)
