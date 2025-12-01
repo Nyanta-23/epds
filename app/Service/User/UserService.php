@@ -7,6 +7,7 @@ namespace App\Service\User;
 use App\DTO\Request\User\UserStoreAttributeRequest;
 use App\DTO\Request\User\UserUpdateAttributeRequest;
 use App\Models\User;
+use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -70,6 +71,27 @@ class UserService
         'role_id' => $request->role_id,
       ]);
     });
+  }
+
+  public function changeEmail(?string $email, ?string $id) 
+  {
+    try {
+      $findUser = User::find($id);
+
+      if($findUser->email == $email) throw new Exception('tidak bisa mengubah email yang sama', 400);
+
+      $findUser->email = $email;
+      $findUser->email_verified_at = null;
+
+      
+      $findUser->save();
+      
+      event(new Registered($findUser));
+      
+      return $findUser;
+    }catch(Exception $error) {
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
   }
 
   public function softDelete(string $id)
