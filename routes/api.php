@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BabyController;
 use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\PostpartumVisitAnswerController;
 use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\PostpartumVisitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,10 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user', function (Request $request) {
             return $request->user();
+        });
+
+        Route::prefix('user')->group(function() {
+            Route::put('/{id}/change-email', [UserController::class, 'changeEmail']);
         });
 
         Route::prefix('question')->group(function() {
