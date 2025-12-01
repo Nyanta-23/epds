@@ -80,7 +80,7 @@ class DashboardService
     $unFollowUp = PostpartumVisit::all()->count();
     $followUp = Followup::all()->count();
 
-    $result = $followUp / ($followUp + $unFollowUp) * 100;
+    $result = $followUp < 0 ?  $followUp / ($followUp + $unFollowUp) * 100 : 0;
 
     return [
       'label' => 'Follow Up',
@@ -93,7 +93,7 @@ class DashboardService
     $unFollowUp = PostpartumVisit::all()->count();
     $followUp = Followup::all()->count();
 
-    $result = $unFollowUp / ($followUp + $unFollowUp) * 100;
+    $result = $unFollowUp < 0 ? $unFollowUp / ($followUp + $unFollowUp) * 100 : 0;
 
     return [
       'label' => 'Un Follow Up',
