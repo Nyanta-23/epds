@@ -6,6 +6,7 @@ namespace App\Service\User;
 
 use App\DTO\Request\User\UserStoreAttributeRequest;
 use App\DTO\Request\User\UserUpdateAttributeRequest;
+use App\DTO\Request\User\UserUpdatePasswordRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Auth\Events\Registered;
@@ -89,6 +90,23 @@ class UserService
       event(new Registered($findUser));
       
       return $findUser;
+    }catch(Exception $error) {
+      throw new Exception($error->getMessage(), $error->getCode());
+    }
+  }
+
+  public function changePassword(UserUpdatePasswordRequest $request, ?string $id = null)
+  {
+    try {
+      $user = User::find($id);
+
+      if(!Hash::check($request->oldPassword, $user->password)) throw new Exception('password salah', 400);
+      
+      $user->password = Hash::make($request->newPassword);
+
+      $user->save();
+
+      return $user;
     }catch(Exception $error) {
       throw new Exception($error->getMessage(), $error->getCode());
     }

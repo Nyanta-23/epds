@@ -6,10 +6,12 @@ use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Patient\PatientUpdateRequestValidator;
 use App\Http\Resources\PatientResource;
+use App\Models\User;
 use App\Service\Patient\PatientService;
 use Exception;
 use Log;
 use Request;
+use Str;
 
 class PatientController extends Controller
 {
