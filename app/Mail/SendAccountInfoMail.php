@@ -42,7 +42,7 @@ class SendAccountInfoMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.account-info',
+            view: 'mails.account-info',
         );
     }
 
