@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('user')->group(function() {
             Route::put('/{id}/change-email', [UserController::class, 'changeEmail']);
+            Route::put('/{id}/change-password', [UserController::class, 'changePassword']);
         });
 
         Route::prefix('question')->group(function() {
