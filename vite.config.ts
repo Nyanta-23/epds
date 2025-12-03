@@ -21,22 +21,6 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
-   server: {
-        host: '0.0.0.0', 
-        hmr: {
-            host: '0.0.0.0',
-        },
-        cors: true,
-    },
-    //   server: {
-    //     host: '0.0.0.0', // Mengizinkan akses dari luar localhost
-    //     hmr: {
-    //         host: '10.12.244.166', // IP Laptop Anda (SESUAIKAN JIKA IP BERUBAH)
-    //     },
-    //     cors: {
-    //         origin: '*', // Izinkan semua origin
-    //     },
-    // },
     esbuild: {
         jsx: 'automatic',
     },
