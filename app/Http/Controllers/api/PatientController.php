@@ -101,6 +101,7 @@ class PatientController extends Controller
         'data' => $response
       ]);
     } catch (Exception $error) {
+      Log::error('error',['error' => $error->getMessage()]);
       return response()->json([
         'message' => $error->getMessage(),
         'data' => null

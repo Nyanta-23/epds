@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\DTO\Request\User\UserUpdatePasswordRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\ChangePasswordRequest;
+use App\Http\Requests\Api\ChangePasswordRequest;
 use App\Service\User\UserService;
 use Exception;
 use Illuminate\Http\Request;
