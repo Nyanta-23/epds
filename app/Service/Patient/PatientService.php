@@ -113,6 +113,7 @@ class PatientService
       }
 
       foreach ($postpartums as $postpartum) {
+        Log::info('data', ['data' => $postpartum]);
         $mappingData[] = [
           "parameter" => "KF" . $postpartum['visit_number'],
           'value' => $this->classificationPostpartumScore($postpartum['result']['total_score']),
