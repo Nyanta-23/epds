@@ -14,6 +14,7 @@ use App\Service\AiPostpartumResultService;
 use App\Service\Answer\AnswerService;
 use App\Service\PostpartumVisit\PostpartumVisitService;
 use App\Service\Result\ResultService;
+use DB;
 
 class PostpartumVisitAnswerController extends Controller
 {
@@ -26,170 +27,92 @@ class PostpartumVisitAnswerController extends Controller
         private AiPostpartumResultService $aiService
     ) {}
 
-    public function store(PostpartumVisitAnswerStoreRequest $request)
-    {
-        try {
+    public function store(PostpartumVisitAnswerStoreRequest $request){
 
-            $thisIsMy = auth()->user();
-            // postpartum
+    return DB::transaction(function () use ($request) {
+        try {
+            $user = auth()->user();
+            $validated = $request->validated();
 
             $postpartumVisitReq = new PostpartumVisitStoreAttributeRequest();
-
-            $postpartumVisitReq->visit_number = (int) $request->post('visit_number');
-
-            $postpartumVisitReq->date_filled = (string) $request->post('date_filled');
-
-            $postpartumVisitReq->sleep_quality   = (int) $request->post('sleep_quality');
-            $postpartumVisitReq->partner_support = (int) $request->post('partner_support');
-            $postpartumVisitReq->family_economy  = (int) $request->post('family_economy');
-
-            $postpartumVisitReq->live_with_partner = filter_var($request->post('live_with_partner'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->psych_history = filter_var($request->post('psych_history'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->psych_treatment = filter_var($request->post('psych_treatment'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->psych_trauma = filter_var($request->post('psych_trauma'), FILTER_VALIDATE_BOOL);
-
-            $postpartumVisitReq->preg_comp_history = filter_var($request->post('preg_comp_history'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->last_comp         = filter_var($request->post('last_comp'), FILTER_VALIDATE_BOOL);
-
-            $postpartumVisitReq->last_comp_note = $request->post('last_comp_note') !== null
-                ? (string) $request->post('last_comp_note')
-                : null;
-
-            $postpartumVisitReq->parity_count = (string) $request->post('parity_count');
-
-            $postpartumVisitReq->baby_healthy = filter_var($request->post('baby_healthy'), FILTER_VALIDATE_BOOL);
-
-
-            $postpartumVisitReq->baby_caregiver = (int) $request->post('baby_caregiver');
-            $postpartumVisitReq->feed_type = (int) $request->post('feed_type');
-
-            $postpartumVisitReq->mother_id = (string) $thisIsMy->id;
-
+            
+            $postpartumVisitReq->visit_number = $validated['visit_number'];
+            $postpartumVisitReq->date_filled = $validated['date_filled'];
+            $postpartumVisitReq->sleep_quality = $validated['sleep_quality'];
+            $postpartumVisitReq->partner_support = $validated['partner_support'];
+            $postpartumVisitReq->family_economy = $validated['family_economy'];
+            $postpartumVisitReq->live_with_partner = $validated['live_with_partner'];
+            $postpartumVisitReq->psych_history = $validated['psych_history'];
+            $postpartumVisitReq->psych_treatment = $validated['psych_treatment'];
+            $postpartumVisitReq->psych_trauma = $validated['psych_trauma'];
+            $postpartumVisitReq->preg_comp_history = $validated['preg_comp_history'];
+            $postpartumVisitReq->last_comp = $validated['last_comp'];
+            $postpartumVisitReq->last_comp_note = $validated['last_comp_note'] ?? null;
+            $postpartumVisitReq->parity_count = $validated['parity_count'];
+            $postpartumVisitReq->baby_healthy = $validated['baby_healthy'];
+            $postpartumVisitReq->baby_caregiver = $validated['baby_caregiver'];
+            $postpartumVisitReq->feed_type = $validated['feed_type'];
+            $postpartumVisitReq->mother_id = $user->id;
             $postpartumVisit = $this->postpartumVisitService->store($postpartumVisitReq);
 
 
-            $postpartumVisitId = $postpartumVisit->id;
-
-
             $answerReq = [];
-
-            foreach ($request->answers as $ans) {
-
-                $answer = new AnswerPostAttributeRequest();
-                $answer->answer = $ans['answer'];
-                $answer->question_id = $ans['question_id'];
-                $answer->postpartum_visit_id  = $postpartumVisitId;
-
-                $answerReq[] = $answer;
+            
+            foreach ($validated['answers'] as $ans) {
+                $answerDTO = new AnswerPostAttributeRequest();
+                $answerDTO->answer = $ans['answer'];
+                $answerDTO->question_id = $ans['question_id'];
+                $answerDTO->postpartum_visit_id = $postpartumVisit->id;
+                $answerReq[] = $answerDTO;
             }
 
+            $this->answerService->storeMany($answerReq);
 
-            $answers = $this->answerService->storeMany($answerReq);
-
-
-            $questionAnswereds = $this->answerService->getAnswersByPostpartumVisitId($postpartumVisitId);
-
-
+            $questionAnswereds = $this->answerService->getAnswersByPostpartumVisitId($postpartumVisit->id);
+            
             $totalScore = 0;
-
-
-            $questionAndAnswer = [];
-
             foreach ($questionAnswereds as $answer) {
-
-                $userAnswer = strtolower($answer->answer);
-
+                $userAnswer = strtolower($answer->answer); 
+                
                 $matchedOption = $answer->question->optionQuestions
                     ->firstWhere('option', $userAnswer);
-
-
-                $questionAndAnswer[] = [
-                    'question' => $answer->question->question,
-                    'answer' => $matchedOption->option_text
-                ];
 
                 if ($matchedOption) {
                     $totalScore += $matchedOption->value;
                 }
             }
 
-            $result = new ResultPostAttributeRequest();
-            $result->total_score = $totalScore;
-            $result->followup_status = 0;
-            $result->postpartum_visit_id = $postpartumVisitId;
+            $resultDTO = new ResultPostAttributeRequest();
+            $resultDTO->total_score = $totalScore;
+            $resultDTO->followup_status = 0;
+            $resultDTO->postpartum_visit_id = $postpartumVisit->id;
 
-            $postpartum = $this->postpartumVisitService->getPostpartumVisitById($postpartumVisitId);
+            $savedResult = $this->resultService->store($resultDTO);
 
-            $result =  $this->resultService->store($result);
-
-            $dataAi = [
-                'total_score' => $totalScore,
-                'result_epds' => interpreted_score($totalScore),
-                'partner_support' => $postpartum->partner_support->label_id(),
-                'family_economy' => $postpartum->family_economy->label_id(),
-                'feed_type' => $postpartum->feed_type->label_id(),
-                'sleep_quality' => $postpartum->sleep_quality->label_id(),
-
-                'psych_history' => $postpartum->psych_history ? 'Ya' : 'Tidak',
-                'baby_healthy'  => $postpartum->baby_healthy ? 'Sehat' : 'Tidak Sehat',
-                'question_and_answer' => $questionAndAnswer
-            ];
-
-
-            $rule = RecomendationRule::where(function ($q) use ($totalScore) {
-                $q->where('min_score', '<=', $totalScore)
-                    ->orWhereNull('min_score');
-            })
+            $recommendation = RecomendationRule::query()
                 ->where(function ($q) use ($totalScore) {
-                    $q->where('max_score', '>=', $totalScore)
-                        ->orWhereNull('max_score');
+                    $q->where('min_score', '<=', $totalScore)->orWhereNull('min_score');
+                })
+                ->where(function ($q) use ($totalScore) {
+                    $q->where('max_score', '>=', $totalScore)->orWhereNull('max_score');
                 })
                 ->first();
 
-
-            // if ($rule && $rule->recommendationVariations->count() > 0) {
-
-            //     // CASE A — PAKAI DB (random variation)
-            //     $variation = $rule->recommendationVariations->random();
-
-            //     AutoRecommendation::create([
-            //         'result_id' => $result->id,
-            //         'recommendation_variation_id' => $variation->id,
-            //     ]);
-
-            //     $finalRecommendationText = $variation->recommendation_text;
-            // } else {
-
-            // CASE B — TIDAK ADA RULE → GENERATE AI
-            $aiText = $this->aiService->analyze($dataAi);
-
-            $variation = RecomendationVariation::create([
-                'recomendation_rule_id' => $rule?->id,
-                'recomendation_text' => $aiText,
-                'generated_at' => now(),
-            ]);
-
-            $aiResult = AutoRecomendation::create([
-                'result_id' => $result->id,
-                'recomendation_variation_id' => $variation->id,
-            ]);
-
-            // }
-
-
-            $result->load('autoRecomendation.recomendationVariation');
-
-
-            return  response()->json([
-                'message' => 'Successfully store data',
-                'postpartum_visit' => $postpartumVisitReq,
-                'answers' => $answers,
-                'result' => $result
-            ]);
-        } catch (\Exception $e) {
+            $recommendationText = generate_dummy_recommendation($totalScore);;
+            
             return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
+                'message' => 'Successfully store data',
+                'data' => [
+                    'postpartum_visit_id' => $postpartumVisit->id,
+                    'total_score' => $totalScore,
+                    'interpretation' => interpreted_score($totalScore),
+                    'recommendation' => $recommendationText,
+                ]
+            ], 201);
+
+        } catch (\Exception $e) { 
+            throw $e;
         }
-    }
+    }); 
+}
 }
