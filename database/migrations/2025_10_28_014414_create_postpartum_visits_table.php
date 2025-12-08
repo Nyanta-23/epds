@@ -18,15 +18,15 @@ return new class extends Migration
 
             $table->date('date_filled');
             // $table->enum('sleep_quality', ['good', 'poor', 'frequently_awake']);
-            $table->unsignedTinyInteger('sleep_quality')->comment('0: good, 1: poor, 2: frequently_awake');
+            $table->unsignedTinyInteger('sleep_quality')->comment('0: kurang dari 3 Jam, 1: 3-4j am, 2: 5-6 jam');
 
             // $table->enum('partner_support', ['good', 'fair', 'poor']);
             $table->unsignedTinyInteger('partner_support')->comment('0: good, 1: fair, 2: poor');
 
+            $table->unsignedTinyInteger('family_salary_permonth');
+            $table->unsignedTinyInteger('dependent_family_count')->comment('0: 1-2, 1: 3-4, 2: >5');
+            $table->unsignedTinyInteger('is_salary_sufficient')->comment('0: insufficient, 1: sufficient for basic needs, 2: sufficient for comfort');
             $table->boolean('live_with_partner');
-
-            // $table->enum('family_economy', ['good', 'fair', 'poor']);
-            $table->unsignedTinyInteger('family_economy')->comment('0: good, 1: fair, 2: poor');
 
             $table->boolean('psych_history');
             $table->boolean('psych_treatment');

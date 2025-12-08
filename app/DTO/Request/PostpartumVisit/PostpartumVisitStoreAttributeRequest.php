@@ -11,7 +11,10 @@ class PostpartumVisitStoreAttributeRequest
 
   public int $sleep_quality;
   public int $partner_support;
-  public int $family_economy;
+
+  public int $family_salary_permonth;
+  public int $dependent_family_count;
+  public int $is_salary_sufficient;
 
   public bool $live_with_partner;
   public bool $psych_history;
