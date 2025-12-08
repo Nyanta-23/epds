@@ -40,10 +40,7 @@ class PatientService
   public function getPatients(?string $id = null)
   {
     try {
-      $results = User::with('role')->with('babies')
-        ->whereHas('role', function ($query) {
-          $query->where('slug', 'patient');
-        })->latest();
+      $results = User::with('babies')->latest();
 
       if ($id) {
         $results->where('id', '=', $id);

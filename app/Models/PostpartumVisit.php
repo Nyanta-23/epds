@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\BabyCaregiverEnum;
-use App\Enums\FamilyEconomyEnum;
+use App\Enums\DependentFamilyCountEnum;
+use App\Enums\FamilySalaryPerMonthEnum;
+use App\Enums\FamilySalarySufficientEnum;
 use App\Enums\FeedTyperEnum;
 use App\Enums\PartnerSupportEnum;
 use App\Enums\SleepQualityEnum;
@@ -22,9 +24,11 @@ class PostpartumVisit extends Model
     protected $casts = [
         'sleep_quality' => SleepQualityEnum::class,
         'partner_support' => PartnerSupportEnum::class,
-        'family_economy' => FamilyEconomyEnum::class,
         'baby_caregiver' => BabyCaregiverEnum::class,
         'feed_type' => FeedTyperEnum::class,
+        'family_salary_permonth' => FamilySalaryPerMonthEnum::class,
+        'dependent_family_count' => DependentFamilyCountEnum::class,
+        'is_salary_sufficient' => FamilySalarySufficientEnum::class,
     ];
 
     protected $fillable = [
@@ -34,7 +38,9 @@ class PostpartumVisit extends Model
         'sleep_quality',
         'partner_support',
         'live_with_partner',
-        'family_economy',
+        'family_salary_permonth',
+        'dependent_family_count',
+        'is_salary_sufficient',
 
         'psych_history',
         'psych_treatment',

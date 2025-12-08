@@ -92,7 +92,9 @@ class PostpartumVisitService
         'sleep_quality'     => $request->sleep_quality,
         'partner_support'   => $request->partner_support,
         'live_with_partner' => $request->live_with_partner,
-        'family_economy'    => $request->family_economy,
+        'family_salary_permonth' => $request->family_salary_permonth,
+        'dependent_family_count' => $request->dependent_family_count,
+        'is_salary_sufficient'   => $request->is_salary_sufficient,
 
         'psych_history'     => $request->psych_history,
         'psych_treatment'   => $request->psych_treatment,
