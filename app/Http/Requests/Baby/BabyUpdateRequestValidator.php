@@ -28,6 +28,7 @@ class BabyUpdateRequestValidator extends FormRequest
             'typeof_delivery' => ['sometimes', 'integer', 'between:0,2'],
             'gender' => ['sometimes', 'in:male,female'],
             'mother_id' => ['sometimes', 'uuid', 'exists:users,id'],
+            'baby_feeding_method' => ['sometimes', 'integer']
         ];
     }
 }

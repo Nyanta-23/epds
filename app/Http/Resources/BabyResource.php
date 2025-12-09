@@ -23,7 +23,9 @@ class BabyResource extends JsonResource
             'gender' => $this->gender,
             'baby_condition_label' => $this->baby_condition->label(),
             'typeof_delivery_label' => $this->typeof_delivery->label(),
-            'mother' => new PatientResource($this->whenLoaded('mother'))
+            'mother' => new PatientResource($this->whenLoaded('mother')),
+            'baby_feeding_method' => $this->feed_type,
+            'baby_feeding_method_label' => $this->feed_type->label_id(),
         ];
     }
 }

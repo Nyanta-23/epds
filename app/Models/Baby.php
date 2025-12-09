@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\BabyConditionEnum;
 use App\Enums\BabyTypeOfDeliveryEnum;
+use App\Enums\FeedTyperEnum;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,11 +23,13 @@ class Baby extends Model
         'typeof_delivery',
         'gender',
         'mother_id',
+        'feed_type'
     ];
 
     protected $casts = [
         'baby_condition' => BabyConditionEnum::class,
-        'typeof_delivery' => BabyTypeOfDeliveryEnum::class
+        'typeof_delivery' => BabyTypeOfDeliveryEnum::class,
+        'feed_type' => FeedTyperEnum::class,
     ];
 
     public function mother(): BelongsTo

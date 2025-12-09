@@ -19,13 +19,25 @@ enum BabyCaregiverEnum: int
     };
   }
 
+  public static function getLabelsFromIds(array $ids): array
+    {
+        return collect($ids)
+            ->map(function ($id) {
+                $enum = self::tryFrom($id);
+                return $enum ? $enum->label_id() : null;
+            })
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
   public function label_id(): string
   {
     return match ($this) {
       self::PARTNER => 'Pasangan',
       self::PARENTS => 'Orang Tua',
       self::FAMILY_OR_NANNY => 'Keluarga atau Pengasuh',
-      self::NONE => 'Tidak Ada',
+      self::NONE => 'Sendiri',
     };
   }
 

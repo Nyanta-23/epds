@@ -21,8 +21,17 @@ enum FeedTyperEnum: int
   {
     return match ($this) {
       self::EXCLUSIVE => 'ASI Eksklusif',
-      self::MIXED => 'Campuran',
+      self::MIXED => 'Campuran ASI dan Susu Formula',
       self::FORMULA => 'Susu Formula',
+    };
+  }
+
+  public function value_id(): int
+  {
+    return match ($this) {
+      self::EXCLUSIVE => 0,
+      self::MIXED => 1,
+      self::FORMULA => 2,
     };
   }
 

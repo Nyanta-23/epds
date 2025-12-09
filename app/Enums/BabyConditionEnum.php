@@ -29,6 +29,16 @@ enum BabyConditionEnum: int
     };
   }
 
+  public function value_id(): int
+  {
+    return match ($this) {
+      self::HEALTHY => 0,
+      self::PREMATURE => 1,
+      self::LOW_BW => 2,
+      self::NICU => 3
+    };
+  }
+
 
   public static function options(): array
   {

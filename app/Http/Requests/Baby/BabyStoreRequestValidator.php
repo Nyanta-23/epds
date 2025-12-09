@@ -28,6 +28,7 @@ class BabyStoreRequestValidator extends FormRequest
             'typeof_delivery' => ['required', 'integer', 'between:0,2'],
             'gender' => ['required', 'in:male,female'],
             'mother_id' => ['required', 'uuid', 'exists:users,id'],
+            'baby_feeding_method' => ['required', 'integer']
         ];
     }
 

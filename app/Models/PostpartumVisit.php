@@ -24,7 +24,7 @@ class PostpartumVisit extends Model
     protected $casts = [
         'sleep_quality' => SleepQualityEnum::class,
         'partner_support' => PartnerSupportEnum::class,
-        'baby_caregiver' => BabyCaregiverEnum::class,
+        'baby_caregiver' => 'array',
         'feed_type' => FeedTyperEnum::class,
         'family_salary_permonth' => FamilySalaryPerMonthEnum::class,
         'dependent_family_count' => DependentFamilyCountEnum::class,
