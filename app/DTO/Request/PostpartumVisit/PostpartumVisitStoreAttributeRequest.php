@@ -27,10 +27,12 @@ class PostpartumVisitStoreAttributeRequest
 
   public string $parity_count;
 
-  public bool $baby_healthy;
-  public int $baby_caregiver;
+  public int $baby_healthy;
+  public array $baby_caregiver;
 
   public int $feed_type;
 
   public string $mother_id;
+
+  public string $baby_id;
 }

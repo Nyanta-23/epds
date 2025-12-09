@@ -32,6 +32,7 @@ class BabyController extends Controller
             $babyReq->typeof_delivery = (int) $request->post('typeof_delivery');
             $babyReq->gender = $request->post('gender');
             $babyReq->mother_id = $request->post('mother_id');
+            $babyReq->baby_feeding_method = (int) $request->post('baby_feeding_method');
 
             $response = $this->babyService->store($babyReq);
 
@@ -75,6 +76,7 @@ class BabyController extends Controller
             $request->typeof_delivery = (int) $validated['typeof_delivery'];
             $request->gender = $validated['gender'];
             $request->mother_id = $validated['mother_id'];
+            $request->baby_feeding_method = (int) $validated['baby_feeding_method'];
 
             $response = $this->babyService->update($request, $id);
 

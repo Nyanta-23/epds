@@ -10,4 +10,5 @@ class BabyUpdateAttributeRequest
   public int $typeof_delivery;
   public string $gender;
   public string $mother_id;
+  public int $baby_feeding_method;
 }

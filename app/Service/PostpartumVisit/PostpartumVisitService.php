@@ -84,6 +84,7 @@ class PostpartumVisitService
 
   public function store(PostpartumVisitStoreAttributeRequest $request)
   {
+    Log::info('Storing postpartum visit with caregiver: ' . json_encode($request->baby_caregiver));
     return DB::transaction(function () use ($request) {
       return PostpartumVisit::create([
         'visit_number'      => $request->visit_number,
@@ -107,7 +108,7 @@ class PostpartumVisitService
         'last_comp_note'    => $request->last_comp_note,
 
         'baby_healthy'      => $request->baby_healthy,
-        'baby_caregiver'    => $request->baby_caregiver,
+        'baby_caregiver'    => json_encode($request->baby_caregiver),
 
         'feed_type'         => $request->feed_type,
         'mother_id'         => $request->mother_id

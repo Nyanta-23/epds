@@ -36,6 +36,7 @@ class BabyService
         'typeof_delivery' => $request->typeof_delivery,
         'gender' => $request->gender,
         'mother_id' => $request->mother_id,
+        'feed_type' => $request->baby_feeding_method,
       ]);
     });
   }
@@ -52,6 +53,7 @@ class BabyService
         'typeof_delivery' => $request->typeof_delivery,
         'gender' => $request->gender,
         'mother_id' => $request->mother_id,
+        'feed_type' => $request->baby_feeding_method,
       ]);
 
       return $baby;

@@ -25,6 +25,7 @@ class PostpartumVisitAnswerStoreRequest extends FormRequest
             'visit_number'       => ['required', 'integer'],
             'date_filled'        => ['required', 'date'],
 
+            'parity_count'     => ['required', 'string', 'in:1,2-4,>5'],
             'sleep_quality'      => ['required', 'integer'],
             'partner_support'    => ['required', 'integer'],
             'live_with_partner'  => ['required', 'boolean'],
@@ -36,19 +37,10 @@ class PostpartumVisitAnswerStoreRequest extends FormRequest
             'psych_history'      => ['required', 'boolean'],
             'psych_treatment'    => ['required', 'boolean'],
             'psych_trauma'       => ['required', 'boolean'],
-
-            'parity_count'       => ['required', 'string', 'in:1x,2x,3x,>3x'],
             'preg_comp_history'  => ['required', 'boolean'],
-
             'last_comp'          => ['required', 'boolean'],
             'last_comp_note'     => ['nullable', 'string'],
-
-            'baby_healthy'       => ['required', 'boolean'],
-            'baby_caregiver'     => ['required', 'integer'],
-
-            'feed_type'          => ['required', 'integer'],
-
-
+            'baby_caregiver'     => ['required', 'array'],
             'answers' => ['required', 'array'],
             'answers.*.answer' => ['required', 'string'],
             'answers.*.question_id' => ['required', 'uuid']

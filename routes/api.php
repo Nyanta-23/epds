@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BabyController;
 use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\PostpartumController;
 use App\Http\Controllers\Api\PostpartumVisitAnswerController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\UserController;
@@ -49,6 +50,7 @@ Route::prefix('v1')->group(function () {
 
 
         Route::prefix('postpartum')->group(function () {
+            Route::get('/{motherId}/schedule', [PostpartumController::class, 'getSchedule']);
             Route::get('/', [PostpartumVisitController::class, 'previousPostpartumVisit']);
             Route::post('/answer', [PostpartumVisitAnswerController::class, 'store']);
         });
