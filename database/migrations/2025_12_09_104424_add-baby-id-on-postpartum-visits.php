@@ -12,9 +12,11 @@ return new class extends Migration {
     {
         if (!Schema::hasColumn('postpartum_visits', 'baby_id')) {
             Schema::table('postpartum_visits', function (Blueprint $table) {
-                $table->unsignedBigInteger('baby_id')->nullable()->after('mother_id');
-
-                $table->foreign('baby_id')->references('id')->on('babies')->onDelete('set null');
+              $table->foreignUuid('baby_id')
+                  ->nullable()
+                  ->after('mother_id')
+                  ->constrained('babies')
+                  ->onDelete('set null');
             });
         }
     }
