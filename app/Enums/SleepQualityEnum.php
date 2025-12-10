@@ -11,18 +11,18 @@ enum SleepQualityEnum: int
   public function label(): string
   {
     return match ($this) {
-      self::GOOD => 'Good',
-      self::POOR => 'Poor',
-      self::FAIR => 'Fair',
+      self::GOOD => '5-6 hours',
+      self::POOR => 'Less than 3 hours',
+      self::FAIR => '3 - 4 hours',
     };
   }
 
   public function label_id(): string
   {
     return match ($this) {
-      self::GOOD => 'Baik',
-      self::POOR => 'Buruk',
-      self::FAIR => 'Cukup',
+       self::GOOD => '5-6 Jam',
+      self::POOR => 'Kurang dari 3 Jam',
+      self::FAIR => '3 - 4 Jam',
     };
   }
 

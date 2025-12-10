@@ -23,8 +23,6 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
 
   const [result, setResult] = useState<Result>();
 
-  console.log(data);
-
   return (
     <section className='rounded-b-md border-t-0 border overflow-hidden'>
       <Table>

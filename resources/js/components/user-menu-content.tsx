@@ -11,6 +11,7 @@ import { edit } from '@/routes/profile';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';
+import { MouseEvent } from 'react';
 
 interface UserMenuContentProps {
     user: User;
@@ -19,10 +20,20 @@ interface UserMenuContentProps {
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
 
-    const handleLogout = () => {
-        cleanup();
-        router.flushAll();
-    };
+    const handleLogout = (e: MouseEvent<Element>) => {
+    e.preventDefault();
+
+    router.post('/logout', {}, {
+        onSuccess: () => {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login';
+        },
+        onError: () => {
+            window.location.href = '/login';
+        }
+    });
+};
 
     return (
         <>
@@ -52,7 +63,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     className="block w-full"
                     href={logout()}
                     as="button"
-                    onClick={handleLogout}
+                    onClick={(e) => handleLogout(e)}
                     data-test="logout-button"
                 >
                     <LogOut className="mr-2" />

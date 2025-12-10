@@ -22,7 +22,8 @@ class Followup extends Model
         'notes',
         'midwife_id',
         'result_id',
-        'date_filled'
+        'date_filled',
+        'postpartum_visit_id'
     ];
 
     public function midwife(): BelongsTo

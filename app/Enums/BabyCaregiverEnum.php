@@ -15,19 +15,21 @@ enum BabyCaregiverEnum: int
       self::PARTNER => 'Partner',
       self::PARENTS => 'Parents',
       self::FAMILY_OR_NANNY => 'Family or Nanny',
-      self::NONE => 'None',
+      self::NONE => 'Alone',
     };
   }
 
-  public static function getLabelsFromIds(array $ids): array
+  public static function getLabelsFromIds(?array $ids): array
     {
+        if (empty($ids)) return [];
+
         return collect($ids)
             ->map(function ($id) {
-                $enum = self::tryFrom($id);
+                $enum = self::tryFrom((int) $id);
                 return $enum ? $enum->label_id() : null;
             })
             ->filter()
-            ->values()
+            ->values() 
             ->toArray();
     }
 

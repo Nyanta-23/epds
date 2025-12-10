@@ -23,7 +23,8 @@ class PostpartumVisitController extends Controller
 
     public function __construct(
         private PostpartumVisitService $postpartumVisitService,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request)
     {
@@ -64,11 +65,24 @@ class PostpartumVisitController extends Controller
         $postpartum->load([
             'mother',
             'result',
-            'answers.question.optionQuestions',
+            'followup',
+            'answers' => function ($query) {
+                $query
+                    ->join('questions', 'answers.question_id', '=', 'questions.id')
+                    ->orderBy('questions.number_question', 'asc')
+                    ->select('answers.*');
+            },
+            'answers.question.optionQuestions'
         ]);
 
         return Inertia::render('postpartum/action/postpartum-show', [
-            'postpartum' => new PostpartumVisitResource($postpartum)
+            'postpartum' => new PostpartumVisitResource($postpartum),
+            'page_prop' => [
+                'enums' => [
+                    'followup_types' => FollowUpTypeEnum::options(),
+                    'followup_status' => FollowUpStatusEnum::options()
+                ]
+            ],
         ]);
     }
 
@@ -103,17 +117,17 @@ class PostpartumVisitController extends Controller
 
             $postpartumVisitReq->date_filled = (string) $request->post('date_filled');
 
-            $postpartumVisitReq->sleep_quality   = (string) $request->post('sleep_quality');
+            $postpartumVisitReq->sleep_quality = (string) $request->post('sleep_quality');
             $postpartumVisitReq->partner_support = (string) $request->post('partner_support');
-            $postpartumVisitReq->family_economy  = (string) $request->post('family_economy');
+            $postpartumVisitReq->family_economy = (string) $request->post('family_economy');
 
             $postpartumVisitReq->live_with_partner = filter_var($request->post('live_with_partner'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->psych_history     = filter_var($request->post('psych_history'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->psych_treatment   = filter_var($request->post('psych_treatment'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->psych_trauma      = filter_var($request->post('psych_trauma'), FILTER_VALIDATE_BOOL);
+            $postpartumVisitReq->psych_history = filter_var($request->post('psych_history'), FILTER_VALIDATE_BOOL);
+            $postpartumVisitReq->psych_treatment = filter_var($request->post('psych_treatment'), FILTER_VALIDATE_BOOL);
+            $postpartumVisitReq->psych_trauma = filter_var($request->post('psych_trauma'), FILTER_VALIDATE_BOOL);
             $postpartumVisitReq->preg_comp_history = filter_var($request->post('preg_comp_history'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->last_comp         = filter_var($request->post('last_comp'), FILTER_VALIDATE_BOOL);
-            $postpartumVisitReq->baby_healthy      = filter_var($request->post('baby_healthy'), FILTER_VALIDATE_BOOL);
+            $postpartumVisitReq->last_comp = filter_var($request->post('last_comp'), FILTER_VALIDATE_BOOL);
+            $postpartumVisitReq->baby_healthy = filter_var($request->post('baby_healthy'), FILTER_VALIDATE_BOOL);
 
             $postpartumVisitReq->parity_count = (string) $request->post('parity_count');
 
@@ -145,7 +159,7 @@ class PostpartumVisitController extends Controller
         try {
             $thisIsMy = auth()->user();
 
-            
+
             $hasPrevious = $this->postpartumVisitService->hasPrevious($thisIsMy);
 
             if ($hasPrevious) {

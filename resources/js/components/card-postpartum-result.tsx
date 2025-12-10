@@ -1,8 +1,13 @@
+import { PostpartumVisit } from "@/types/resource";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-export default function CardPostpartumResult() {
+interface CardPostpartumResultProps {
+  postpartum: PostpartumVisit
+}
 
+export default function CardPostpartumResult({postpartum}: CardPostpartumResultProps) {
+  console.log(postpartum);
   return (
     <Card className="p-4">
       <CardHeader>
@@ -12,12 +17,12 @@ export default function CardPostpartumResult() {
 
         <div>
           <p className="font-medium">Total Score</p>
-          <p className="text-muted-foreground">12</p>
+          <p className="text-muted-foreground">{postpartum.result?.total_score?? '-'}</p>
         </div>
 
         <div>
           <p className="font-medium">Follow-Up Status</p>
-          <Badge>Not Counseled</Badge>
+          <Badge>{postpartum.result?.followup_status.label_id ?? '-'}</Badge>
         </div>
 
       </CardContent>

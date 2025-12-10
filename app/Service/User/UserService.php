@@ -57,11 +57,12 @@ class UserService
         'name' => $request->name,
         'email' => $request->email,
         'role_id' => $request->role_id,
-        'password' => Hash::make($request->password)
+        'password' => Hash::make($request->password),
+        'email_verified_at' => now(),
+        'is_verified' => true
       ]);
     }));
 
-    event(new Registered($user));
   }
 
   public function update(UserUpdateAttributeRequest $request, string $id)

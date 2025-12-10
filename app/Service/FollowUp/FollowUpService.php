@@ -19,6 +19,7 @@ class FollowUpService
       $result = Result::findOrFail($request->result_id);
 
       $followUp = Followup::create([
+        'postpartum_visit_id' => $request->postpartum_visit_id,
         'type' => $request->type,
         'notes' => $request->notes,
         'midwife_id' => $request->midwife_id,
