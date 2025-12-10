@@ -6,6 +6,7 @@ use App\DTO\Response\Postpartum\PostpartumScheduleResponse;
 use App\Models\Baby;
 use App\Models\PostpartumVisit;
 use Carbon\Carbon;
+use Log;
 
 class PostpartumScheduleService
 {
@@ -25,10 +26,12 @@ class PostpartumScheduleService
       $response->nextVisitDate = null;
       return $response;
     }
-    $birthDate = Carbon::parse($latestBaby->date_of_birth);
+    $birthDate = $latestBaby->date_of_birth;
     $now = Carbon::now();
-
     $hoursSinceBirth = $birthDate->diffInHours($now, false);
+
+    Log::info('birth_date', ['birth_date'=> $birthDate]);
+    Log::info('hours_since_birth', ['hour_since_birth'=> $hoursSinceBirth]);
 
     if ($hoursSinceBirth < 0) {
       $response->status = 'invalid_date';

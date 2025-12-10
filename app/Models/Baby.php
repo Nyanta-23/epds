@@ -30,6 +30,7 @@ class Baby extends Model
         'baby_condition' => BabyConditionEnum::class,
         'typeof_delivery' => BabyTypeOfDeliveryEnum::class,
         'feed_type' => FeedTyperEnum::class,
+        'date_of_birth' => 'datetime'
     ];
 
     public function mother(): BelongsTo
