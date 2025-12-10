@@ -3,14 +3,16 @@ import CardPostpartumDetail from "@/components/card-postpartum-detail";
 import CardPostpartumDetailBaby from "@/components/card-postpartum-detail-baby";
 import CardPostpartumFollowUp from "@/components/card-postpartum-followup";
 import CardPostpartumResult from "@/components/card-postpartum-result";
-import { PostpartumVisit } from "@/types/resource";
+import { PageProp } from "@/types";
+import { FollowUp, PostpartumVisit } from "@/types/resource";
 
 
 interface PopstpartumDetailProps {
   postpartum: PostpartumVisit;
+   page_prop: PageProp;
 }
 
-export default function PostpartumDetail({ postpartum }: PopstpartumDetailProps) {
+export default function PostpartumDetail({ postpartum, page_prop }: PopstpartumDetailProps) {
 
   return (
     <section className="grid gap-10">
@@ -26,16 +28,16 @@ export default function PostpartumDetail({ postpartum }: PopstpartumDetailProps)
 
         <section className="w-1/3 space-y-4">
 
-          <CardPostpartumResult />
+          <CardPostpartumResult postpartum={postpartum} />
 
-          <CardPostpartumFollowUp />
+          <CardPostpartumFollowUp enums={page_prop.enums} postpartum={postpartum} />
 
         </section>
 
       </section>
 
       <section className="w-full space-y-4">
-        <CardPostpartumAnswer />
+        <CardPostpartumAnswer postpartum={postpartum} />
       </section>
     </section>
   );

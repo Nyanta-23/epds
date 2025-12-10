@@ -1,6 +1,6 @@
 import { FormFollowUp } from "@/types/form";
 import { Result } from "@/types/resource";
-import { useForm } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 
 export function useFollowUpAction(result?: Result, onSuccessCallBack?: () => void) {
 
@@ -29,8 +29,8 @@ export function useFollowUpAction(result?: Result, onSuccessCallBack?: () => voi
   //   }));
   // }
 
-  const storeFollowUp = () => {
-    post(route('followup.store'), {
+  const storeFollowUp = (postpartumId: string) => {
+    post(route('followup.store', postpartumId), {
       onSuccess: () => {
         reset(
           'type',

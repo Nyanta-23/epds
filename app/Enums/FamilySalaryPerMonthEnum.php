@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum FamilySalaryPerMonthEnum : int
+enum FamilySalaryPerMonthEnum: int
 {
     case LESS_THAN_4M = 0;
     case BETWEEN_4M_AND_8M = 1;

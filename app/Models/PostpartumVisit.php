@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\BabyCaregiverEnum;
+use App\Enums\BabyConditionEnum;
 use App\Enums\DependentFamilyCountEnum;
 use App\Enums\FamilySalaryPerMonthEnum;
 use App\Enums\FamilySalarySufficientEnum;
 use App\Enums\FeedTyperEnum;
 use App\Enums\PartnerSupportEnum;
 use App\Enums\SleepQualityEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +31,7 @@ class PostpartumVisit extends Model
         'family_salary_permonth' => FamilySalaryPerMonthEnum::class,
         'dependent_family_count' => DependentFamilyCountEnum::class,
         'is_salary_sufficient' => FamilySalarySufficientEnum::class,
+        'baby_healthy' => BabyConditionEnum::class,
     ];
 
     protected $fillable = [
@@ -59,6 +62,22 @@ class PostpartumVisit extends Model
         'mother_id'
     ];
 
+    protected function babyCaregiverLabel(): Attribute
+    {
+        return Attribute::make(
+        get: function () {
+            $data = $this->baby_caregiver;
+
+            if (is_string($data)) {
+                $data = json_decode($data, true);
+            }
+            $safeIds = is_array($data) ? $data : [];
+
+            return BabyCaregiverEnum::getLabelsFromIds($safeIds);
+        }
+    );
+    }
+
     public function mother(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -72,5 +91,10 @@ class PostpartumVisit extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(Answer::class);
+    }
+
+    public function followup()
+    {
+        return $this->hasOne(Followup::class);
     }
 }

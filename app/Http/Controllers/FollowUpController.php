@@ -17,7 +17,7 @@ class FollowUpController extends Controller
         private FollowUpService $followUpService
     ) {}
 
-    public function store(FollowUpStoreRequestValidator $request)
+    public function store(FollowUpStoreRequestValidator $request, $postpartum)
     {
         try {
 
@@ -27,6 +27,7 @@ class FollowUpController extends Controller
 
             $followUpReq = new FollowUpStoreAttributeRequest();
 
+            $followUpReq->postpartum_visit_id = $postpartum;
             $followUpReq->followup_status = $request->post('followup_status');
             $followUpReq->notes = $request->post('notes');
             $followUpReq->type = $request->post('type');

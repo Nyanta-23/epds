@@ -2,6 +2,7 @@ import FollowupFormInformation from "../form/followup-form-information";
 import { Enums } from "@/types";
 import { useFollowUpAction } from "@/hooks/use-followup-action";
 import { Result } from "@/types/resource";
+import { usePage } from "@inertiajs/react";
 
 interface FollowUpCreateProps {
   result: Result | undefined;
@@ -10,6 +11,9 @@ interface FollowUpCreateProps {
 }
 
 export default function FollowUpCreate({ enums, result, onSuccess }: FollowUpCreateProps) {
+  const { ziggy } = usePage().props;
+
+    const id = route().params.postpartum;
 
   const {
     data,
@@ -21,7 +25,7 @@ export default function FollowUpCreate({ enums, result, onSuccess }: FollowUpCre
 
   return (
     <section className="px-2">
-      <FollowupFormInformation processing={processing} action={() => storeFollowUp()} data={data} errors={errors} handleInputChange={handleInputChange} enums={enums} />
+      <FollowupFormInformation processing={processing} action={() => storeFollowUp(id)} data={data} errors={errors} handleInputChange={handleInputChange} enums={enums} />
     </section>
   )
 }

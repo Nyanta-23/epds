@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BabyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowUpController;
@@ -27,6 +27,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 
 
     Route::prefix('user')->group(function () {
@@ -77,7 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::prefix('followup')->group(function () {
-        Route::post('/', [FollowUpController::class, 'store'])->name('followup.store');
+        Route::post('/{postpartum}', [FollowUpController::class, 'store'])->name('followup.store');
         Route::put('/{followup}', [FollowUpController::class, 'update'])->name('followup.update');
     });
 

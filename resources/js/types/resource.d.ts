@@ -2,8 +2,8 @@ import { FollowUpStatusEnum } from "./enum";
 
 export interface Enum {
   value: number;
-  label: string;
-  label_id: string;
+  label: string|List;
+  label_id: string|List;
 }
 
 export interface User {
@@ -65,6 +65,7 @@ export interface Baby {
   typeof_delivery_label: string;
   gender: string;
   mother: Patient;
+  baby_feeding_method_label: string
 }
 
 export interface Question {
@@ -93,19 +94,20 @@ export interface PostpartumVisit {
   sleep_quality: Enum;
   partner_support: Enum;
   live_with_partner: boolean;
-  family_economy: Enum;
+  family_salary_permonth: Enum;
 
   psych_history: boolean;
   psych_treatment: boolean;
   psych_trauma: boolean;
-
+  dependent_family_count: Enum;
+  is_salary_sufficient: Enum;
   parity_count: string;
   preg_comp_history: boolean;
 
-  last_comp: boolean;
+  last_comp: boolean|number;
   last_comp_note: string | null;
 
-  baby_healthy: boolean;
+  baby_healthy: Enum;
   baby_caregiver: Enum;
 
   feed_type: Enum;
@@ -113,6 +115,7 @@ export interface PostpartumVisit {
   mother: Patient;
   result: Result;
   answers: Answer[];
+  followup: FollowUp
 
 }
 
