@@ -49,9 +49,6 @@ class UserService
 
   public function store(UserStoreAttributeRequest $request)
   {
-
-    // $password = Str::random(8);
-
     $user = DB::transaction((function () use ($request) {
       return User::create([
         'name' => $request->name,
@@ -63,7 +60,8 @@ class UserService
         'province_id' => $request->province_id,
         'city_or_district_id' => $request->regency_id,
         'subdistrict_id' => $request->district_id,
-        'village_id' => $request->village_id
+        'village_id' => $request->village_id,
+        'number_patient' => $this->generatePatientNumber()
       ]);
     }));
 
@@ -131,4 +129,24 @@ class UserService
       return $user;
     });
   }
+
+  private static function generatePatientNumber()
+{
+    $prefix = 'PS-' . date('ym') . '-';
+
+    return DB::transaction(function () use ($prefix) {
+        $lastUser = User::where('number_patient', 'like', $prefix . '%')
+            ->lockForUpdate()
+            ->orderBy('number_patient', 'desc')
+            ->first();
+
+        if (!$lastUser) {
+            $number = 1;
+        } else {
+            $lastNumber = (int) substr($lastUser->patient_number, -4);
+            $number = $lastNumber + 1;
+        }
+        return $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+    });
+}
 }

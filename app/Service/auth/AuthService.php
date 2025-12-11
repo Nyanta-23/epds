@@ -57,6 +57,7 @@ class AuthService
         'name' => $request->name,
         'password' => $request->password,
         'role_id' => Role::where('slug', 'patient')->first()->id,
+        'number_patient' => $this->generatePatientNumber()
       ]);
 
       event(new Registered($user));
@@ -73,4 +74,24 @@ class AuthService
       throw new Exception($error->getMessage(), $error->getCode());
     }
   }
+
+  private static function generatePatientNumber()
+{
+    $prefix = 'PS-' . date('ym') . '-';
+
+    return DB::transaction(function () use ($prefix) {
+        $lastUser = User::where('number_patient', 'like', $prefix . '%')
+            ->lockForUpdate()
+            ->orderBy('number_patient', 'desc')
+            ->first();
+
+        if (!$lastUser) {
+            $number = 1;
+        } else {
+            $lastNumber = (int) substr($lastUser->patient_number, -4);
+            $number = $lastNumber + 1;
+        }
+        return $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+    });
+}
 }

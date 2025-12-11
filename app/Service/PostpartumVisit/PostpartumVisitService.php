@@ -4,6 +4,7 @@ namespace App\Service\PostpartumVisit;
 
 use App\DTO\Request\PostpartumVisit\PostpartumVisitStoreAttributeRequest;
 use App\DTO\Request\PostpartumVisit\PostpartumVisitUpdateAttributeRequest;
+use App\Models\Baby;
 use App\Models\PostpartumVisit;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -54,28 +55,28 @@ class PostpartumVisitService
     return DB::transaction(function () use ($request, $id) {
       PostpartumVisit::findOrFail($id)
         ->update([
-          'visit_number'      => $request->visit_number,
-          'date_filled'       => $request->date_filled,
+          'visit_number' => $request->visit_number,
+          'date_filled' => $request->date_filled,
 
-          'sleep_quality'     => $request->sleep_quality,
-          'partner_support'   => $request->partner_support,
+          'sleep_quality' => $request->sleep_quality,
+          'partner_support' => $request->partner_support,
           'live_with_partner' => $request->live_with_partner,
-          'family_economy'    => $request->family_economy,
+          'family_economy' => $request->family_economy,
 
-          'psych_history'     => $request->psych_history,
-          'psych_treatment'   => $request->psych_treatment,
-          'psych_trauma'      => $request->psych_trauma,
+          'psych_history' => $request->psych_history,
+          'psych_treatment' => $request->psych_treatment,
+          'psych_trauma' => $request->psych_trauma,
 
-          'parity_count'      => $request->parity_count,
+          'parity_count' => $request->parity_count,
           'preg_comp_history' => $request->preg_comp_history,
 
-          'last_comp'         => $request->last_comp,
-          'last_comp_note'    => $request->last_comp_note,
+          'last_comp' => $request->last_comp,
+          'last_comp_note' => $request->last_comp_note,
 
-          'baby_healthy'      => $request->baby_healthy,
-          'baby_caregiver'    => $request->baby_caregiver,
+          'baby_healthy' => $request->baby_healthy,
+          'baby_caregiver' => $request->baby_caregiver,
 
-          'feed_type'         => $request->feed_type,
+          'feed_type' => $request->feed_type,
         ]);
     });
   }
@@ -84,34 +85,33 @@ class PostpartumVisitService
 
   public function store(PostpartumVisitStoreAttributeRequest $request)
   {
-    Log::info('Storing postpartum visit with caregiver: ' . json_encode($request->baby_caregiver));
     return DB::transaction(function () use ($request) {
       return PostpartumVisit::create([
-        'visit_number'      => $request->visit_number,
-        'date_filled'       => $request->date_filled,
+        'visit_number' => $request->visit_number,
+        'date_filled' => $request->date_filled,
 
-        'sleep_quality'     => $request->sleep_quality,
-        'partner_support'   => $request->partner_support,
+        'sleep_quality' => $request->sleep_quality,
+        'partner_support' => $request->partner_support,
         'live_with_partner' => $request->live_with_partner,
         'family_salary_permonth' => $request->family_salary_permonth,
         'dependent_family_count' => $request->dependent_family_count,
-        'is_salary_sufficient'   => $request->is_salary_sufficient,
+        'is_salary_sufficient' => $request->is_salary_sufficient,
 
-        'psych_history'     => $request->psych_history,
-        'psych_treatment'   => $request->psych_treatment,
-        'psych_trauma'      => $request->psych_trauma,
+        'psych_history' => $request->psych_history,
+        'psych_treatment' => $request->psych_treatment,
+        'psych_trauma' => $request->psych_trauma,
 
-        'parity_count'      => $request->parity_count,
+        'parity_count' => $request->parity_count,
         'preg_comp_history' => $request->preg_comp_history,
 
-        'last_comp'         => $request->last_comp,
-        'last_comp_note'    => $request->last_comp_note,
+        'last_comp' => $request->last_comp,
+        'last_comp_note' => $request->last_comp_note,
 
-        'baby_healthy'      => $request->baby_healthy,
-        'baby_caregiver'    => json_encode($request->baby_caregiver),
-
-        'feed_type'         => $request->feed_type,
-        'mother_id'         => $request->mother_id
+        'baby_healthy' => $request->baby_healthy,
+        'baby_caregiver' => json_encode($request->baby_caregiver),
+        'baby_id' => $request->baby_id,
+        'feed_type' => $request->feed_type,
+        'mother_id' => $request->mother_id
       ]);
     });
   }
@@ -126,7 +126,10 @@ class PostpartumVisitService
 
   public function hasPrevious(User $user): bool
   {
-    return PostpartumVisit::where('mother_id', $user->id)->exists();
+    $latestBaby = Baby::where('mother_id', $user->id)
+      ->orderBy('date_of_birth', 'desc')
+      ->first();
+    return PostpartumVisit::where('mother_id', $user->id)->where('baby_id', $latestBaby->baby_id)->exists();
   }
 
 

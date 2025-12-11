@@ -29,6 +29,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 
+    Route::post('/notifications/read-all', function () {
+        auth()->user()->unreadNotifications->markAsRead();
+        return back();
+    })->name('notifications.readAll');
+
+    Route::post('/notifications/{id}/read', function ($id) {
+        auth()->user()->notifications()->where('id', $id)->first()?->markAsRead();
+        return back();
+    })->name('notifications.read');
+
 
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('user');

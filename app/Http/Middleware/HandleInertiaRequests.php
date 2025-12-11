@@ -53,8 +53,15 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user()
                     ? $request->user()->load('role')
                     : null,
+                'notifications' => $request->user()
+                    ? $request->user()->unreadNotifications()->limit(5)->get()
+                    : [],
+                'unreadCount' => $request->user()
+                    ? $request->user()->unreadNotifications()->count()
+                    : 0,
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             // 'ziggy' => fn(): array => [
             //     ...(new Ziggy)->toArray(),
             //     'location' => $request->url()
@@ -70,8 +77,8 @@ class HandleInertiaRequests extends Middleware
             },
             'flash' => [
                 'success' => $request->session()->get('success'),
-                'error'   => $request->session()->get('error'),
-                'info'    => $request->session()->get('info'),
+                'error' => $request->session()->get('error'),
+                'info' => $request->session()->get('info'),
                 'warning' => $request->session()->get('warning'),
             ],
         ];

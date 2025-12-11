@@ -1,44 +1,40 @@
-import CardPostpartumAnswer from "@/components/card-postpartum-answer";
-import CardPostpartumDetail from "@/components/card-postpartum-detail";
-import CardPostpartumDetailBaby from "@/components/card-postpartum-detail-baby";
-import CardPostpartumFollowUp from "@/components/card-postpartum-followup";
-import CardPostpartumResult from "@/components/card-postpartum-result";
-import { PageProp } from "@/types";
-import { FollowUp, PostpartumVisit } from "@/types/resource";
-
+import CardPostpartumAnswer from '@/components/card-postpartum-answer';
+import CardPostpartumDetail from '@/components/card-postpartum-detail';
+import CardPostpartumDetailBaby from '@/components/card-postpartum-detail-baby';
+import CardPostpartumFollowUp from '@/components/card-postpartum-followup';
+import CardPostpartumResult from '@/components/card-postpartum-result';
+import { PageProp } from '@/types';
+import { PostpartumVisit } from '@/types/resource';
 
 interface PopstpartumDetailProps {
-  postpartum: PostpartumVisit;
-   page_prop: PageProp;
+    postpartum: PostpartumVisit;
+    page_prop: PageProp;
 }
 
-export default function PostpartumDetail({ postpartum, page_prop }: PopstpartumDetailProps) {
+export default function PostpartumDetail({
+    postpartum,
+    page_prop,
+}: PopstpartumDetailProps) {
+    return (
+        <section className="space-y-8 p-4 md:p-6">
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+                <div className="space-y-6 lg:col-span-2">
+                    <CardPostpartumDetail postpartum={postpartum} />
+                    <CardPostpartumDetailBaby postpartum={postpartum} />
+                </div>
 
-  return (
-    <section className="grid gap-10">
+                <div className="sticky top-4 space-y-6 lg:col-span-1">
+                    <CardPostpartumResult postpartum={postpartum} />
 
-      <section className="flex gap-4 w-full">
-        <section className="w-2/3 space-y-4">
-
-          <CardPostpartumDetail postpartum={postpartum} />
-
-          <CardPostpartumDetailBaby postpartum={postpartum} />
-
+                    <CardPostpartumFollowUp
+                        enums={page_prop.enums}
+                        postpartum={postpartum}
+                    />
+                </div>
+            </div>
+            <div className="w-full">
+                <CardPostpartumAnswer postpartum={postpartum} />
+            </div>
         </section>
-
-        <section className="w-1/3 space-y-4">
-
-          <CardPostpartumResult postpartum={postpartum} />
-
-          <CardPostpartumFollowUp enums={page_prop.enums} postpartum={postpartum} />
-
-        </section>
-
-      </section>
-
-      <section className="w-full space-y-4">
-        <CardPostpartumAnswer postpartum={postpartum} />
-      </section>
-    </section>
-  );
+    );
 }

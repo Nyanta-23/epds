@@ -58,7 +58,7 @@ class PostpartumVisit extends Model
 
         'baby_healthy',
         'baby_caregiver',
-
+        'baby_id',
         'feed_type',
         'mother_id'
     ];

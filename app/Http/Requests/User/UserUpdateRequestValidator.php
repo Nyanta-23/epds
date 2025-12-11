@@ -36,7 +36,7 @@ class UserUpdateRequestValidator extends FormRequest
 
             ],
             'province_id' => [
-                'required'
+                'required',
             ],
             'regency_id' => [
                 'required'
