@@ -11,6 +11,10 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  province_id: string;
+  regency_id: string;
+  district_id: string;
+  village_id: string
 }
 
 export interface Role {
@@ -159,4 +163,9 @@ export interface RecomendationVariation {
   recomendation_text: string;
   generated_at: string;
   recomendation_rule: RecomendationRule;
+}
+
+export interface Region {
+  id: string;
+  name: string|null
 }

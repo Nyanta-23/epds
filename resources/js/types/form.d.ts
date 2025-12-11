@@ -4,6 +4,10 @@ export interface FormUser {
   role_id: string;
   password?: string;
   password_confirmation?: string;
+  province_id: string;
+  regency_id: string;
+  district_id: string;
+  village_id: string;
   [key: string]: any;
 }
 

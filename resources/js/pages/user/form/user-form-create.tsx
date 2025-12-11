@@ -1,47 +1,81 @@
-import UserFormInformation from "./user-form-information";
-import { Extra } from "@/types";
-import { useUserAction } from "@/hooks/use-user-action";
+import { useRegion } from '@/hooks/use-region';
+import { useUserAction } from '@/hooks/use-user-action';
+import { Extra } from '@/types';
+import { FormUser } from '@/types/form';
+import UserFormInformation from './user-form-information';
 
 interface UserFormCreateProps {
-  extra: Extra;
+    extra: Extra;
 }
 
 export default function UserFormCreate({ extra }: UserFormCreateProps) {
+    const { roles } = extra;
 
+    const { data, errors, handleInputChange, createUser, processing } =
+        useUserAction();
 
-  const { roles } = extra;
+    const {
+        regions: { provinces, cities, districts, villages },
+        handlers: { onProvinceChange, onCityChange, onDistrictChange },
+        loading,
+    } = useRegion();
 
-  const {
-    data,
-    errors,
-    handleInputChange,
-    createUser,
-    processing
-  } = useUserAction();
+    const onFieldChange = (
+        field: keyof FormUser,
+        value: string | number | null,
+    ) => {
+        handleInputChange(field, value);
 
+        const strValue = value?.toString() ?? '';
 
-  return (
+        if (field === 'province_id') {
+            onProvinceChange(strValue);
+            handleInputChange('regency_id', null);
+            handleInputChange('district_id', null);
+            handleInputChange('village_id', null);
+        } else if (field === 'regency_id') {
+            onCityChange(strValue);
+            handleInputChange('district_id', null);
+            handleInputChange('village_id', null);
+        } else if (field === 'district_id') {
+            onDistrictChange(strValue);
+            handleInputChange('village_id', null);
+        }
+    };
 
-    <section className="px-6 py-6">
-      <div className="mx-auto">
-        <form>
-          <div className="space-y-6 lg:col-span-2">
-            <div className="rounded-lg border">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-medium">Create a User</h3>
-                <p className="mt-1 text-sm">Details about User</p>
-              </div>
+    return (
+        <section className="px-6 py-6">
+            <div className="mx-auto">
+                <form>
+                    <div className="space-y-6 lg:col-span-2">
+                        <div className="rounded-lg border">
+                            <div className="border-b px-6 py-4">
+                                <h3 className="text-lg font-medium">
+                                    Create a User
+                                </h3>
+                                <p className="mt-1 text-sm">
+                                    Details about User
+                                </p>
+                            </div>
 
-              <div className="space-y-4 p-6">
-                <UserFormInformation roles={roles.data} data={data} errors={errors} process={processing} handleInputChange={handleInputChange} action={() => createUser()} />
-              </div>
+                            <div className="space-y-4 p-6">
+                                <UserFormInformation
+                                    provinces={provinces}
+                                    cities={cities}
+                                    districts={districts}
+                                    villages={villages}
+                                    roles={roles.data}
+                                    data={data}
+                                    errors={errors}
+                                    process={processing || loading}
+                                    handleInputChange={onFieldChange}
+                                    action={() => createUser()}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-
-
-          </div>
-        </form>
-      </div>
-    </section>
-
-  );
+        </section>
+    );
 }

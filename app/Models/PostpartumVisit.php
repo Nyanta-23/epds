@@ -10,6 +10,7 @@ use App\Enums\FamilySalarySufficientEnum;
 use App\Enums\FeedTyperEnum;
 use App\Enums\PartnerSupportEnum;
 use App\Enums\SleepQualityEnum;
+use App\Models\Scopes\RegionAccessScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -78,11 +79,6 @@ class PostpartumVisit extends Model
     );
     }
 
-    public function mother(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function result(): HasOne
     {
         return $this->hasOne(Result::class);
@@ -96,5 +92,19 @@ class PostpartumVisit extends Model
     public function followup()
     {
         return $this->hasOne(Followup::class);
+    }
+
+    public function mother()
+    {
+        // belongsTo(ModelTujuan, NamaKolomForeign, NamaKolomOwner)
+        return $this->belongsTo(User::class, 'mother_id', 'id');
+    }
+
+    /**
+     * Aktifkan Global Scope
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new RegionAccessScope);
     }
 }

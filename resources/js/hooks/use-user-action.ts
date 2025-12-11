@@ -10,7 +10,11 @@ export function useUserAction(user?: User) {
     email: user?.email || '',
     role_id: user?.role.id || '',
     password: '',
-    password_confirmation: ''
+    password_confirmation: '',
+    province_id: user?.province_id || '',
+    regency_id: user?.regency_id || '',
+    district_id: user?.district_id || '',
+    village_id: user?.village_id || '',
   });
 
   const [processingId, setProcessingId] = useState<string | null>(null);

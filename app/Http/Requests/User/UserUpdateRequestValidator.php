@@ -20,27 +20,32 @@ class UserUpdateRequestValidator extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules($test): array
+    public function rules(): array
     {
-
-        // dd($test);
-
         return [
             'name' => [
                 'required',
                 'string',
                 'max:255'
             ],
-            // 'email' => [
-            //     'unique:users,email',
-            //     'string',
-            //     'max:255'
-            // ],
             'role_id' => [
                 'required',
                 Rule::exists('roles', 'id')->where(function ($query) {
                     $query->where('deleted_at', null);
                 }),
+
+            ],
+            'province_id' => [
+                'required'
+            ],
+            'regency_id' => [
+                'required'
+            ],
+            'district_id' => [
+                'required'
+            ],
+            'village_id' => [
+                'required'
             ]
         ];
     }

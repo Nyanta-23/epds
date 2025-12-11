@@ -45,6 +45,18 @@ class UserStoreRequestValidator extends FormRequest
                 Rule::exists('roles', 'id')->where(function ($query) {
                     $query->where('deleted_at', null);
                 }),
+            ],
+            'province_id' => [
+                'required',
+            ],
+            'regency_id' => [
+                'required'
+            ],
+            'district_id' => [
+                'required'
+            ],
+            'village_id' => [
+                'required'
             ]
         ];
     }
