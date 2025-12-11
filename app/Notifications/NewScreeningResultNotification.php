@@ -3,46 +3,38 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-
-namespace App\Notifications;
-
-use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue; // Wajib Queue agar tidak lemot
-use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class NewScreeningResultNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $result;
-    protected $patient;
+    public $result;
+    public $motherName;
+    public $postpartumId;
 
-    public function __construct($result, $patient)
+    public function __construct($result, $motherName, $postpartumId)
     {
         $this->result = $result;
-        $this->patient = $patient;
+        $this->motherName = $motherName;
+        $this->postpartumId = $postpartumId;
     }
 
     public function via($notifiable)
     {
-        return ['database']; 
+        return ['database'];
     }
 
     public function toArray($notifiable)
     {
-        $score = $this->result->total_score;
-        $status = $score >= 13 ? 'BAHAYA' : 'INFO';
-        
+        $isHighRisk = $this->result->total_score >= 13;
+
         return [
-            'title' => "Hasil Skrining Baru: {$this->patient->name}",
-            'body' => "Skor: {$score}. Status: " . interpreted_score($score),
-            'action_url' => "/admin/screening/" . $this->result->id,
-            'type' => $status,
-            'icon' => $status === 'BAHAYA' ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-check-circle',
+            'title' => $isHighRisk ? '⚠️ BAHAYA: Pasien Risiko Tinggi' : 'Hasil Skrining Baru',
+            'body' => "Ibu {$this->motherName} memiliki skor EPDS: {$this->result->total_score}",
+            'action_url' => route('postpartum.show', $this->postpartumId),
+            'created_at' => now(),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class BabyResource extends JsonResource
         return [
             'id' => $this->id,
             'which_child' => $this->which_child,
-            'date_of_birth' => $this->date_of_birth,
+            'date_of_birth' => Carbon::parse($this->date_of_birth)->format('Y-m-d H:m:s'),
             'baby_condition' => $this->baby_condition,
             'typeof_delivery' => $this->typeof_delivery,
             'gender' => $this->gender,

@@ -53,7 +53,8 @@ export default function UserFormInformation({
     );
     const isMidwife =
         selectedRole?.name?.toLowerCase().includes('midwife') ||
-        selectedRole?.name?.toLowerCase().includes('bidan');
+        selectedRole?.name?.toLowerCase().includes('bidan') ||
+        selectedRole?.name?.toLowerCase().includes('patient')
 
     return (
         <div className="space-y-4 p-6">

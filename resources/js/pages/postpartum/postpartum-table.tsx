@@ -40,7 +40,7 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
             <TableRow key={postpartum.id}>
               <TableCell className="font-medium">{postpartum.mother.number_patient}</TableCell>
               <TableCell className="font-medium">{postpartum.mother.name}</TableCell>
-              <TableCell>{postpartum.visit_number}</TableCell>
+              <TableCell>KF-{postpartum.visit_number}</TableCell>
               <TableCell>{postpartum.result.followup_status.label}</TableCell>
 
               <TableCell className="flex justify-end gap-2">
