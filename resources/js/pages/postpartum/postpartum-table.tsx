@@ -44,11 +44,11 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
               <TableCell>{postpartum.result.followup_status.label}</TableCell>
 
               <TableCell className="flex justify-end gap-2">
-                <Link href={route('postpartum.edit', postpartum.id)}>
+                {/* <Link href={route('postpartum.edit', postpartum.id)}>
                   <Button className="cursor-pointer">
                     <Pencil />
                   </Button>
-                </Link>
+                </Link> */}
                 <Link href={route('postpartum.show', postpartum.id)}>
                   <Button className="cursor-pointer">
                     <Eye />

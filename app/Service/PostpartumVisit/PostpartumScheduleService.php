@@ -48,14 +48,13 @@ class PostpartumScheduleService
     }
 
     $currentVisitTarget = 0;
-    $label = '';
     $deadlineDate = null;
     $nextPhaseStartDate = null;
     $nextVisitLabel = null;
     
     if ($hoursSinceBirth >= 6 && $hoursSinceBirth <= 72) {
         $currentVisitTarget = 1;
-        $label = 'Kunjungan Nifas 1 (KF 1)';
+        $response->label = 'Kunjungan Nifas 1 (KF 1)';
         $nextVisitLabel = 'Kunjungan Nifas 2 (KF 2)';
         
         $deadlineDate = $birthDate->copy()->addHours(72);
@@ -63,7 +62,7 @@ class PostpartumScheduleService
     }
     elseif ($hoursSinceBirth > 72 && $hoursSinceBirth <= 672) {
         $currentVisitTarget = 2;
-        $label = 'Kunjungan Nifas 2 (KF 2)';
+        $response->label = 'Kunjungan Nifas 2 (KF 2)';
         $nextVisitLabel = 'Kunjungan Nifas 3 (KF 3)';
         
         $deadlineDate = $birthDate->copy()->addHours(672);
@@ -71,7 +70,7 @@ class PostpartumScheduleService
     }
     elseif ($hoursSinceBirth > 672 && $hoursSinceBirth <= 1008) {
         $currentVisitTarget = 3;
-        $label = 'Kunjungan Nifas 3 (KF 3)';
+        $response->label = 'Kunjungan Nifas 3 (KF 3)';
         $nextVisitLabel = 'Selesai';
         
         $deadlineDate = $birthDate->copy()->addHours(1008);
@@ -92,11 +91,10 @@ class PostpartumScheduleService
         ->exists();
 
     $response->visitNumber = $currentVisitTarget;
-    $response->label = $label;
 
     if ($hasFilled) {
         $response->status = 'already_filled';
-        $response->message = "Anda sudah mengisi $label.";
+        $response->message = "Anda sudah mengisi $response->label.";
         $response->canFill = false;
 
         $response->nextVisitLabel = $nextVisitLabel;
@@ -106,7 +104,7 @@ class PostpartumScheduleService
 
     } else {
         $response->status = 'can_fill';
-        $response->message = "Waktunya mengisi $label.";
+        $response->message = "Waktunya mengisi $response->label.";
         $response->canFill = true;
 
         $response->nextVisitDate = $deadlineDate->toDateTimeString();
