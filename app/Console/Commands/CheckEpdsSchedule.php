@@ -25,8 +25,8 @@ class CheckEpdsSchedule extends Command
 
            $response = app(PostpartumScheduleService::class)->getScheduleForMother($baby->mother_id);
             
-            if ($response->label) {
-                $this->sendNotification($baby, $$response->label, $response->visitNumber);
+            if ($response->canFill) {
+                $this->sendNotification($baby, $response->label, $response->visitNumber);
             }
         }
         
