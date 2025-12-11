@@ -3,6 +3,7 @@
 namespace App\Service\Patient;
 
 use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
+use App\Models\Baby;
 use App\Models\PostpartumVisit;
 use App\Models\User;
 use Exception;
@@ -96,33 +97,43 @@ class PatientService
     }
   }
 
-  public function getPostpartumChart(?string $id = null)
-  {
+  public function getPostpartumChart(?string $motherId = null)
+{
     try {
-      $postpartums = PostpartumVisit::with([
-        'result'
-      ])->where('mother_id', '=', $id)->orderBy('visit_number', 'asc')->get();
+        $latestBaby = Baby::where('mother_id', $motherId)
+            ->orderBy('date_of_birth', 'desc')
+            ->first();
 
-      $mappingData = [];
+        if (! $latestBaby) {
+            return [];
+        }
+        $postpartums = PostpartumVisit::with(['result'])
+            ->where('mother_id', $motherId)
+            ->where('baby_id', $latestBaby->id)
+            ->orderBy('visit_number', 'asc')
+            ->get();
 
-      if (sizeof($postpartums) == 0) {
-        throw new Exception('data kosong', 404);
-      }
+        $mappingData = [];
 
-      foreach ($postpartums as $postpartum) {
-        Log::info('data', ['data' => $postpartum]);
-        $mappingData[] = [
-          "parameter" => "KF" . $postpartum['visit_number'],
-          'value' => $this->classificationPostpartumScore($postpartum['result']['total_score']),
-          'risk_category' => category_score($postpartum['result']['total_score']),
-          'date_filled' => $postpartum['date_filled']
-        ];
-      }
-      return $mappingData;
+        foreach ($postpartums as $visit) {
+            if (! $visit->result) continue; 
+            
+            $totalScore = $visit->result->total_score;
+
+            $mappingData[] = [
+                "parameter" => "KF" . $visit->visit_number,
+                'value' => $this->classificationPostpartumScore($totalScore),
+                'risk_category' => category_score($totalScore), 
+                'date_filled' => $visit->date_filled 
+            ];
+        }
+
+        return $mappingData;
+
     } catch (Exception $error) {
-      throw new Exception($error->getMessage(), $error->getCode());
+        throw new Exception($error->getMessage(), 500);
     }
-  }
+}
 
   private function classificationPostpartumScore(int $score)
   {
