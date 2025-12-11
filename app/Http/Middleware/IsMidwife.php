@@ -17,9 +17,6 @@ class IsMidwife
     public function handle(Request $request, Closure $next): Response
     {
 
-        if (Auth::check() && Auth::user()->load('role')->role->slug == 'midwife') {
-            return abort(403, 'Unauthorized');
-        }
 
 
         return $next($request);

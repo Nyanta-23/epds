@@ -59,7 +59,11 @@ class UserService
         'role_id' => $request->role_id,
         'password' => Hash::make($request->password),
         'email_verified_at' => now(),
-        'is_verified' => true
+        'is_verified' => true,
+        'province_id' => $request->province_id,
+        'city_or_district_id' => $request->regency_id,
+        'subdistrict_id' => $request->district_id,
+        'village_id' => $request->village_id
       ]);
     }));
 
@@ -71,6 +75,10 @@ class UserService
       User::findOrFail($id)->update([
         'name' => $request->name,
         'role_id' => $request->role_id,
+        'province_id' => $request->province_id,
+        'city_or_district_id' => $request->regency_id,
+        'subdistrict_id' => $request->district_id,
+        'village_id' => $request->village_id
       ]);
     });
   }

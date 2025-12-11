@@ -18,7 +18,11 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'role' => new RoleResource($this->whenLoaded('role'))
+            'role' => new RoleResource($this->whenLoaded('role')),
+            'province_id' => $this->province_id,
+            'regency_id' => $this->city_or_district_id,
+            'district_id' => $this->subdistrict_id,
+            'village_id' => $this->village_id
         ];
     }
 }

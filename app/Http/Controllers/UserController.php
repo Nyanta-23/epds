@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Service\Role\RoleService;
 use App\Service\User\UserService;
 use Illuminate\Http\Request;
+use Log;
 
 class UserController extends Controller
 {
@@ -21,7 +22,8 @@ class UserController extends Controller
     public function __construct(
         private UserService $userService,
         private RoleService $roleService
-    ) {}
+    ) {
+    }
 
     public function index(Request $request)
     {
@@ -63,8 +65,6 @@ class UserController extends Controller
 
         $roles = $this->roleService->getAllRoles($whoAmI);
 
-        // Nanti ubah agar tidak dengan super admin
-
         return Inertia::render('user/action/user-create', [
             'extra' => [
                 'roles' => RoleResource::collection($roles)
@@ -76,21 +76,23 @@ class UserController extends Controller
     {
 
         try {
-            $request->validated();
+            $validated = $request->validated();
 
             $userReq = new UserStoreAttributeRequest();
-            $userReq->name = $request->post('name');
-            $userReq->email = $request->post('email');
-            $userReq->password = $request->post('password');
-            $userReq->role_id = $request->post('role_id');
+            $userReq->name = $validated['name'];
+            $userReq->email = $validated['email'];
+            $userReq->password = $validated['password'];
+            $userReq->role_id = $validated['role_id'];
+            $userReq->province_id = $validated['province_id'];
+            $userReq->district_id = $validated['district_id'];
+            $userReq->regency_id = $validated['regency_id'];
+            $userReq->village_id = $validated['village_id'];
 
             $this->userService->store($userReq);
 
             return redirect()->route('user')->with('success', 'User with email ' . $userReq->email . ', has been added');
         } catch (\Throwable $th) {
             dump($th->getMessage());
-            dd($th);
-
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
@@ -117,22 +119,21 @@ class UserController extends Controller
     {
         try {
 
-            $request->validated();
-
-
+            $validated = $request->validated();
             $userReq = new UserUpdateAttributeRequest();
 
-            // $userReq->email = $request->post('email');
-            $userReq->name = $request->post('name');
-            $userReq->role_id = $request->post('role_id');
+            $userReq->name = $validated['name'];
+            $userReq->role_id = $validated['role_id'];
+            $userReq->province_id = $validated['province_id'];
+            $userReq->district_id = $validated['district_id'];
+            $userReq->regency_id = $validated['regency_id'];
+            $userReq->village_id = $validated['village_id'];
 
             $this->userService->update($userReq, $user->id);
 
             return redirect()->route('user')->with('success', 'User with email ' . $user->email . ', has been updated.');
         } catch (\Throwable $th) {
             dump($th->getMessage());
-            dd($th);
-
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
@@ -145,7 +146,6 @@ class UserController extends Controller
             return redirect()->back()->with('success', 'Successfully deleting user.');
         } catch (\Throwable $th) {
             dump($th->getMessage());
-            dd($th);
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
