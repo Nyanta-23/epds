@@ -21,7 +21,7 @@ export function SelectHighestEducationInput({ value, onChange }: SelectHighestEd
   const [isInputMode, setIsInputMode] = useState<boolean>(false);
 
 
-  const dataEdu = ['SD', 'SMP', 'SMA', 'D3', 'D4/S1', 'S2', 'S3'];
+  const dataEdu = ['SD/SMP', 'SMA/SMK', 'D3/S1/S2'];
 
   useEffect(() => {
     if (value && !dataEdu.includes(value)) {

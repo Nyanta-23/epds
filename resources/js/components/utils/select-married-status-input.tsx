@@ -22,7 +22,7 @@ export function SelectMarriedStatusInput({ value, onChange, className }: SelectM
       <SelectContent>
         <SelectItem className="cursor-pointer" value="married">Married</SelectItem>
         <SelectItem className="cursor-pointer" value="not_married">Belum menikah</SelectItem>
-        <SelectItem className="cursor-pointer" value="divorced">Duda / Janda</SelectItem>
+        <SelectItem className="cursor-pointer" value="divorced">Bercerai</SelectItem>
       </SelectContent>
     </Select>
   )

@@ -25,7 +25,8 @@ export function usePatientAction(patient?: Patient) {
 
     address: patient?.address || '',
     is_verified: patient?.is_verified || false,
-    is_can_visit: patient?.is_can_visit || false
+    is_can_visit: patient?.is_can_visit || false,
+    number_patient: patient?.number_patient || ''
   });
 
 
