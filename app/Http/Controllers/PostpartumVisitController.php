@@ -11,8 +11,10 @@ use App\Enums\FollowUpTypeEnum;
 use App\Enums\PartnerSupportEnum;
 use App\Enums\SleepQualityEnum;
 use App\Http\Requests\PostpartumVisit\PostpartumVisitUpdateRequestValidator;
+use App\Http\Resources\BabyResource;
 use App\Http\Resources\PatientResource;
 use App\Http\Resources\PostpartumVisitResource;
+use App\Models\Baby;
 use App\Models\PostpartumVisit;
 use App\Service\PostpartumVisit\PostpartumVisitService;
 use Illuminate\Http\Request;
@@ -75,8 +77,11 @@ class PostpartumVisitController extends Controller
             'answers.question.optionQuestions'
         ]);
 
+        $baby = Baby::where('mother_id', $postpartum->mother_id)->orderBy('date_of_birth', 'desc')->first();
+
         return Inertia::render('postpartum/action/postpartum-show', [
             'postpartum' => new PostpartumVisitResource($postpartum),
+            'baby' => new BabyResource($baby),
             'page_prop' => [
                 'enums' => [
                     'followup_types' => FollowUpTypeEnum::options(),
@@ -89,8 +94,6 @@ class PostpartumVisitController extends Controller
 
     public function edit(PostpartumVisit $postpartum)
     {
-
-        // dd($postpartum);
         return Inertia::render('postpartum/action/postpartum-edit', [
             'postpartum' => new PostpartumVisitResource($postpartum),
             'page_prop' => [

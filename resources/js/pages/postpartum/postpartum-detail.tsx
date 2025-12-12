@@ -4,23 +4,25 @@ import CardPostpartumDetailBaby from '@/components/card-postpartum-detail-baby';
 import CardPostpartumFollowUp from '@/components/card-postpartum-followup';
 import CardPostpartumResult from '@/components/card-postpartum-result';
 import { PageProp } from '@/types';
-import { PostpartumVisit } from '@/types/resource';
+import { Baby, PostpartumVisit } from '@/types/resource';
 
 interface PopstpartumDetailProps {
     postpartum: PostpartumVisit;
     page_prop: PageProp;
+    baby: Baby
 }
 
 export default function PostpartumDetail({
     postpartum,
     page_prop,
+    baby
 }: PopstpartumDetailProps) {
     return (
         <section className="space-y-8 p-4 md:p-6">
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
-                    <CardPostpartumDetail postpartum={postpartum} />
-                    <CardPostpartumDetailBaby postpartum={postpartum} />
+                    <CardPostpartumDetail baby={baby} postpartum={postpartum} />
+                    <CardPostpartumDetailBaby baby={baby} postpartum={postpartum} />
                 </div>
 
                 <div className="sticky top-4 space-y-6 lg:col-span-1">

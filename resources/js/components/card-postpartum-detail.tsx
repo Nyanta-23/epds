@@ -1,13 +1,15 @@
-import { PostpartumVisit } from '@/types/resource';
+import { Baby, PostpartumVisit } from '@/types/resource';
 import { Badge } from './ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Separator } from './ui/separator';
 
 interface CardPostpartumDetailProps {
     postpartum: PostpartumVisit;
+    baby: Baby;
 }
 
 export default function CardPostpartumDetail({
+    baby,
     postpartum,
 }: CardPostpartumDetailProps) {
     return (
@@ -26,6 +28,19 @@ export default function CardPostpartumDetail({
                         </p>
                     </div>
                     <div>
+                        <p className="font-medium">Tanggal Persalinan</p>
+                        <p className="text-muted-foreground">
+                            {new Date(baby.date_of_birth).toLocaleDateString(
+                                'id-ID',
+                                {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                },
+                            )}
+                        </p>
+                    </div>
+                    <div>
                         <p className="font-medium">Date Filled</p>
                         <p className="text-muted-foreground">
                             {postpartum.date_filled}
@@ -34,7 +49,7 @@ export default function CardPostpartumDetail({
                     <div>
                         <p className="font-medium">Patient Number</p>
                         <p className="text-muted-foreground">
-                            {postpartum.mother.id}
+                            {postpartum.mother.number_patient}
                         </p>
                     </div>
 
@@ -195,8 +210,7 @@ export default function CardPostpartumDetail({
                             <div>
                                 {postpartum.last_comp == 1 && (
                                     <p className="text-md mt-1 text-muted-foreground">
-                                        Note: 
-                                        {postpartum.last_comp_note ??
+                                        Note:                                        {postpartum.last_comp_note ??
                                             'Tidak Ada'}
                                     </p>
                                 )}
