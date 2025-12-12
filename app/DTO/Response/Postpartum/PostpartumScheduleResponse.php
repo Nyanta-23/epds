@@ -11,4 +11,5 @@ class PostpartumScheduleResponse
   public ?string $label;
   public ?string $nextVisitDate;
   public ?string $nextVisitLabel;
+  public ?string $birthDate;
 }
