@@ -18,7 +18,7 @@ class BabyResource extends JsonResource
         return [
             'id' => $this->id,
             'which_child' => $this->which_child,
-            'date_of_birth' => Carbon::parse($this->date_of_birth)->format('Y-m-d'),
+            'date_of_birth' => $this->date_of_birth,
             'baby_condition' => $this->baby_condition,
             'typeof_delivery' => $this->typeof_delivery,
             'gender' => $this->gender,

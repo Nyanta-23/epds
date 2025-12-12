@@ -1,4 +1,4 @@
-import { PostpartumVisit } from '@/types/resource';
+import { Baby, PostpartumVisit } from '@/types/resource';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
     Table,
@@ -11,17 +11,19 @@ import {
 
 interface CardPostpartumDetailBabyProps {
     postpartum: PostpartumVisit;
+    baby: Baby;
 }
 
 export default function CardPostpartumDetailBaby({
     postpartum,
+    baby,
 }: CardPostpartumDetailBabyProps) {
-    console.log(postpartum);
+    console.log();
     return (
         <Card className="p-4">
             <CardHeader>
                 <CardTitle className="text-lg font-semibold">
-                    Detail Baby
+                    Detail Bayi Pasca Persalinan
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
@@ -41,23 +43,30 @@ export default function CardPostpartumDetailBaby({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {postpartum.mother.babies.map((baby, index) => (
-                                <TableRow>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{baby.which_child}</TableCell>
-                                    <TableCell>{baby.date_of_birth}</TableCell>
-                                    <TableCell>
-                                        {baby.baby_condition_label}
-                                    </TableCell>
-                                    <TableCell>
-                                        {baby.baby_feeding_method_label}
-                                    </TableCell>
-                                    <TableCell>
-                                        {baby.typeof_delivery_label}
-                                    </TableCell>
-                                    <TableCell>{baby.gender}</TableCell>
-                                </TableRow>
-                            ))}
+                            <TableRow>
+                                <TableCell>{1}</TableCell>
+                                <TableCell>{baby.which_child}</TableCell>
+                                <TableCell>
+                                    {' '}
+                                    {new Date(
+                                        baby.date_of_birth,
+                                    ).toLocaleDateString('id-ID', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                    })}
+                                </TableCell>
+                                <TableCell>
+                                    {baby.baby_condition_label}
+                                </TableCell>
+                                <TableCell>
+                                    {baby.baby_feeding_method_label}
+                                </TableCell>
+                                <TableCell>
+                                    {baby.typeof_delivery_label}
+                                </TableCell>
+                                <TableCell>{baby.gender}</TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </section>

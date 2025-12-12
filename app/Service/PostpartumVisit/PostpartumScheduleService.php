@@ -28,8 +28,10 @@ class PostpartumScheduleService
         }
 
         $birthDate = $latestBaby->date_of_birth;
+        
         $now = Carbon::now();
         $hoursSinceBirth = $birthDate->diffInHours($now, false);
+        $response->birthDate = $latestBaby->date_of_birth;
 
         if ($hoursSinceBirth < 0) {
             $response->status = 'invalid_date';
@@ -89,7 +91,6 @@ class PostpartumScheduleService
             ->exists();
 
         $response->visitNumber = $currentVisitTarget;
-        $response->birthDate = $latestBaby->date_of_birth;
 
         if ($hasFilled) {
             $response->status = 'already_filled';
