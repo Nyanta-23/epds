@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Service\Patient\PatientService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Log;
 
 class PatientController extends Controller
 {
@@ -66,6 +67,8 @@ class PatientController extends Controller
 
             $request->validated();
 
+            Log::info('request update patient', ['request' => $request->validated()]);
+
             $patientReq = new PatientUpdateAttributeRequest();
 
             $patientReq->name = $request->input('name');
@@ -85,6 +88,7 @@ class PatientController extends Controller
             $patientReq->city_or_district_id = $request->input('city_or_district_id');
             $patientReq->subdistrict_id = $request->input('subdistrict_id');
             $patientReq->village_id = $request->input('village_id');
+            $patientReq->number_patient = $request->input('number_patient');
 
             $patientReq->address = $request->input('address');
 
@@ -92,8 +96,8 @@ class PatientController extends Controller
 
             return redirect()->route('patient')->with('success', 'User with email ' . $user->email . ', has been updated.');
         } catch (\Throwable $th) {
-            dump($th->getMessage());
-            dd($th);
+
+           Log::error('error', ['error' => $th->getMessage()]);
 
             return redirect()->back()->with('error', 'An internal server error.');
         }

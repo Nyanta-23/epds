@@ -24,6 +24,7 @@ export interface FormPatient {
   subdistrict: string; // select api
   village: string; // select api
   address: string; // text
+  number_patient: string
   [key: string]: any;
 }
 
