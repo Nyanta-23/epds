@@ -73,11 +73,17 @@ class BabyService
     try {
       $find = Baby::where('id', '=', $id)->first();
 
-      if(!$find) throw new Exception('data bayi tidak ditemukan', 404);
+      if (!$find)
+        throw new Exception('data bayi tidak ditemukan', 404);
 
       return $find;
-    } catch(Exception $error) {
+    } catch (Exception $error) {
       throw new Exception($error->getMessage(), $error->getCode());
     }
+  }
+
+  public function isBabyFilled(string $motherId = null): bool
+  {
+    return Baby::where('mother_id', $motherId)->exists();
   }
 }
