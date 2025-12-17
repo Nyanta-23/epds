@@ -98,42 +98,43 @@ class PatientService
   }
 
   public function getPostpartumChart(?string $motherId = null)
-{
+  {
     try {
-        $latestBaby = Baby::where('mother_id', $motherId)
-            ->orderBy('date_of_birth', 'desc')
-            ->first();
+      $latestBaby = Baby::where('mother_id', $motherId)
+        ->orderBy('date_of_birth', 'desc')
+        ->first();
 
-        if (! $latestBaby) {
-            return [];
-        }
-        $postpartums = PostpartumVisit::with(['result'])
-            ->where('mother_id', $motherId)
-            ->where('baby_id', $latestBaby->id)
-            ->orderBy('visit_number', 'asc')
-            ->get();
+      if (!$latestBaby) {
+        return [];
+      }
+      $postpartums = PostpartumVisit::with(['result'])
+        ->where('mother_id', $motherId)
+        ->where('baby_id', $latestBaby->id)
+        ->orderBy('visit_number', 'asc')
+        ->get();
 
-        $mappingData = [];
+      $mappingData = [];
 
-        foreach ($postpartums as $visit) {
-            if (! $visit->result) continue; 
-            
-            $totalScore = $visit->result->total_score;
+      foreach ($postpartums as $visit) {
+        if (!$visit->result)
+          continue;
 
-            $mappingData[] = [
-                "parameter" => "KF" . $visit->visit_number,
-                'value' => $this->classificationPostpartumScore($totalScore),
-                'risk_category' => category_score($totalScore), 
-                'date_filled' => $visit->date_filled 
-            ];
-        }
+        $totalScore = $visit->result->total_score;
 
-        return $mappingData;
+        $mappingData[] = [
+          "parameter" => "KF" . $visit->visit_number,
+          'value' => $this->classificationPostpartumScore($totalScore),
+          'risk_category' => category_score($totalScore),
+          'date_filled' => $visit->date_filled
+        ];
+      }
+
+      return $mappingData;
 
     } catch (Exception $error) {
-        throw new Exception($error->getMessage(), 500);
+      throw new Exception($error->getMessage(), 500);
     }
-}
+  }
 
   private function classificationPostpartumScore(int $score)
   {
@@ -177,5 +178,35 @@ class PatientService
     });
 
     return $user;
+  }
+
+  public function isProfileFilled(string $userId): bool
+  {
+    $user = User::find($userId);
+
+    if (!$user) {
+      return false;
+    }
+
+    $requiredFields = [
+      'phone_number',
+      'birthplace',
+      'date_of_birth',
+      'job',
+      'married_status',
+      'highest_education',
+      'province_id',
+      'city_or_district_id',
+      'subdistrict_id',
+      'village_id',
+      'address',
+    ];
+
+    foreach ($requiredFields as $field) {
+      if (!filled($user->{$field})) {
+        return false;
+      }
+    }
+    return true;
   }
 }

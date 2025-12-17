@@ -19,7 +19,6 @@ class RegionAccessScope implements Scope
             return;
         }
 
-        // 2. PASIEN (Lihat Data Sendiri)
         if ($user->role === 'patient') {
             $builder->where('mother_id', $user->id);
             return;
@@ -34,7 +33,7 @@ class RegionAccessScope implements Scope
             }
             if ($user->district_id) {
                 $builder->whereHas('mother', function ($query) use ($user) {
-                    $query->where('district_id', $user->district_id);
+                    $query->where('subdistrict_id', $user->district_id);
                 });
                 return;
             }
