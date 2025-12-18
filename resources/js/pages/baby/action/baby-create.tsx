@@ -11,11 +11,11 @@ interface BabyCreateProps {
 
 export default function BabyCreate({ extra, page_prop }: BabyCreateProps) {
 
-  const title: string = 'Baby';
+  const title: string = 'Bayi';
   const link: string = '/baby';
 
-  const subtitle = `Create ${title}`;
-  const desc = `Add your ${title}`
+  const subtitle = `Tambah ${title}`;
+  const desc = `Tambah Data  ${title}`
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
