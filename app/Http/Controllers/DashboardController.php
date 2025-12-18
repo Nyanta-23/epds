@@ -11,7 +11,8 @@ class DashboardController extends Controller
 
     public function __construct(
         private DashboardService $dashboardService
-    ) {}
+    ) {
+    }
 
     public function index()
     {
@@ -22,13 +23,12 @@ class DashboardController extends Controller
         $screeningMonths = $this->dashboardService->postpartumScreeningLineMonth();
 
 
-        $followUp = $this->dashboardService->followUp();
-        $unFollowUp = $this->dashboardService->unFollowUp();
+        $followUpStats = $this->dashboardService->followUpStats();
 
         $riskDistribution = $this->dashboardService->riskDistribution();
 
         $latestPostpartumData = $this->dashboardService->latestPostpartumData();
-        
+
 
 
         return Inertia::render('dashboard', [
@@ -37,7 +37,7 @@ class DashboardController extends Controller
                 'screening_weeks' => $sreeningWeeks,
                 'screening_months' => $screeningMonths
             ],
-            "followups" => [$followUp, $unFollowUp],
+            "followups" => [$followUpStats['follow_up'], $followUpStats['unfollow_up']],
             "risk_distributions" => $riskDistribution,
             "latest_postpartum_datas" => $latestPostpartumData
         ]);
