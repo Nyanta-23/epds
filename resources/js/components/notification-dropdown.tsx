@@ -190,7 +190,7 @@ export default function NotificationDropdown() {
 
                         <div className="border-t bg-gray-50 px-4 py-2 text-center">
                             <Link
-                                href="/admin/notifications"
+                                href="/notifications"
                                 className="block w-full py-1 text-xs font-medium text-gray-600 hover:text-gray-900"
                             >
                                 Lihat Semua Riwayat
