@@ -13,11 +13,11 @@ interface PatientEditProps {
 
 export default function PatientEdit({ patient }: PatientEditProps) {
 
-  const title: string = 'Patient';
+  const title: string = 'Pasien';
   const link: string = '/patient';
 
   const subtitle = `Edit ${title}`;
-  const desc = `Add your ${title}`
+  const desc = `Edit Pasien ${title}`
 
   const breadcrumbs: BreadcrumbItem[] = [
     {

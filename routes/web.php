@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BabyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PostpartumVisitController;
 use App\Http\Controllers\QuestionController;
@@ -31,7 +32,7 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
 
 // --- AUTHENTICATED ROUTES ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     // 1. GLOBAL AUTH ROUTES (Semua User Login Bisa Akses)
     // ---------------------------------------------------
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
@@ -58,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 3. SYSTEM & CONFIGURATION (Akses: HANYA Super Admin)
     // ---------------------------------------------------
     Route::middleware(['role:super_admin'])->group(function () {
-        
+
         // Manajemen Role
         Route::prefix('role')->group(function () {
             Route::get('/', [RoleController::class, 'index'])->name('role');
@@ -114,7 +115,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{user}/edit', [PatientController::class, 'edit'])->name('patient.edit');
             Route::get('/{user}', [PatientController::class, 'show'])->name('patient.show');
             Route::put('/{user}', [PatientController::class, 'update'])->name('patient.update');
-            
+
             // Aksi Khusus
             Route::patch('/{user}/visit', [PatientController::class, 'visit'])->name('patient.visit');
             Route::patch('/{user}/verification', [PatientController::class, 'verification'])->name('patient.verification');
@@ -150,6 +151,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{followup}', [FollowUpController::class, 'update'])->name('followup.update');
     });
 
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('readAll');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+    });
 });
 
 require __DIR__ . '/settings.php';
