@@ -16,8 +16,8 @@ export default function Baby({ babies, page_prop }: BabyProps) {
     const title: string = 'Baby';
     const link: string = '/baby';
 
-    const subtitle = `${title} Management`;
-    const desc = `Manage your ${title}`;
+    const subtitle = `Manajemen Bayi`;
+    const desc = `Atur Data Bayi`;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

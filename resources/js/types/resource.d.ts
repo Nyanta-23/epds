@@ -63,13 +63,14 @@ export interface Baby {
   id: string;
   which_child: number;
   date_of_birth: string;
-  baby_condition: string;
+  baby_condition: number;
   baby_condition_label: string;
-  typeof_delivery: string;
+  typeof_delivery: number;
   typeof_delivery_label: string;
   gender: string;
   mother: Patient;
   baby_feeding_method_label: string
+  baby_feeding_method: number
 }
 
 export interface Question {
@@ -129,6 +130,7 @@ export interface Result {
   followup_status: Enum;
   postpartum_visit: PostpartumVisit;
   follow_up: FollowUp;
+  followup:FollowUp;
 }
 
 export interface Answer {

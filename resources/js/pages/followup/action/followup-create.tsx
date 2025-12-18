@@ -1,11 +1,11 @@
 import FollowupFormInformation from "../form/followup-form-information";
 import { Enums } from "@/types";
 import { useFollowUpAction } from "@/hooks/use-followup-action";
-import { Result } from "@/types/resource";
+import { PostpartumVisit, Result } from "@/types/resource";
 import { usePage } from "@inertiajs/react";
 
 interface FollowUpCreateProps {
-  result: Result | undefined;
+  result: PostpartumVisit | undefined;
   enums: Enums;
   onSuccess: () => void;
 }

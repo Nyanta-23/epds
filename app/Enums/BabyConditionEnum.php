@@ -43,8 +43,8 @@ enum BabyConditionEnum: int
   public static function options(): array
   {
     return collect(self::cases())->map(fn($case) => [
-      'value' => $case->value,
-      'label' => $case->label(),
+      'value' => $case->value_id(),
+      'label' => $case->label_id(),
     ])->toArray();
   }
 }

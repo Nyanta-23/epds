@@ -15,8 +15,8 @@ export default function Role({ roles }: RoleProps) {
   const title: string = 'Role';
   const link: string = '/role';
 
-  const subtitle = `${title} Management`;
-  const desc = `Manage your ${title}`;
+  const subtitle = `Manajemen Peran`;
+  const desc = `Atur ${title}`;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {

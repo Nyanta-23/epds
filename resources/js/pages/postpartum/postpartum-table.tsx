@@ -1,91 +1,77 @@
-
-
-import { Clipboard, ClipboardPenLine, Eye, Pencil } from "lucide-react";
-import { PostpartumVisit, Result } from "@/types/resource";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Enums } from "@/types";
-import { Link } from "@inertiajs/react";
-import { useState } from "react";
-import FormDialog from "@/components/form-dialog-version-two";
-import FollowUpCreate from "../followup/action/followup-create";
-import FollowUpEdit from "../followup/action/followup-edit";
-
+import { Button } from '@/components/ui/button';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Enums } from '@/types';
+import { PostpartumVisit } from '@/types/resource';
+import { Link } from '@inertiajs/react';
+import { Eye } from 'lucide-react';
+import { useState } from 'react';
 
 interface PostpartumTableProps {
-  data: PostpartumVisit[];
-  enums: Enums;
+    data: PostpartumVisit[];
+    enums: Enums;
 }
 
 export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [result, setResult] = useState<PostpartumVisit>();
 
-  const [result, setResult] = useState<Result>();
+    console.log(result);
 
-  return (
-    <section className='rounded-b-md border-t-0 border overflow-hidden'>
-      <Table>
-        <TableHeader className='bg-accent'>
-          <TableRow>
-            <TableHead>Number Patient</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Visiting</TableHead>
-            <TableHead>Result Status</TableHead>
-            <TableHead className="text-right">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((postpartum) => (
-            <TableRow key={postpartum.id}>
-              <TableCell className="font-medium">{postpartum.mother.number_patient}</TableCell>
-              <TableCell className="font-medium">{postpartum.mother.name}</TableCell>
-              <TableCell>KF-{postpartum.visit_number}</TableCell>
-              <TableCell>{postpartum.result.followup_status.label}</TableCell>
+    return (
+        <section className="overflow-hidden rounded-b-md border border-t-0">
+            <Table>
+                <TableHeader className="bg-accent">
+                    <TableRow>
+                        <TableHead>Nomor Pasien</TableHead>
+                        <TableHead>Nama</TableHead>
+                        <TableHead>Kunjungan Nifas</TableHead>
+                        <TableHead>Status Hasil</TableHead>
+                        <TableHead className="text-right">Aksi</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {data.map((postpartum) => (
+                        <TableRow key={postpartum.id}>
+                            <TableCell className="font-medium">
+                                {postpartum.mother.number_patient}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                                {postpartum.mother.name}
+                            </TableCell>
+                            <TableCell>KF-{postpartum.visit_number}</TableCell>
+                            <TableCell>
+                                {postpartum.result.followup_status.label_id}
+                            </TableCell>
 
-              <TableCell className="flex justify-end gap-2">
-                {/* <Link href={route('postpartum.edit', postpartum.id)}>
+                            <TableCell className="flex justify-end gap-2">
+                                {/* <Link href={route('postpartum.edit', postpartum.id)}>
                   <Button className="cursor-pointer">
                     <Pencil />
                   </Button>
                 </Link> */}
-                <Link href={route('postpartum.show', postpartum.id)}>
-                  <Button className="cursor-pointer">
-                    <Eye />
-                  </Button>
-                </Link>
-
-                <Button className="cursor-pointer" onClick={() => {
-                  setOpenDialog(true);
-                  setResult(postpartum.result);
-                }} >
-                  {!postpartum.result.follow_up ? (
-                    <Clipboard />
-                  ) : (
-                    <ClipboardPenLine />
-                  )}
-                </Button>
-
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-
-      <FormDialog
-        open={openDialog}
-        onOpenChange={setOpenDialog}
-        title="Form Checkup"
-        description={!result?.follow_up ? 'Fill data postpartum checkup.' : 'Edit data postpartum checkup.'}
-      >
-        {!result?.follow_up ? (
-          <FollowUpCreate enums={enums} result={result} onSuccess={() => setOpenDialog(false)} />
-        ) : (
-          <FollowUpEdit enums={enums} result={result} onSuccess={() => setOpenDialog(false)} />
-        )}
-      </FormDialog>
-
-    </section>
-  );
+                                <Link
+                                    href={route(
+                                        'postpartum.show',
+                                        postpartum.id,
+                                    )}
+                                >
+                                    <Button className="cursor-pointer">
+                                        <Eye />
+                                    </Button>
+                                </Link>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </section>
+    );
 }

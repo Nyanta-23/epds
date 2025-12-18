@@ -6,6 +6,7 @@ use App\DTO\Request\Baby\BabyStoreAttributeRequest;
 use App\DTO\Request\Baby\BabyUpdateAttributeRequest;
 use App\Enums\BabyConditionEnum;
 use App\Enums\BabyTypeOfDeliveryEnum;
+use App\Enums\FeedTyperEnum;
 use App\Http\Requests\Baby\BabyStoreRequestValidator;
 use App\Http\Requests\Baby\BabyUpdateRequestValidator;
 use App\Http\Resources\BabyResource;
@@ -63,11 +64,7 @@ class BabyController extends Controller
         $patients = $this->patientService->getPatients();
 
         $baby->load('mother');
-
-        // dump($baby->load('mother'));
-
-        // dd($baby->load('mother'));
-
+        
         return Inertia::render('baby/action/baby-edit', [
             'baby' => new BabyResource($baby),
             'extra' => [
@@ -77,6 +74,7 @@ class BabyController extends Controller
                 'enums' => [
                     'baby_conditions' => BabyConditionEnum::options(),
                     'baby_typeof_deliveries' => BabyTypeOfDeliveryEnum::options(),
+                    'baby_feeding_types' => FeedTyperEnum::options(),
                 ]
             ]
         ]);
@@ -97,6 +95,7 @@ class BabyController extends Controller
             $babyReq->baby_condition = (int) $request->post('baby_condition');
             $babyReq->typeof_delivery = (int) $request->post('typeof_delivery');
             $babyReq->gender = $request->post('gender');
+            $babyReq->baby_feeding_method = (int) $request->post('baby_feeding_method');
             $babyReq->mother_id = $request->post('mother_id');
 
             $this->babyService->store($babyReq);
@@ -127,6 +126,7 @@ class BabyController extends Controller
             $babyReq->typeof_delivery = (int) $request->post('typeof_delivery');
             $babyReq->gender = $request->post('gender');
             $babyReq->mother_id = $request->post('mother_id');
+            $babyReq->baby_feeding_method = (int) $request->post('baby_feeding_method');
 
             
             $this->babyService->update($babyReq, $baby->id);

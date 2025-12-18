@@ -38,9 +38,6 @@ class FollowUpController extends Controller
 
             return redirect()->route('postpartum')->with('success', 'Success adding follow up.');
         } catch (\Throwable $th) {
-            dump($th->getMessage());
-            dd($th);
-
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
@@ -51,24 +48,9 @@ class FollowUpController extends Controller
 
             $user = auth()->user();
 
-            // $role = $user->role->slug;
-
             $request->validated();
 
             $followUpReq = new FollowUpUpdateAttributeRequest();
-
-            // if ($role != "midiwife") {
-            //     $followUpReq->followup_status = $request->post('followup_status');
-            //     $followUpReq->notes = $request->post('notes');
-            //     $followUpReq->type = $request->post('type');
-            //     $followUpReq->result_id = $followup->result->id;
-            // } else {
-            //     $followUpReq->followup_status = $request->post('followup_status');
-            //     $followUpReq->notes = $request->post('notes');
-            //     $followUpReq->type = $request->post('type');
-            //     $followUpReq->midiwfe_id  = $user->id;
-            //     $followUpReq->result_id = $followup->result->id;
-            // }
 
             $followUpReq->followup_status = $request->post('followup_status');
             $followUpReq->notes = $request->post('notes');
@@ -83,9 +65,6 @@ class FollowUpController extends Controller
 
             return redirect()->route('postpartum')->with('success', 'Success update follow up.');
         } catch (\Throwable $th) {
-            dump($th->getMessage());
-            dd($th);
-
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }

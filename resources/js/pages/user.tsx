@@ -12,13 +12,11 @@ interface UserProps {
 }
 
 export default function User({ users, extra, page_prop }: UserProps) {
-    console.log(extra);
-
     const title: string = 'User';
     const link: string = '/user';
 
-    const subtitle = `${title} Management`;
-    const desc = `Manage your ${title}`;
+    const subtitle = `Manajemen Pengguna`;
+    const desc = `Atur pengguna`;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

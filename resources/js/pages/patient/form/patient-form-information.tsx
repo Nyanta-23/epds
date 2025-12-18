@@ -33,7 +33,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
       <div>
         <Label className="mb-2 block text-sm font-medium">
-          Name <span className="text-red-500">*</span>
+          Nama <span className="text-red-500">*</span>
         </Label>
         <Input
           type="text"
@@ -49,7 +49,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
       <div>
         <Label className="mb-2 block text-sm font-medium">
-          Phone Number <span className="text-red-500">*</span>
+          Nomor Telepon <span className="text-red-500">*</span>
         </Label>
         <Input
           type="text"
@@ -67,7 +67,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
         <div className="w-[60%]">
           <Label className="mb-2 block text-sm font-medium">
-            Birthplace <span className="text-red-500">*</span>
+            Tempat Lahir <span className="text-red-500">*</span>
           </Label>
           <Input
             type="text"
@@ -83,7 +83,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
         <div className="w-[40%]">
           <Label className="mb-2 block text-sm font-medium">
-            Date of Birth <span className="text-red-500">*</span>
+            Tanggal lahir <span className="text-red-500">*</span>
           </Label>
           <DatePicker
             value={data.date_of_birth ? new Date(data.date_of_birth) : undefined}
@@ -96,7 +96,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
       <div>
         <Label className="mb-2 block text-sm font-medium">
-          Job <span className="text-red-500">*</span>
+          Pekerjaan <span className="text-red-500">*</span>
         </Label>
         <Input
           type="text"
@@ -114,7 +114,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
         <div className="w-[50%]">
           <Label className="mb-2 block text-sm font-medium">
-            Married Status <span className="text-red-500">*</span>
+            Status Pernikahan <span className="text-red-500">*</span>
           </Label>
           <SelectMarriedStatusInput
             value={data.married_status}
@@ -126,7 +126,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
         <div className="w-[50%]">
           <Label className="mb-2 block text-sm font-medium">
-            Highest Education <span className="text-red-500">*</span>
+            Pendidikan Terakhir <span className="text-red-500">*</span>
           </Label>
           <SelectHighestEducationInput
             value={data.highest_education}
@@ -168,7 +168,7 @@ export default function PatientFormInformation({ data, errors, process, handleIn
 
       <div>
         <Label className="mb-2 block text-sm font-medium">
-          Address <span className="text-red-500">*</span>
+          Alamat Lengkap <span className="text-red-500">*</span>
         </Label>
         <Textarea placeholder="Address"
           value={data.address}

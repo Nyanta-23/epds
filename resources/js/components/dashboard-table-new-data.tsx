@@ -24,18 +24,18 @@ export default function DashboardTableNewData({ latest_data }: DashboardTableNew
   return (
     <Card className="flex flex-col gap-5">
       <CardHeader className="pb-0">
-        <CardTitle>Latest Data</CardTitle>
-        <CardDescription>Latest postpartum records.</CardDescription>
+        <CardTitle>Data Terbaru</CardTitle>
+        <CardDescription>Data terbaru dari pospartum</CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Number Patient</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Date Filled</TableHead>
-              <TableHead>Risk</TableHead>
+              <TableHead>Nomor Pasien</TableHead>
+              <TableHead>Nama</TableHead>
+              <TableHead>Tanggal Diisi</TableHead>
+              <TableHead>Resiko</TableHead>
             </TableRow>
           </TableHeader>
 

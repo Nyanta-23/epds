@@ -20,7 +20,7 @@ export default function Search({ total, filter, link }: SearchProps) {
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
   const handleSearch = (e?: React.FormEvent) => {
-    e?.preventDefault(); // cegah reload halaman jika submit form
+    e?.preventDefault(); 
     setIsSearching(true);
 
     router.get(
@@ -42,16 +42,16 @@ export default function Search({ total, filter, link }: SearchProps) {
     <form onSubmit={handleSearch}>
       <InputGroup>
         <InputGroupInput
-          placeholder="Search..."
+          placeholder="Cari pengguna..."
           value={querySearch}
           onChange={(e) => setQuerySearch(e.target.value)}
         />
         <InputGroupAddon align="inline-end">
-          {isSearching ? "Searching..." : `${total} results`}
+          {isSearching ? "Mencari" : `${total} hasil`}
         </InputGroupAddon>
         <InputGroupAddon align="inline-end">
           <Button
-            type="submit" // <--- tombol submit form
+            type="submit" 
             className="cursor-pointer w-fit h-fit rounded-none"
             variant="ghost"
           >

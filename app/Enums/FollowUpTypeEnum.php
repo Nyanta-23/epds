@@ -30,7 +30,7 @@ enum FollowUpTypeEnum: int
   {
     return collect(self::cases())->map(fn($case) => [
       'value' => $case->value,
-      'label' => $case->label(),
+      'label' => $case->label_id(),
     ])->toArray();
   }
 }

@@ -2,6 +2,7 @@ import { Baby, PostpartumVisit } from '@/types/resource';
 import { Badge } from './ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Separator } from './ui/separator';
+import marriedStatus from './utils/married_status';
 
 interface CardPostpartumDetailProps {
     postpartum: PostpartumVisit;
@@ -16,13 +17,13 @@ export default function CardPostpartumDetail({
         <Card className="p-4">
             <CardHeader>
                 <CardTitle className="text-lg font-semibold">
-                    Postpartum Detail
+                    Detail Postpartum
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 <div className="grid grid-cols-2 gap-3">
                     <div>
-                        <p className="font-medium">Visit Number</p>
+                        <p className="font-medium">Kunjungan ke</p>
                         <p className="text-muted-foreground">
                             {postpartum.visit_number}
                         </p>
@@ -41,45 +42,45 @@ export default function CardPostpartumDetail({
                         </p>
                     </div>
                     <div>
-                        <p className="font-medium">Date Filled</p>
+                        <p className="font-medium">Tanggal diisi</p>
                         <p className="text-muted-foreground">
                             {postpartum.date_filled}
                         </p>
                     </div>
                     <div>
-                        <p className="font-medium">Patient Number</p>
+                        <p className="font-medium">Nomor Pasien</p>
                         <p className="text-muted-foreground">
                             {postpartum.mother.number_patient}
                         </p>
                     </div>
 
                     <div>
-                        <p className="font-medium">Name</p>
+                        <p className="font-medium">Nama</p>
                         <p className="text-muted-foreground">
                             {postpartum.mother.name}
                         </p>
                     </div>
 
                     <div>
-                        <p className="font-medium">Place, Date of Birth</p>
+                        <p className="font-medium">Tempat, Tanggal Lahir</p>
                         <p className="text-muted-foreground">{`${postpartum.mother.birthplace}, ${postpartum.mother.date_of_birth}`}</p>
                     </div>
                     <div>
-                        <p className="font-medium">Job</p>
+                        <p className="font-medium">Pekerjaan</p>
                         <p className="text-muted-foreground">
                             {postpartum.mother.job}
                         </p>
                     </div>
 
                     <div>
-                        <p className="font-medium">Married Status</p>
+                        <p className="font-medium">Status Pernikahan</p>
                         <p className="text-muted-foreground">
-                            {postpartum.mother.married_status}
+                            {marriedStatus(postpartum.mother.married_status)}
                         </p>
                     </div>
 
                     <div>
-                        <p className="font-medium">Highest Education</p>
+                        <p className="font-medium">Pendidikan Terakhir</p>
                         <p className="text-muted-foreground">
                             {postpartum.mother.highest_education}
                         </p>
@@ -160,7 +161,7 @@ export default function CardPostpartumDetail({
                             </div>
 
                             <div className="space-y-2">
-                                <p className="font-medium">Past Treatment</p>
+                                <p className="font-medium">Terapi Psikologi dimasa lalu</p>
                                 <Badge>
                                     {postpartum.psych_treatment
                                         ? 'Ya'
@@ -169,7 +170,7 @@ export default function CardPostpartumDetail({
                             </div>
 
                             <div className="space-y-2">
-                                <p className="font-medium">Trauma History</p>
+                                <p className="font-medium">Pernah ada trauma</p>
                                 <Badge>
                                     {postpartum.psych_trauma ? 'Ya' : 'Tidak'}
                                 </Badge>
@@ -210,7 +211,7 @@ export default function CardPostpartumDetail({
                             <div>
                                 {postpartum.last_comp == 1 && (
                                     <p className="text-md mt-1 text-muted-foreground">
-                                        Note:                                        {postpartum.last_comp_note ??
+                                        Catatan:                                        {postpartum.last_comp_note ??
                                             'Tidak Ada'}
                                     </p>
                                 )}

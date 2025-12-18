@@ -34,20 +34,27 @@ class FollowUpService
   }
 
   public function update(FollowUpUpdateAttributeRequest $request, string $id)
-  {
-
+{
     return DB::transaction(function () use ($request, $id) {
-      $result = Result::findOrFail($request->result_id);
-      $followUp = Followup::findOrFail($id);
+        $followUp = Followup::findOrFail($id);
+        
 
-      $result->update([
-        'followup_status' => $request->followup_status
-      ]);
+        $followUp->update([
+            'type' => $request->type,
+            'notes' => $request->notes
+        ]);
 
-      $followUp->update([
-        'type' => $request->type,
-        'notes' => $request->notes
-      ]);
+        $result = Result::where('postpartum_visit_id', $followUp->postpartum_visit_id)->firstOrFail();
+
+        $result->update([
+            'followup_status' => $request->followup_status
+        ]);
+        
+        if ($followUp->wasChanged() === false) {
+             $followUp->touch();
+        }
+
+        return $followUp;
     });
-  }
+}
 }

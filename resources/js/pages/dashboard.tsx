@@ -1,9 +1,7 @@
-
 import ChartLineScreening from '@/components/chart-line-screening';
 import ChartPieFollowUp from '@/components/chart-pie-followup';
 import ChartPieRisk from '@/components/chart-pie-risk';
 import DashboardTableNewData from '@/components/dashboard-table-new-data';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -16,7 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
 interface DashboardProps {
     screenings: any;
     followups: any;
@@ -24,12 +21,12 @@ interface DashboardProps {
     latest_postpartum_datas: any;
 }
 
-export default function Dashboard({ screenings, followups, risk_distributions, latest_postpartum_datas }: DashboardProps) {
-
-    // console.log(latest_postpartum_datas);
-
-    // console.log(risk_distributions)
-
+export default function Dashboard({
+    screenings,
+    followups,
+    risk_distributions,
+    latest_postpartum_datas,
+}: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -44,7 +41,9 @@ export default function Dashboard({ screenings, followups, risk_distributions, l
                     </div>
                     <div className="relative aspect-video rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
-                        <DashboardTableNewData latest_data={latest_postpartum_datas} />
+                        <DashboardTableNewData
+                            latest_data={latest_postpartum_datas}
+                        />
                     </div>
                 </div>
                 <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">

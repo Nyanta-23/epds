@@ -60,10 +60,10 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
                         <div className="rounded-lg border">
                             <div className="border-b px-6 py-4">
                                 <h3 className="text-lg font-medium">
-                                    Edit a User
+                                    Edit pengguna.
                                 </h3>
                                 <p className="mt-1 text-sm">
-                                    Details about User
+                                    Data pengguna
                                 </p>
                             </div>
 

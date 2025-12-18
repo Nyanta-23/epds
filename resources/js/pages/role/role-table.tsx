@@ -9,6 +9,7 @@ import { useUserAction } from "@/hooks/use-user-action";
 import { Filter } from "@/types";
 import { Link } from "@inertiajs/react";
 import { Spinner } from "@/components/ui/spinner";
+import roleIdentifier from "@/components/utils/role-identifier";
 
 
 interface RoleTableProps {
@@ -25,7 +26,7 @@ export default function RoleTable({ data }: RoleTableProps) {
       <Table>
         <TableHeader className='bg-accent'>
           <TableRow>
-            <TableHead>Name</TableHead>
+            <TableHead>Nama</TableHead>
             {/* <TableHead>Email</TableHead> */}
             {/* <TableHead>Role</TableHead> */}
             {/* <TableHead className="text-right">Action</TableHead> */}
@@ -34,7 +35,7 @@ export default function RoleTable({ data }: RoleTableProps) {
         <TableBody>
           {data.map((role) => (
             <TableRow key={role.id}>
-              <TableCell className="font-medium">{role.name}</TableCell>
+              <TableCell className="font-medium">{roleIdentifier(role.name)}</TableCell>
 
               {/* <TableCell className="flex justify-end gap-2">
 

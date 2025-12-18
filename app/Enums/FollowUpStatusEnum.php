@@ -18,7 +18,7 @@ enum FollowUpStatusEnum: int
       self::REFER_PSYCHOLOGIST => 'Referred to Psychologist',
     };
   }
-  
+
   public function label_id(): string
   {
     return match ($this) {
@@ -33,7 +33,7 @@ enum FollowUpStatusEnum: int
   {
     return collect(self::cases())->map(fn($case) => [
       'value' => $case->value,
-      'label' => $case->label(),
+      'label' => $case->label_id(),
     ])->toArray();
   }
 }
