@@ -2,187 +2,188 @@
 
 namespace App\Service\Dashboard;
 
-use App\Models\Followup;
 use App\Models\PostpartumVisit;
-use Illuminate\Support\Facades\DB;
+use App\Models\Followup;
 
 class DashboardService
 {
-  public function postpartumScreeningLineDay()
-  {
+    /**
+     * Grafik Harian (7 Hari Terakhir)
+     * Menggunakan Group By SQL agar cuma 1 query, bukan 7.
+     */
+    public function postpartumScreeningLineDay(): array
+    {
+        $startDate = now()->subDays(6)->startOfDay();
+        $endDate = now()->endOfDay();
 
-    $results = [];
+        $data = PostpartumVisit::selectRaw('DATE(date_filled) as date, count(*) as total')
+            ->whereBetween('date_filled', [$startDate, $endDate])
+            ->groupBy('date')
+            ->pluck('total', 'date'); 
 
-    for ($i = 6; $i >= 0; $i--) {
-      $date = now()->copy()->subDays($i);
+        $results = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $dateString = $date->toDateString();
 
-      $results[] = [
-        'day' => $date->englishDayOfWeek,
-        'date' => $date->toDateString(),
-        'total' => PostpartumVisit::whereDate('date_filled', $date)->count()
-      ];
+            $results[] = [
+                'day' => $date->format('l'),
+                'date' => $dateString,
+                'total' => $data[$dateString] ?? 0
+            ];
+        }
+
+        return $results;
     }
 
-    return array_reverse($results);
-  }
+    /**
+     * Grafik Mingguan (4 Minggu Terakhir)
+     */
+    public function postpartumScreeningLineWeekly(): array
+    {
+        $results = [];
+        for ($i = 3; $i >= 0; $i--) {
+            $weekDate = now()->subWeeks($i);
+            $start = $weekDate->copy()->startOfWeek();
+            $end = $weekDate->copy()->endOfWeek();
 
+            $count = PostpartumVisit::whereBetween('date_filled', [
+                $start->toDateString(), 
+                $end->toDateString()
+            ])->count();
 
-  public function postpartumScreeningLineWeekly()
-  {
-    $results = [];
+            $results[] = [
+                'week' => "Week " . (4 - $i),
+                'start' => $start->toDateString(),
+                'end' => $end->toDateString(),
+                'total' => $count
+            ];
+        }
 
-    for ($i = 3; $i >= 0; $i--) {
-      $weekDate = now()->copy()->subWeeks($i);
-
-      $start = $weekDate->copy()->startOfWeek();
-      $end = $weekDate->copy()->endOfWeek();
-
-      $weekNumber = 3 - $i + 1;
-
-      $results[] = [
-        'week' => "Week $weekNumber",
-        'start' => $start->toDateString(),
-        'end' => $end->toDateString(),
-        'total' => PostpartumVisit::whereBetween('date_filled', [
-          $start->toDateString(),
-          $end->toDateString()
-        ])->count()
-      ];
+        return $results;
     }
 
-    return array_reverse($results);
-  }
+    /**
+     * Grafik Bulanan (12 Bulan Terakhir)
+     * Menggunakan SQL Group By Year-Month
+     */
+    public function postpartumScreeningLineMonth(): array
+    {
+        $startDate = now()->subMonths(11)->startOfMonth();
+        
+        $data = PostpartumVisit::selectRaw('YEAR(date_filled) as year, MONTH(date_filled) as month, count(*) as total')
+            ->where('date_filled', '>=', $startDate)
+            ->groupBy('year', 'month')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item->total];
+            });
 
+        $results = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $key = $date->format('Y-m');
 
-  public function postpartumScreeningLineMonth()
-  {
-    $results = [];
+            $results[] = [
+                'month' => $date->format('F'),
+                'year' => $date->year,
+                'total' => $data[$key] ?? 0
+            ];
+        }
 
-    for ($i = 11; $i >= 0; $i--) {
-      $date = now()->copy()->subMonths($i);
-
-      $results[] = [
-        'month' => $date->englishMonth,
-        'year' => $date->year,
-        'total' => PostpartumVisit::whereYear('date_filled', $date->year)
-          ->whereMonth('date_filled', $date->month)
-          ->count()
-      ];
+        return $results;
     }
 
+    /**
+     * Statistik Follow Up (Persentase)
+     */
+    public function followUpStats(): array
+    {
+        $totalVisits = PostpartumVisit::count();
+      
+        $totalFollowUp = Followup::count();
 
-    return array_reverse($results);
-  }
+        if ($totalVisits === 0) {
+            return [
+                'follow_up_percentage' => 0,
+                'unfollow_up_percentage' => 0,
+                'total_visits' => 0
+            ];
+        }
 
+        $percentageFollowUp = ($totalFollowUp / $totalVisits) * 100;
+        $percentageUnFollowUp = 100 - $percentageFollowUp;
 
-  public function followUp()
-  {
-    $unFollowUp = PostpartumVisit::all()->count();
-    $followUp = Followup::all()->count();
-
-    $result = $followUp < 0 ?  $followUp / ($followUp + $unFollowUp) * 100 : 0;
-
-    return [
-      'label' => 'Follow Up',
-      'data' => round($result)
-    ];
-  }
-
-  public function unFollowUp()
-  {
-    $unFollowUp = PostpartumVisit::all()->count();
-    $followUp = Followup::all()->count();
-
-    $result = $unFollowUp < 0 ? $unFollowUp / ($followUp + $unFollowUp) * 100 : 0;
-
-    return [
-      'label' => 'Un Follow Up',
-      'data' => round($result)
-    ];
-  }
-
-  public function riskDistribution()
-  {
-    $visits = PostpartumVisit::with('result')
-      // ->whereDate('date_filled', [now()->startOfWeek(), now()->endOfWeek()])
-      ->whereBetween('date_filled', [
-        now()->startOfWeek()->toDateString(),
-        now()->endOfWeek()->toDateString(),
-      ])
-      ->get();
-
-    $normal = 0;
-    $low = 0;
-    $high = 0;
-
-
-    foreach ($visits as $visit) {
-      if (!$visit->result) continue;
-
-      $score = $visit->result->total_score;
-
-      $category = category_score($score);
-
-      if ($category === "Normal") {
-        $normal++;
-      } elseif ($category === "Low Risk") {
-        $low++;
-      } else {
-        $high++;
-      }
+        return [
+            'follow_up' => [
+                'label' => 'Sudah Follow Up',
+                'data' => round($percentageFollowUp),
+                'count' => $totalFollowUp
+            ],
+            'unfollow_up' => [
+                'label' => 'Belum Follow Up',
+                'data' => round($percentageUnFollowUp),
+                'count' => $totalVisits - $totalFollowUp
+            ]
+        ];
     }
 
-    return [
-      ['label' => 'Normal', 'value' => $normal],
-      ['label' => 'Low Risk', 'value' => $low],
-      ['label' => 'High Risk', 'value' => $high],
-    ];
-  }
+    /**
+     * Distribusi Risiko Minggu Ini
+     */
+    public function riskDistribution(): array
+    {
+        $visits = PostpartumVisit::with('result:id,postpartum_visit_id,total_score')
+            ->whereBetween('date_filled', [
+                now()->startOfWeek()->toDateString(),
+                now()->endOfWeek()->toDateString(),
+            ])
+            ->get();
 
+        $stats = [
+            'Normal' => 0,
+            'Low Risk' => 0,
+            'High Risk' => 0,
+        ];
 
+        foreach ($visits as $visit) {
+            if (!$visit->result) continue;
 
-  public function latestPostpartumData()
-  {
-    $visits = PostpartumVisit::with(['mother', 'result'])
-      ->orderBy('created_at', 'desc')
-      ->take(6)
-      ->get();
+            $category = category_score($visit->result->total_score);
 
-    return $visits->map(function ($visit) {
-      return [
-        'number_patient' => $visit->mother?->number_patient,
-        'name' => $visit->mother?->name,
-        'date_filled' => $visit->date_filled,
-        'risk' => $visit->result
-          ? category_score($visit->result->total_score)
-          : 'No Result',
-      ];
-    })->toArray();
-  }
+            if (isset($stats[$category])) {
+                $stats[$category]++;
+            } else {
+                $stats['High Risk']++; 
+            }
+        }
 
+        return [
+            ['label' => 'Normal', 'value' => $stats['Normal'] ?? 0],
+            ['label' => 'Low Risk', 'value' => $stats['Low Risk'] ?? 0],
+            ['label' => 'High Risk', 'value' => $stats['High Risk'] ?? 0],
+        ];
+    }
 
+    /**
+     * Data Terbaru
+     */
+    public function latestPostpartumData(): array
+    {
+        $visits = PostpartumVisit::with(['mother', 'result'])
+            ->latest('created_at')
+            ->take(6)
+            ->get();
 
-  // public function postpartumScreeningLineMonth()
-  // {
-  //   $startOfMonth = now()->startOfMonth();
-
-  //   $results = [];
-
-  //   $orderedMonths = month_collection();
-
-  //   foreach ($orderedMonths as $index => $monthName) {
-
-  //     $date = $startOfMonth->copy()->addMonths($index)->toDateString();
-
-  //     $count = PostpartumVisit::whereDate('date_filled', $date)->count();
-
-  //     $results[] = [
-  //       'month' => $monthName,
-  //       'date' => $date,
-  //       'total' => $count
-  //     ];
-  //   }
-
-  //   return $results;
-  // }
+        return $visits->map(function ($visit) {
+            return [
+                'number_patient' => $visit->mother?->number_patient ?? '-',
+                'name' => $visit->mother?->name ?? 'Unknown',
+                'date_filled' => $visit->date_filled,
+                'risk' => $visit->result
+                    ? category_score($visit->result->total_score)
+                    : 'No Result',
+            ];
+        })->toArray();
+    }
 }
