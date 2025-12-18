@@ -23,7 +23,8 @@ class BabyController extends Controller
     public function __construct(
         private BabyService $babyService,
         private PatientService $patientService
-    ) {}
+    ) {
+    }
 
     public function index(Request $request)
     {
@@ -54,6 +55,7 @@ class BabyController extends Controller
                 'enums' => [
                     'baby_conditions' => BabyConditionEnum::options(),
                     'baby_typeof_deliveries' => BabyTypeOfDeliveryEnum::options(),
+                    'baby_feeding_types' => FeedTyperEnum::options()
                 ]
             ]
         ]);
@@ -64,7 +66,7 @@ class BabyController extends Controller
         $patients = $this->patientService->getPatients();
 
         $baby->load('mother');
-        
+
         return Inertia::render('baby/action/baby-edit', [
             'baby' => new BabyResource($baby),
             'extra' => [
@@ -128,7 +130,7 @@ class BabyController extends Controller
             $babyReq->mother_id = $request->post('mother_id');
             $babyReq->baby_feeding_method = (int) $request->post('baby_feeding_method');
 
-            
+
             $this->babyService->update($babyReq, $baby->id);
 
             return redirect()->route('baby')->with('success', 'Baby has been updated.');

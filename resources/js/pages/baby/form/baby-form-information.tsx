@@ -1,3 +1,4 @@
+import { DateTimePicker } from '@/components/datetime-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -8,10 +9,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { DatePicker } from '@/components/utils/date-picker';
 import { Enums } from '@/types';
 import { FormBaby } from '@/types/form';
 import { Patient } from '@/types/resource';
+import { format } from 'date-fns';
 import { ChevronDown } from 'lucide-react';
 import BabyActionForm from './baby-action-form';
 
@@ -111,9 +112,10 @@ export default function BabyFormInformation({
 
             <div>
                 <Label className="mb-2 block text-sm font-medium">
-                    Tanggal Lahir <span className="text-red-500">*</span>
+                    Tanggal & Jam Lahir <span className="text-red-500">*</span>
                 </Label>
-                <DatePicker
+
+                <DateTimePicker
                     value={
                         data.date_of_birth
                             ? new Date(data.date_of_birth)
@@ -122,7 +124,8 @@ export default function BabyFormInformation({
                     onChange={(date) =>
                         handleInputChange(
                             'date_of_birth',
-                            date ? date.toISOString().split('T')[0] : null,
+
+                            date ? format(date, 'yyyy-MM-dd HH:mm:ss') : null,
                         )
                     }
                 />
@@ -133,6 +136,12 @@ export default function BabyFormInformation({
                     </p>
                 )}
             </div>
+
+            {errors.date_of_birth && (
+                <p className="mt-1 text-sm text-red-500">
+                    {errors.date_of_birth}
+                </p>
+            )}
 
             <div>
                 <Label className="mb-2 block text-sm font-medium">
@@ -225,14 +234,18 @@ export default function BabyFormInformation({
 
             <div>
                 <Label className="mb-2 block text-sm font-medium">
-                    Cara memberi makan bayi <span className="text-red-500">*</span>
+                    Cara memberi makan bayi{' '}
+                    <span className="text-red-500">*</span>
                 </Label>
 
                 <div className="relative">
                     <Select
                         value={String(data.baby_feeding_method)}
                         onValueChange={(value) =>
-                            handleInputChange('baby_feeding_method', Number(value))
+                            handleInputChange(
+                                'baby_feeding_method',
+                                Number(value),
+                            )
                         }
                         required
                     >
