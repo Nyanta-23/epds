@@ -16,8 +16,8 @@ export default function Patient({ patients, extra, page_prop }: UserProps) {
     const title: string = 'Patient';
     const link: string = '/patient';
 
-    const subtitle = `${title} Management`;
-    const desc = `Manage your ${title}`;
+    const subtitle = `Manajemen Pasien`;
+    const desc = `Atur Data Pasien`;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

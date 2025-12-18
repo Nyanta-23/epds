@@ -9,6 +9,7 @@ import { useUserAction } from "@/hooks/use-user-action";
 import { Filter } from "@/types";
 import { Link } from "@inertiajs/react";
 import { Spinner } from "@/components/ui/spinner";
+import roleIdentifier from "@/components/utils/role-identifier";
 
 
 interface UserTableProps {
@@ -21,15 +22,16 @@ export default function UserTable({ data, filter }: UserTableProps) {
   const { deleteUser, processingId } = useUserAction();
   const { only_trash } = filter;
 
+  
   return (
     <section className='rounded-b-md border-t-0 border overflow-hidden'>
       <Table>
         <TableHeader className='bg-accent'>
           <TableRow>
-            <TableHead>Name</TableHead>
+            <TableHead>Nama</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead>Peran</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,7 +39,7 @@ export default function UserTable({ data, filter }: UserTableProps) {
             <TableRow key={user.id}>
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role.name}</TableCell>
+              <TableCell>{roleIdentifier(user.role.name)}</TableCell>
 
               <TableCell className="flex justify-end gap-2">
 
@@ -51,8 +53,8 @@ export default function UserTable({ data, filter }: UserTableProps) {
 
                     <ButtonConfirmation
                       content={{
-                        title: 'Are you sure?',
-                        description: 'Deleting this user'
+                        title: 'Apa kamu yakin?',
+                        description: 'Menghapus pengguna ini?'
                       }}
                       onConfirm={() => deleteUser(user.id)}
                     >

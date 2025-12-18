@@ -15,11 +15,7 @@ export default function BabyMainContent({ baby, page_prop }: BabyMainContentProp
 
   const { filter } = page_prop;
   const { meta, data } = baby;
-
-
-  // const { roles } = extra;
   
-
   return (
     <>
       <BabyAction filter={filter} meta={meta} />

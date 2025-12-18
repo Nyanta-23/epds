@@ -21,21 +21,19 @@ export default function BabyTable({ data, filter }: UserTableProps) {
   const { deleteBaby, processingId } = useBabyAction();
   const { only_trash } = filter;
 
-
-  console.log(data);
-
   return (
     <section className='rounded-b-md border-t-0 border overflow-hidden'>
       <Table>
         <TableHeader className='bg-accent'>
           <TableRow>
-            <TableHead>Mother Name</TableHead>
-            <TableHead className="text-center">Which Child</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Baby Condition</TableHead>
-            <TableHead>Typeof Delivery</TableHead>
-            <TableHead>Gender</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead>Nama Ibu</TableHead>
+            <TableHead className="text-center">Anak 1</TableHead>
+            <TableHead>Tanggal Lahir</TableHead>
+            <TableHead>Kondisi Bayi</TableHead>
+            <TableHead>Jenis Persalinan</TableHead>
+            <TableHead>Cara Memberi Makan</TableHead>
+            <TableHead>Jenis Kelamin</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -43,10 +41,18 @@ export default function BabyTable({ data, filter }: UserTableProps) {
             <TableRow key={baby.id}>
               <TableCell className="font-medium">{baby.mother.name}</TableCell>
               <TableCell className="text-center">{baby.which_child}</TableCell>
-              <TableCell>{baby.date_of_birth}</TableCell>
+              <TableCell>{new Date(baby.date_of_birth).toLocaleDateString(
+                                'id-ID',
+                                {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                },
+                            )}</TableCell>
               <TableCell>{baby.baby_condition_label}</TableCell>
               <TableCell>{baby.typeof_delivery_label}</TableCell>
-              <TableCell>{baby.gender}</TableCell>
+              <TableCell>{baby.baby_feeding_method_label}</TableCell>
+              <TableCell>{baby.gender === 'male' ? "Laki - Laki" : "Perempuan"}</TableCell>
 
               <TableCell className="flex justify-end gap-2">
 
@@ -60,8 +66,8 @@ export default function BabyTable({ data, filter }: UserTableProps) {
 
                     <ButtonConfirmation
                       content={{
-                        title: 'Are you sure?',
-                        description: 'Deleting this baby.'
+                        title: 'Apakah kamu yakin?',
+                        description: 'Menghapus data bayi ini?'
                       }}
                       onConfirm={() => deleteBaby(baby.id)}
                     >

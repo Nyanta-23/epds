@@ -28,10 +28,6 @@ export default function ChartPieRisk({ risk_distributions }: ChartPieRiskProps) 
       fill: `var(--chart-${index + 1})`,
     }))
 
-  // --- Handle empty dataset ---
-  // const hasData = chartData.some((item) => item.value > 0)
-
-  // --- Dynamic Chart Config ---
   const chartConfig: ChartConfig = {
     value: { label: "Total" },
     ...chartData.reduce((acc: any, item) => {
@@ -43,15 +39,11 @@ export default function ChartPieRisk({ risk_distributions }: ChartPieRiskProps) 
     }, {}),
   }
 
-  console.log(chartData);
-
-  console.log(chartConfig);
-
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Risk Distribution</CardTitle>
-        <CardDescription>This Week's Screening Results</CardDescription>
+        <CardTitle>Distribusi Resiko</CardTitle>
+        <CardDescription>Hasil Skrining Minggu ini</CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">

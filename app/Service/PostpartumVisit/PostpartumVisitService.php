@@ -5,6 +5,7 @@ namespace App\Service\PostpartumVisit;
 use App\DTO\Request\PostpartumVisit\PostpartumVisitStoreAttributeRequest;
 use App\DTO\Request\PostpartumVisit\PostpartumVisitUpdateAttributeRequest;
 use App\Models\Baby;
+use App\Models\Followup;
 use App\Models\PostpartumVisit;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -14,37 +15,34 @@ class PostpartumVisitService
 {
   public function index($filters)
   {
-    $search = $filters['search'];
-    $verified = filter_var($filters['filter_list']['select_filter']['is_verified'], FILTER_VALIDATE_BOOLEAN);
-    $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'], FILTER_VALIDATE_BOOLEAN);
-    $isFollowed = filter_var($filters['is_followed'], FILTER_VALIDATE_BOOLEAN);
+    $search = $filters['search'] ?? null;
+
+    $verified = filter_var($filters['filter_list']['select_filter']['is_verified'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    $isFollowed = filter_var($filters['is_followed'] ?? null, FILTER_VALIDATE_BOOLEAN);
 
     $query = PostpartumVisit::with([
       'mother',
-      'result',
       'result.followup',
-      'answers',
-      'answers.question',
       'answers.question.optionQuestions'
-    ])
-      ->when($search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $searchTerms = '%' . $search . '%';
+    ]);
 
-          $q->whereHas('mother', function ($q) use ($searchTerms) {
-            $q->where('name', 'like', $searchTerms);
-          });
-        });
-      })
-      ->when($isFollowed, function ($q) {
-        $q->whereHas('result', fn($r) => $r->whereNotNull('followup_id'));
-      })
-      ->when(!$isFollowed, function ($q) {
-        $q->whereHas('result', fn($r) => $r->whereNull('followup_id'));
-      })
-      ->when($verified, fn($q) => $q->where('is_verified', $verified))
-      ->when($canVisit, fn($q) => $q->where('is_can_visit', $canVisit))
-      ->latest();
+    $query->when($search, function ($q, $search) {
+      $q->whereHas('mother', fn($subQ) => $subQ->where('name', 'like', "%{$search}%"));
+    });
+
+    if ($isFollowed) {
+      $query->whereHas('result.followup');
+      $query->orderByDesc(
+        Followup::select('updated_at')
+          ->whereColumn('postpartum_visit_id', 'postpartum_visits.id')
+          ->latest()
+          ->limit(1)
+      );
+    } else {
+      $query->whereDoesntHave('result.followup');
+      $query->latest('created_at');
+    }
 
     return $query->paginate(10)->withQueryString();
   }

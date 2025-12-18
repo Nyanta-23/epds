@@ -23,25 +23,25 @@ export default function PatientTable({ data }: PatientTableProps) {
       <Table>
         <TableHeader className='bg-accent'>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Phone Number</TableHead>
-            <TableHead>Place, Date of birth</TableHead>
-            <TableHead>Job</TableHead>
-            <TableHead>City</TableHead>
-            <TableHead className="text-center">Is Verified</TableHead>
-            <TableHead className="text-center">Is Can Visit</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead>Nama</TableHead>
+            <TableHead>Nomor Telepon</TableHead>
+            <TableHead>Tempat, Tanggal Lahir</TableHead>
+            <TableHead>Pekerjaan</TableHead>
+            <TableHead>Kota</TableHead>
+            {/* <TableHead className="text-center">Is Verified</TableHead>
+            <TableHead className="text-center">Is Can Visit</TableHead> */}
+            <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((patient) => (
             <TableRow key={patient.id}>
-              <TableCell className="font-medium">{patient.name}</TableCell>
-              <TableCell>{patient.phone_number}</TableCell>
-              <TableCell>{`${patient.birthplace}, ${patient.date_of_birth}`}</TableCell>
-              <TableCell>{patient.job}</TableCell>
-              <TableCell>{patient.city_or_district}</TableCell>
-              <TableCell className="text-center">
+              <TableCell className={`font-medium ${patient?.name == null ? 'text-center': ''}`}>{patient?.name}</TableCell>
+              <TableCell className={`font-medium ${patient?.phone_number == null ? 'text-center': ''}`}>{patient?.phone_number ?? '-'}</TableCell>
+              <TableCell className={`font-medium ${patient?.birthplace == null ? 'text-center': ''}`}>{`${patient?.birthplace ?? '-'}, ${patient?.date_of_birth ?? '-'}`}</TableCell>
+              <TableCell className={`font-medium ${patient?.job == null ? 'text-center': ''}`}>{patient?.job ?? '-'}</TableCell>
+              <TableCell className={`font-medium ${patient?.city_or_district == null ? 'text-center': ''}`}>{patient?.city_or_district ?? '-'}</TableCell>
+              {/* <TableCell className="text-center">
                 <ButtonConfirmation
                   content={{
                     title: "Are you sure?",
@@ -56,9 +56,9 @@ export default function PatientTable({ data }: PatientTableProps) {
                     }
                   </Button>
                 </ButtonConfirmation>
-              </TableCell>
+              </TableCell> */}
 
-              <TableCell className="text-center">
+              {/* <TableCell className="text-center">
                 <ButtonConfirmation
                   content={{
                     title: "Are you sure?",
@@ -73,7 +73,7 @@ export default function PatientTable({ data }: PatientTableProps) {
                     }
                   </Button>
                 </ButtonConfirmation>
-              </TableCell>
+              </TableCell> */}
 
               <TableCell className="flex justify-end gap-2">
                 <Link href={route('patient.edit', patient.id)}>

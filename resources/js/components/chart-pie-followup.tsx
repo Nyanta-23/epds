@@ -36,8 +36,8 @@ export default function ChartPieFollowUp({ followups }: ChartPieFollowUpProps) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Follow Up & Un Follow Up</CardTitle>
-        <CardDescription>All data record</CardDescription>
+        <CardTitle>Tindak Lanjut</CardTitle>
+        <CardDescription>Semua Data</CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1 pb-0">

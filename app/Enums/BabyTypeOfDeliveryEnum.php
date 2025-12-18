@@ -27,11 +27,20 @@ enum BabyTypeOfDeliveryEnum: int
     };
   }
 
+  public function value_id(): int
+  {
+    return match ($this) {
+      self::NORMAL => 0,
+      self::C_SECTION => 1,
+      self::FORSEP => 2
+    };
+  }
+
   public static function options(): array
   {
     return collect(self::cases())->map(fn($case) => [
-      'value' => $case->value,
-      'label' => $case->label(),
+      'value' => $case->value_id(),
+      'label' => $case->label_id(),
     ])->toArray();
   }
 }

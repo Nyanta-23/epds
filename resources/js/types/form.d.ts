@@ -1,99 +1,99 @@
 export interface FormUser {
-  name: string;
-  email: string;
-  role_id: string;
-  password?: string;
-  password_confirmation?: string;
-  province_id: string;
-  regency_id: string;
-  district_id: string;
-  village_id: string;
-  [key: string]: any;
+    name: string;
+    email: string;
+    role_id: string;
+    password?: string;
+    password_confirmation?: string;
+    province_id: string;
+    regency_id: string;
+    district_id: string;
+    village_id: string;
+    [key: string]: any;
 }
 
 export interface FormPatient {
-  name: string; // input
-  phone_number: string; // input
-  birthplace: string; // input
-  date_of_birth: string; // date
-  job: string; // input
-  married_status: string; // select
-  highest_education: string; // select
-  province: string; // select api
-  city_or_district: string; // select api 
-  subdistrict: string; // select api
-  village: string; // select api
-  address: string; // text
-  number_patient: string
-  [key: string]: any;
+    name: string; // input
+    phone_number: string; // input
+    birthplace: string; // input
+    date_of_birth: string; // date
+    job: string; // input
+    married_status: string; // select
+    highest_education: string; // select
+    province: string; // select api
+    city_or_district: string; // select api
+    subdistrict: string; // select api
+    village: string; // select api
+    address: string; // text
+    number_patient: string;
+    [key: string]: any;
 }
 
 export interface FormBaby {
-  which_child: number;
-  date_of_birth: string;
-  baby_condition: string;
-  typeof_delivery: string;
-  gender: string;
-  mother_id: string;
-  [key: string]: any;
+    which_child: number;
+    date_of_birth: string;
+    baby_condition: number;
+    typeof_delivery: number;
+    gender: string;
+    mother_id: string;
+    baby_feeding_method: number;
+    [key: string]: any;
 }
 
 export interface FormQuestion {
-  number_question: string;
-  question: string;
-  [key: string]: any;
+    number_question: string;
+    question: string;
+    [key: string]: any;
 }
 
 export interface FormOptionQuestion {
-  option: string;
-  option_text: string;
-  value: number;
-  [key: string]: any;
+    option: string;
+    option_text: string;
+    value: number;
+    [key: string]: any;
 }
 
 export interface FormPostpartumVisit {
-  visit_number: number;
-  date_filled: string;
+    visit_number: number;
+    date_filled: string;
 
-  sleep_quality: string;
-  partner_support: string;
-  live_with_partner: boolean;
-  family_economy: string;
+    sleep_quality: string;
+    partner_support: string;
+    live_with_partner: boolean;
+    family_economy: string;
 
-  psych_history: boolean;
-  psych_treatment: boolean;
-  psych_trauma: boolean;
+    psych_history: boolean;
+    psych_treatment: boolean;
+    psych_trauma: boolean;
 
-  parity_count: string;
-  preg_comp_history: boolean;
+    parity_count: string;
+    preg_comp_history: boolean;
 
-  last_comp: boolean;
-  last_comp_note: string | null;
+    last_comp: boolean;
+    last_comp_note: string | null;
 
-  baby_healthy: boolean;
-  baby_caregiver: string;
+    baby_healthy: boolean;
+    baby_caregiver: string;
 
-  feed_type: string;
+    feed_type: string;
 
-  [key: string]: any;
+    [key: string]: any;
 }
 
-
 export interface FormResult {
-  followup_status: string;
+    followup_status: string;
 }
 
 export interface FormFollowUp {
-  type: number;
-  notes: string;
-  followup_status: number;
-  result_id: string;
+    type: number;
+    notes: string;
+    followup_status: number;
+    result_id: string;
 }
 
 export interface FormRecomendationRule {
-  name: string;
-  description: string;
-  min_score: number;
-  max_score: number;
-  [key: string]: any;
+    name: string;
+    description: string;
+    min_score: number;
+    max_score: number;
+    [key: string]: any;
 }

@@ -28,8 +28,6 @@ class FollowUpUpdateRequestValidator extends FormRequest
 
             'notes' => ['required', 'string', 'max:5000'],
 
-            'date_filled' => ['required', 'date'],
-
             'result_id' => ['uuid', 'exists:results,id'],
 
             'midwife_id' => ['uuid', 'exists:users,id'],

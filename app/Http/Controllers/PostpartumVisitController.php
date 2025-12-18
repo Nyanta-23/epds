@@ -36,11 +36,9 @@ class PostpartumVisitController extends Controller
             'is_followed' => $request->boolean('is_followed', false),
             'filter_list' => [
                 'select_filter' => [
-                    // 'role' => $request->input('role')
                     'is_verified' => $request->input('is_verified'),
                     'is_can_visit' => $request->input('is_can_visit'),
                 ],
-                // 'checkbox_filter' => []
             ]
         ];
 

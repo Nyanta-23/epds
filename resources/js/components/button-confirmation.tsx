@@ -28,9 +28,9 @@ export function ButtonConfirmation({ content, children, onConfirm }: ButtonConfi
           )}
         </AlertDialogHeader>
         <AlertDialogFooter className="flex gap-2">
-          <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="cursor-pointer">Batalkan</AlertDialogCancel>
           <AlertDialogAction className="cursor-pointer" onClick={onConfirm}>
-              Confirm
+              Lanjutkan
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

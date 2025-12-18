@@ -11,6 +11,7 @@ import { FormUser } from '@/types/form';
 import { Region, Role } from '@/types/resource';
 import { ChevronDown } from 'lucide-react';
 import UserActionForm from './user-action-form';
+import roleIdentifier from '@/components/utils/role-identifier';
 
 type Errors = Partial<Record<keyof FormUser, string>>;
 
@@ -60,7 +61,7 @@ export default function UserFormInformation({
         <div className="space-y-4 p-6">
             <div>
                 <Label className="mb-2 block text-sm font-medium">
-                    Name <span className="text-red-500">*</span>
+                    Nama <span className="text-red-500">*</span>
                 </Label>
                 <Input
                     type="text"
@@ -151,7 +152,7 @@ export default function UserFormInformation({
 
             <div>
                 <Label className="mb-2 block text-sm font-medium">
-                    Role <span className="text-red-500">*</span>
+                    Peran <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
                     <Select
@@ -175,7 +176,7 @@ export default function UserFormInformation({
                                         key={role.id}
                                         value={role.id.toString()}
                                     >
-                                        {role.name}
+                                        {roleIdentifier(role.name)}
                                     </SelectItem>
                                 ))}
                         </SelectContent>

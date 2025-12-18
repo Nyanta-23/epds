@@ -27,8 +27,8 @@ export default function PatientFormEdit({ patient }: PatientFormEditProps) {
           <div className="space-y-6 lg:col-span-2">
             <div className="rounded-lg border">
               <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-medium">Edit a User</h3>
-                <p className="mt-1 text-sm">Details about User</p>
+                <h3 className="text-lg font-medium">Ubah Pasien</h3>
+                <p className="mt-1 text-sm">Detail Pasien</p>
               </div>
 
               <div className="space-y-4 p-6">

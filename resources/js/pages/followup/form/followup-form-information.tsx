@@ -31,7 +31,7 @@ export default function FollowupFormInformation({ data, errors, handleInputChang
     <section className="grid gap-4">
       <div className="grid gap-3">
         <Label className="mb-2 block text-sm font-medium">
-          Follow Up Type <span className="text-red-500">*</span>
+          Tipe Followup <span className="text-red-500">*</span>
         </Label>
 
         <div className="relative">

@@ -2,6 +2,7 @@ import { router } from "@inertiajs/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Filter } from "@/types";
 import { Role } from "@/types/resource";
+import roleIdentifier from "./role-identifier";
 
 interface SelectFilterRoleProps {
   title?: string;
@@ -57,7 +58,7 @@ export default function SelectFilterRole({
         <SelectItem className="cursor-pointer" value="all">All</SelectItem>
         {roles.map((role) => (
           <SelectItem className="cursor-pointer" key={role.id} value={role.slug}>
-            {role.name}
+            {roleIdentifier(role.name)}
           </SelectItem>
         ))}
       </SelectContent>
