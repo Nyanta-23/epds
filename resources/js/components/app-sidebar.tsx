@@ -1,4 +1,3 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -13,7 +12,15 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Award, Baby, BookOpen, FileQuestion, FileText, Folder, LayoutGrid, ScanHeart, UserRoundCog, UserRoundPlus, Users } from 'lucide-react';
+import {
+    Baby,
+    FileQuestion,
+    LayoutGrid,
+    ScanHeart,
+    UserRoundCog,
+    UserRoundPlus,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,74 +28,54 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+        canAccess: ['super_admin', 'admin', 'midwife'],
     },
     {
-        title: 'User',
+        title: 'Pengguna',
         href: '/user',
         icon: Users,
+        canAccess: ['super_admin', 'admin'],
     },
     {
-        title: 'Role',
+        title: 'Peran',
         href: '/role',
         icon: UserRoundCog,
+        canAccess: ['super_admin'],
     },
     {
-        title: 'Patient',
+        title: 'Pasien',
         href: '/patient',
         icon: UserRoundPlus,
+        canAccess: ['super_admin', 'admin', 'midwife'],
     },
     {
-        title: 'Patient Baby Management',
+        title: 'Manajemen Bayi Pasien',
         href: '/baby',
         icon: Baby,
+        canAccess: ['super_admin', 'admin', 'midwife'],
     },
     {
-        title: 'Question',
+        title: 'Pertanyaan Kuesioner',
         href: '/question',
         icon: FileQuestion,
+        canAccess: ['super_admin'],
     },
     {
-        title: 'Pospartum Screening',
+        title: 'Hasil Skrining',
         href: '/postpartum',
         icon: ScanHeart,
-    },
-    {
-        title: 'Recomendation Rule',
-        href: '/recomendation/rule',
-        icon: Award,
-    },
-    {
-        title: 'Recomendation Variation',
-        href: '/recomendation/variation',
-        icon: FileText,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        canAccess: ['super_admin', 'admin', 'midwife'],
     },
 ];
 
 export function AppSidebar() {
-
     const { auth } = usePage().props as any;
 
+    const userRole = auth?.user?.role?.slug || 'guest';
 
-    const userRole = auth.user.role.slug;
-
-    let filteredNavItems = [...mainNavItems];
-
-    if (!['super_admin', 'admin'].includes(userRole)) {
-        filteredNavItems = filteredNavItems.filter(item => item.title !== 'Role');
-    }
+    let filteredNavItems = mainNavItems.filter((value) =>
+        value.canAccess.includes(userRole),
+    );
 
     return (
         <Sidebar collapsible="icon" variant="inset">

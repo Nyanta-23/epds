@@ -17,8 +17,8 @@ interface PostpartumShowProps {
 }
 
 export default function PostpartumShow({postpartum, baby, page_prop}: PostpartumShowProps) {
-  const title: string = 'Patient';
-  const link: string = '/patient';
+  const title: string = 'List Skrining';
+  const link: string = '/postpartum';
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,7 +26,7 @@ export default function PostpartumShow({postpartum, baby, page_prop}: Postpartum
       href: link,
     },
     {
-      title: `Show`,
+      title: `Detail Skrining Pasien`,
       href: `${link}/${postpartum.data.id}`
     }
   ];
