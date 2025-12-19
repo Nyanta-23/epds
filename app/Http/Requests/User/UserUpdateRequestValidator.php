@@ -46,6 +46,18 @@ class UserUpdateRequestValidator extends FormRequest
             ],
             'village_id' => [
                 'required'
+            ],
+            'village' => [
+                'required'
+            ],
+            'province' => [
+                'required'
+            ],
+            'regency' => [
+                'required'
+            ],
+            'district' => [
+                'required'
             ]
         ];
     }

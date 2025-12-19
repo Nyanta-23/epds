@@ -61,7 +61,11 @@ class UserService
         'city_or_district_id' => $request->regency_id,
         'subdistrict_id' => $request->district_id,
         'village_id' => $request->village_id,
-        'number_patient' => $this->generatePatientNumber()
+        'number_patient' => $this->generatePatientNumber(),
+        'province' => $request->province,
+        'city_or_district' => $request->regency,
+        'subdistrict' => $request->district,
+        'village' => $request->village
       ]);
     }));
 
@@ -76,28 +80,33 @@ class UserService
         'province_id' => $request->province_id,
         'city_or_district_id' => $request->regency_id,
         'subdistrict_id' => $request->district_id,
-        'village_id' => $request->village_id
+        'village_id' => $request->village_id,
+        'province' => $request->province,
+        'city_or_district' => $request->regency,
+        'subdistrict' => $request->district,
+        'village' => $request->village
       ]);
     });
   }
 
-  public function changeEmail(?string $email, ?string $id) 
+  public function changeEmail(?string $email, ?string $id)
   {
     try {
       $findUser = User::find($id);
 
-      if($findUser->email == $email) throw new Exception('tidak bisa mengubah email yang sama', 400);
+      if ($findUser->email == $email)
+        throw new Exception('tidak bisa mengubah email yang sama', 400);
 
       $findUser->email = $email;
       $findUser->email_verified_at = null;
 
-      
+
       $findUser->save();
-      
+
       event(new Registered($findUser));
-      
+
       return $findUser;
-    }catch(Exception $error) {
+    } catch (Exception $error) {
       throw new Exception($error->getMessage(), $error->getCode());
     }
   }
@@ -107,14 +116,15 @@ class UserService
     try {
       $user = User::find($id);
 
-      if(!Hash::check($request->oldPassword, $user->password)) throw new Exception('password salah', 400);
-      
+      if (!Hash::check($request->oldPassword, $user->password))
+        throw new Exception('password salah', 400);
+
       $user->password = Hash::make($request->newPassword);
 
       $user->save();
 
       return $user;
-    }catch(Exception $error) {
+    } catch (Exception $error) {
       throw new Exception($error->getMessage(), $error->getCode());
     }
   }
@@ -131,22 +141,22 @@ class UserService
   }
 
   private static function generatePatientNumber()
-{
+  {
     $prefix = 'PS-' . date('ym') . '-';
 
     return DB::transaction(function () use ($prefix) {
-        $lastUser = User::where('number_patient', 'like', $prefix . '%')
-            ->lockForUpdate()
-            ->orderBy('number_patient', 'desc')
-            ->first();
+      $lastUser = User::where('number_patient', 'like', $prefix . '%')
+        ->lockForUpdate()
+        ->orderBy('number_patient', 'desc')
+        ->first();
 
-        if (!$lastUser) {
-            $number = 1;
-        } else {
-            $lastNumber = (int) substr($lastUser->patient_number, -4);
-            $number = $lastNumber + 1;
-        }
-        return $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+      if (!$lastUser) {
+        $number = 1;
+      } else {
+        $lastNumber = (int) substr($lastUser->patient_number, -4);
+        $number = $lastNumber + 1;
+      }
+      return $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
     });
-}
+  }
 }

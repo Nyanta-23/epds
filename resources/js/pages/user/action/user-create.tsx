@@ -14,8 +14,8 @@ export default function UserCreate({ extra }: UserCreateProps) {
   const title: string = 'User';
   const link: string = '/user';
 
-  const subtitle = `Create ${title}`;
-  const desc = `Add your ${title}`
+  const subtitle = `Tambah ${title}`;
+  const desc = `Tambah Data ${title}`
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
