@@ -23,6 +23,14 @@ class CheckRole
         if (in_array($userRole, $roles)) {
             return $next($request); 
         }
-        abort(403, 'Anda tidak memiliki hak akses untuk halaman ini.');
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Akun Anda tidak memiliki hak akses untuk masuk ke area ini.',
+        ]);
     }
 }
