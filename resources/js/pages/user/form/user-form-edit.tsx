@@ -37,18 +37,28 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
 
         const strValue = value?.toString() ?? '';
 
-        if (field === 'province_id') {
+       if (field === 'province_id') {
+            const province = provinces.find((r) => r.id == strValue)
             onProvinceChange(strValue);
+            handleInputChange('province', province?.name ?? '');
             handleInputChange('regency_id', null);
             handleInputChange('district_id', null);
             handleInputChange('village_id', null);
         } else if (field === 'regency_id') {
+            const regencies = cities.find((r) => r.id == strValue);
             onCityChange(strValue);
+            handleInputChange('regency', regencies?.name ?? '');
             handleInputChange('district_id', null);
             handleInputChange('village_id', null);
         } else if (field === 'district_id') {
+            const district = districts.find((r) => r.id == strValue);
             onDistrictChange(strValue);
+            handleInputChange('district', district?.name ?? '');
             handleInputChange('village_id', null);
+        } else {
+            const village = villages.find((v) => v.id === strValue);
+            handleInputChange('village_id', strValue);
+            handleInputChange('village', village?.name ?? '');
         }
     };
 

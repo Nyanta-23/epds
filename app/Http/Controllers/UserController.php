@@ -87,6 +87,10 @@ class UserController extends Controller
             $userReq->district_id = $validated['district_id'];
             $userReq->regency_id = $validated['regency_id'];
             $userReq->village_id = $validated['village_id'];
+            $userReq->province = $validated['province'];
+            $userReq->regency = $validated['regency'];
+            $userReq->district = $validated['district'];
+            $userReq->village = $validated['village'];
 
             $this->userService->store($userReq);
 
@@ -128,6 +132,10 @@ class UserController extends Controller
             $userReq->district_id = $validated['district_id'];
             $userReq->regency_id = $validated['regency_id'];
             $userReq->village_id = $validated['village_id'];
+            $userReq->province = $validated['province'];
+            $userReq->district = $validated['district'];
+            $userReq->regency = $validated['regency'];
+            $userReq->village = $validated['village'];
 
             $this->userService->update($userReq, $user->id);
 

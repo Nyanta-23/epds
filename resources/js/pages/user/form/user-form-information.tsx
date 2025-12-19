@@ -55,7 +55,8 @@ export default function UserFormInformation({
     const isMidwife =
         selectedRole?.name?.toLowerCase().includes('midwife') ||
         selectedRole?.name?.toLowerCase().includes('bidan') ||
-        selectedRole?.name?.toLowerCase().includes('patient')
+        selectedRole?.name?.toLowerCase().includes('patient') ||
+        selectedRole?.name?.toLowerCase().includes('admin') 
 
     return (
         <div className="space-y-4 p-6">
@@ -193,7 +194,7 @@ export default function UserFormInformation({
             {isMidwife && (
                 <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
                     <h3 className="mb-4 text-sm font-semibold text-gray-700">
-                        Wilayah Kerja Bidan
+                        Wilayah Kerja
                     </h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>

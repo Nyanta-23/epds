@@ -1,86 +1,102 @@
-import { FormUser } from "@/types/form";
-import { User } from "@/types/resource";
-import { useForm } from "@inertiajs/react";
-import { useState } from "react";
+import { FormUser } from '@/types/form';
+import { User } from '@/types/resource';
+import { useForm } from '@inertiajs/react';
+import { useState } from 'react';
 
 export function useUserAction(user?: User) {
-
-  const { data, setData, reset, errors, clearErrors, post, put, delete: destory, processing } = useForm<FormUser>({
-    name: user?.name || '',
-    email: user?.email || '',
-    role_id: user?.role.id || '',
-    password: '',
-    password_confirmation: '',
-    province_id: user?.province_id || '',
-    regency_id: user?.regency_id || '',
-    district_id: user?.district_id || '',
-    village_id: user?.village_id || '',
-  });
-
-  const [processingId, setProcessingId] = useState<string | null>(null);
-
-  const createUser = () => {
-    post(route('user.store'), {
-      onSuccess: () => reset("email", "name", "password", "password_confirmation", "role_id"),
-      onError: (err) => {
-        console.log(err);
-      }
+    const {
+        data,
+        setData,
+        reset,
+        errors,
+        clearErrors,
+        post,
+        put,
+        delete: destory,
+        processing,
+    } = useForm<FormUser>({
+        name: user?.name ?? '',
+        email: user?.email ?? '',
+        role_id: user?.role.id ?? '',
+        password: '',
+        password_confirmation: '',
+        province_id: user?.province_id ?? '',
+        regency_id: user?.regency_id ?? '',
+        district_id: user?.district_id ?? '',
+        village_id: user?.village_id ?? '',
+        province: user?.province ?? '',
+        city_or_district: user?.city_or_district ?? '',
+        subdistrict: user?.subdistrict ?? '',
+        village: user?.village ?? ''
     });
-  };
 
-  const updateUser = (id?: string) => {
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
-    if (!id) return;
-
-    put(route('user.update', id), {
-      onSuccess: () => reset("name", "role_id"),
-      onError: (err) => {
-        console.log(err);
-      }
-    });
-  }
-
-
-  const deleteUser = (id: string) => {
-
-    setProcessingId(id);
-
-    destory(route('user.destroy', id), {
-      preserveScroll: true,
-      onFinish: () => setProcessingId(null)
-    });
-  }
-
-
-  const handleInputChange = (field: keyof FormUser, value: string | number | null) => {
-    setData((prev: FormUser) => {
-
-      const updatingValue = {
-        ...prev,
-        [field as keyof FormUser]: value
-      };
-
-      Object.entries(updatingValue)
-        .forEach(([key, val]) => {
-          if (val && val.toString().length > 0) clearErrors(key);
+    const createUser = () => {
+        post(route('user.store'), {
+            onSuccess: () =>
+                reset(
+                    'email',
+                    'name',
+                    'password',
+                    'password_confirmation',
+                    'role_id',
+                ),
+            onError: (err) => {
+                console.log(err);
+            },
         });
+    };
 
-      return updatingValue;
-    });
-  }
+    const updateUser = (id?: string) => {
+        if (!id) return;
 
-  return {
-    data,
-    setData,
-    errors,
-    clearErrors,
-    reset,
-    handleInputChange,
-    processing,
-    processingId,
-    createUser,
-    updateUser,
-    deleteUser,
-  }
+        put(route('user.update', id), {
+            onSuccess: () => reset('name', 'role_id'),
+            onError: (err) => {
+                console.log(err);
+            },
+        });
+    };
+
+    const deleteUser = (id: string) => {
+        setProcessingId(id);
+
+        destory(route('user.destroy', id), {
+            preserveScroll: true,
+            onFinish: () => setProcessingId(null),
+        });
+    };
+
+    const handleInputChange = (
+        field: keyof FormUser,
+        value: string | number | null,
+    ) => {
+        setData((prev: FormUser) => {
+            const updatingValue = {
+                ...prev,
+                [field as keyof FormUser]: value,
+            };
+
+            Object.entries(updatingValue).forEach(([key, val]) => {
+                if (val && val.toString().length > 0) clearErrors(key);
+            });
+
+            return updatingValue;
+        });
+    };
+
+    return {
+        data,
+        setData,
+        errors,
+        clearErrors,
+        reset,
+        handleInputChange,
+        processing,
+        processingId,
+        createUser,
+        updateUser,
+        deleteUser,
+    };
 }
-

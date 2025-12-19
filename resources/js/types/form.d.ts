@@ -8,6 +8,10 @@ export interface FormUser {
     regency_id: string;
     district_id: string;
     village_id: string;
+    province: string;
+    city_or_district: string;
+    subdistrict: string,
+    village: string
     [key: string]: any;
 }
 

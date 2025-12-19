@@ -14,7 +14,11 @@ export interface User {
   province_id: string;
   regency_id: string;
   district_id: string;
-  village_id: string
+  village_id: string;
+  province: string;
+  city_or_district: string;
+  subdistrict: string;
+  village: string;
 }
 
 export interface Role {

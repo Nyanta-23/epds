@@ -57,6 +57,18 @@ class UserStoreRequestValidator extends FormRequest
             ],
             'village_id' => [
                 'required'
+            ],
+            'province' => [
+                'required'
+            ],
+            'regency' => [
+                'required'
+            ],
+            'district' => [
+                'required'
+            ],
+            'village' => [
+                'required'
             ]
         ];
     }

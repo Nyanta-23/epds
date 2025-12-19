@@ -11,4 +11,8 @@ class UserUpdateAttributeRequest
   public string $regency_id;
   public string $district_id;
   public string $village_id;
+  public string $village;
+  public string $province;
+  public string $regency;
+  public string $district;
 }
