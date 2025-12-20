@@ -12,7 +12,10 @@ interface PostpartumFollowedActionProps {
 
 export default function PostpartumFollowedAction({ filter, link }: PostpartumFollowedActionProps) {
 
-  const { is_followed, search } = filter;
+  const { is_followed, search, filter_list } = filter;
+
+  const { date_filter } = filter_list ?? {};
+  const { start_date, end_date } = date_filter ?? {};
 
   return (
     <div className="flex shadow-sm gap-1">
@@ -20,7 +23,9 @@ export default function PostpartumFollowedAction({ filter, link }: PostpartumFol
         className={`h-12 w-14 p-0 rounded-none rounded-t-md cursor-pointer ${!is_followed ? 'bg-muted hover:bg-muted text-foreground' : 'bg-background text-muted-foreground hover:bg-muted'}`}
         onClick={() => router.get(link, {
           is_followed: false,
-          search
+          search,
+          start_date,
+          end_date
         }, {
           preserveState: true,
           preserveScroll: true,
@@ -34,7 +39,9 @@ export default function PostpartumFollowedAction({ filter, link }: PostpartumFol
         className={`h-12 w-14 p-0 rounded-none rounded-t-md cursor-pointer ${is_followed ? 'bg-muted hover:bg-muted text-foreground' : 'bg-background text-muted-foreground hover:bg-muted'}`}
         onClick={() => router.get(link, {
           is_followed: true,
-          search
+          search,
+          start_date,
+          end_date
         }, {
           preserveState: true,
           preserveScroll: true,

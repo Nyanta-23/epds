@@ -8,6 +8,7 @@ use App\Models\Baby;
 use App\Models\Followup;
 use App\Models\PostpartumVisit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,6 +22,10 @@ class PostpartumVisitService
     $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     $isFollowed = filter_var($filters['is_followed'] ?? null, FILTER_VALIDATE_BOOLEAN);
 
+    $startDate = $filters['filter_list']['date_filter']['start_date'] ?? null;
+    $endDate   = $filters['filter_list']['date_filter']['end_date'] ?? null;
+
+
     $query = PostpartumVisit::with([
       'mother',
       'result.followup',
@@ -30,6 +35,21 @@ class PostpartumVisitService
     $query->when($search, function ($q, $search) {
       $q->whereHas('mother', fn($subQ) => $subQ->where('name', 'like', "%{$search}%"));
     });
+
+
+    $query->when($startDate || $endDate, function ($q) use ($startDate, $endDate) {
+      if ($startDate && $endDate) {
+        $q->whereBetween('date_filled', [
+          Carbon::parse($startDate)->startOfDay(),
+          Carbon::parse($endDate)->endOfDay(),
+        ]);
+      } elseif ($startDate) {
+        $q->where('date_filled', '>=', Carbon::parse($startDate)->startOfDay());
+      } elseif ($endDate) {
+        $q->where('date_filled', '<=', Carbon::parse($endDate)->endOfDay());
+      }
+    });
+
 
     if ($isFollowed) {
       $query->whereHas('result.followup');

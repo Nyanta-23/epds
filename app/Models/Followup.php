@@ -35,4 +35,9 @@ class Followup extends Model
     {
         return $this->hasOne(Result::class);
     }
+
+    public function PostpartumVisit(): BelongsTo
+    {
+        return $this->belongsTo(PostpartumVisit::class);
+    }
 }

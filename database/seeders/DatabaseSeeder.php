@@ -53,48 +53,48 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        // User::create([
-        //     'id' => Str::uuid(), // karena primary key UUID
-        //     'name' => 'Yami Chan',
-        //     'email' => 'yami@example.com',
-        //     'email_verified_at' => now(),
-        //     'password' => Hash::make('yami@example.com'),
-        //     'remember_token' => Str::random(10),
+        User::create([
+            'id' => Str::uuid(), // karena primary key UUID
+            'name' => 'Yami Chan',
+            'email' => 'yami@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('yami@example.com'),
+            'remember_token' => Str::random(10),
 
-        //     // kolom tambahan
-        //     'phone_number'        => '081234567890',
-        //     'birthplace'          => 'Bandung',
-        //     'date_of_birth'       => '1999-01-12',
-        //     'job'                 => 'Software Developer',
-        //     'married_status'      => 'not_married', // married / not_married / divorced
-        //     'highest_education'   => 'S1',
+            // kolom tambahan
+            'phone_number'        => '081234567890',
+            'birthplace'          => 'Bandung',
+            'date_of_birth'       => '1999-01-12',
+            'job'                 => 'Software Developer',
+            'married_status'      => 'not_married', // married / not_married / divorced
+            'highest_education'   => 'S1',
 
-        //     'province_id'         => '32',
-        //     'city_or_district_id' => '3273',
-        //     'subdistrict_id'      => '327301',
-        //     'village_id'          => '32730101',
+            'province_id'         => '32',
+            'city_or_district_id' => '3273',
+            'subdistrict_id'      => '327301',
+            'village_id'          => '32730101',
 
-        //     'province'            => 'Jawa Barat',
-        //     'city_or_district'    => 'Kota Bandung',
-        //     'subdistrict'         => 'Antapani',
-        //     'village'             => 'Antapani Wetan',
+            'province'            => 'Jawa Barat',
+            'city_or_district'    => 'Kota Bandung',
+            'subdistrict'         => 'Antapani',
+            'village'             => 'Antapani Wetan',
 
-        //     'address'             => 'Jl. Contoh No. 123',
+            'address'             => 'Jl. Contoh No. 123',
 
-        //     'is_verified'         => true,
-        //     'is_can_visit'        => true,
+            'is_verified'         => true,
+            'is_can_visit'        => true,
 
-        //     // role jika ada
-        //     'role_id'             => Role::where('slug', 'patient')->first()->id,
-        // ]);
+            // role jika ada
+            'role_id'             => Role::where('slug', 'patient')->first()->id,
+        ]);
 
 
-        // // muhamadilhan02404@gmail.com
+        // muhamadilhan02404@gmail.com
 
-        // User::factory()->withRole('admin')->count(3)->create();
-        // User::factory()->withRole('midwife')->count(10)->create();
+        User::factory()->withRole('admin')->count(3)->create();
+        User::factory()->withRole('midwife')->count(10)->create();
 
-        // $mothers =  User::factory()->patient()->withRole('patient')->count(14)->create();
+        $mothers =  User::factory()->patient()->withRole('patient')->count(14)->create();
 
 
         // $permissions = Permission::pluck('id', 'slug')->toArray();
@@ -146,15 +146,75 @@ class DatabaseSeeder extends Seeder
         //     array_map(fn($slug) => $permissions[$slug], $patientPermissions)
         // );
 
+        $mothers->each(function ($mother) {
+
+            $babies = Baby::factory()
+                ->count(rand(1, 3))
+                ->create([
+                    'mother_id' => $mother->id
+                ]);
+
+
+            $babies->each(function ($baby) use ($mother) {
+
+                collect(range(1, 4))->each(function ($visitNumber) use ($mother, $baby) {
+
+                    $visit = PostpartumVisit::factory()->create([
+                        'mother_id'   => $mother->id,
+                        'baby_id'     => $baby->id,
+                        'visit_number' => $visitNumber,
+                    ]);
+
+
+                    $questions = Question::orderBy('number_question')->get();
+
+                    $questions->each(function ($q) use ($visit) {
+                        Answer::factory()->create([
+                            'postpartum_visit_id' => $visit->id,
+                            'question_id' => $q->id,
+                            'answer' => fake()->randomElement(['a', 'b', 'c', 'd']),
+                        ]);
+                    });
+
+
+                    $result = $visit->result()->create([
+                        'total_score' => rand(0, 30),
+                        'followup_status' => 0,
+                    ]);
+
+
+                    if (rand(0, 1)) {
+                        $followup = $visit->followup()->create([
+                            'type' => rand(0, 2),
+                            'notes' => fake()->text(),
+                            'date_filled' => fake()->dateTime(),
+                            'midwife_id' => User::whereHas(
+                                'role',
+                                fn($q) => $q->where('slug', 'midwife')
+                            )->inRandomOrder()->value('id'),
+                        ]);
+
+                        $result->update([
+                            'followup_id' => $followup->id
+                        ]);
+                    }
+                });
+            });
+        });
+
+
+
         // $mothers->each(function ($mother) {
         //     Baby::factory()->count(rand(1, 3))->create(['mother_id' => $mother->id]);
 
-        //     $postpartums = PostpartumVisit::factory()->count(1)->create(['mother_id' => $mother->id]);
+        //     $postpartums = PostpartumVisit::factory()->count(10)->create(['mother_id' => $mother->id]);
 
 
         //     $postpartums->each(function ($visit) {
 
         //         $questions = Question::orderBy('number_question')->get();
+
+        //         // dd($visit->id);
 
         //         $questions->each(function ($q) use ($visit) {
         //             Answer::factory()->create([
@@ -178,7 +238,7 @@ class DatabaseSeeder extends Seeder
 
         //         if (rand(0, 1) === 1) {
 
-        //             $followup = Followup::create([
+        //             $followup = $visit->followup()->create([
         //                 'type' => rand(0, 2),
         //                 'notes' => fake()->text(),
         //                 'date_filled' => fake()->dateTime(),

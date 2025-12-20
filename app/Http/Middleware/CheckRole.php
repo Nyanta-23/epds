@@ -21,7 +21,7 @@ class CheckRole
         }
         $userRole = $request->user()->role->slug ?? '';
         if (in_array($userRole, $roles)) {
-            return $next($request); 
+            return $next($request);
         }
         Auth::guard('web')->logout();
 
