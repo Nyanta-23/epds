@@ -199,7 +199,6 @@ class PostpartumVisitController extends Controller
         $data = $this->postpartumVisitExportService
             ->exportByDateRange($start, $end);
 
-            dd($data);
 
         return Excel::download(
             new PostpartumVisitExport($data),
