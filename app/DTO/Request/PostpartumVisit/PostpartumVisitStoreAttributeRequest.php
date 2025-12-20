@@ -2,6 +2,9 @@
 
 namespace App\DTO\Request\PostpartumVisit;
 
+use App\Enums\BabyConditionEnum;
+use App\Enums\FeedTyperEnum;
+
 
 class PostpartumVisitStoreAttributeRequest
 {
@@ -27,10 +30,10 @@ class PostpartumVisitStoreAttributeRequest
 
   public string $parity_count;
 
-  public int $baby_healthy;
+  public BabyConditionEnum $baby_healthy;
   public array $baby_caregiver;
 
-  public int $feed_type;
+  public FeedTyperEnum $feed_type;
 
   public string $mother_id;
 
