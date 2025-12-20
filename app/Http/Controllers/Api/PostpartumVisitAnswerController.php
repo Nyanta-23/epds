@@ -72,9 +72,9 @@ class PostpartumVisitAnswerController extends Controller
                 $postpartumVisitReq->last_comp = $validated['last_comp'];
                 $postpartumVisitReq->last_comp_note = $validated['last_comp_note'] ?? null;
 
-                $postpartumVisitReq->baby_healthy = $latestBaby->baby_condition->value_id();
+                $postpartumVisitReq->baby_healthy = $latestBaby->baby_condition;
                 $postpartumVisitReq->baby_caregiver = $validated['baby_caregiver'];
-                $postpartumVisitReq->feed_type = $latestBaby->value_id();
+                $postpartumVisitReq->feed_type = $latestBaby->feed_type;
 
                 $postpartumVisit = $this->postpartumVisitService->store($postpartumVisitReq);
 
