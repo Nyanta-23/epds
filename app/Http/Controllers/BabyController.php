@@ -105,9 +105,6 @@ class BabyController extends Controller
 
             return redirect()->route('baby')->with('success', 'Baby, has been added.');
         } catch (\Throwable $th) {
-            dump($th->getMessage());
-            dd($th);
-
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
@@ -135,8 +132,6 @@ class BabyController extends Controller
 
             return redirect()->route('baby')->with('success', 'Baby has been updated.');
         } catch (\Throwable $th) {
-            dump($th->getMessage());
-            dd($th);
 
             return redirect()->back()->with('error', 'An internal server error.');
         }
@@ -152,8 +147,6 @@ class BabyController extends Controller
 
             return redirect()->back()->with('success', 'Successfully deleting baby.');
         } catch (\Throwable $th) {
-            dump($th->getMessage());
-            dd($th);
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
