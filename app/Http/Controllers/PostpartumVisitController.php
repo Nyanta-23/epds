@@ -31,7 +31,8 @@ class PostpartumVisitController extends Controller
     public function __construct(
         private PostpartumVisitService $postpartumVisitService,
         private PostpartumVisitExportService $postpartumVisitExportService
-    ) {}
+    ) {
+    }
 
     public function index(Request $request)
     {
@@ -72,23 +73,21 @@ class PostpartumVisitController extends Controller
     {
 
         $postpartum->load([
-            'mother',
+            'baby' => fn($q) => $q->withTrashed(),
+            'baby.mother',
             'result',
             'followup',
-            'answers' => function ($query) {
-                $query
-                    ->join('questions', 'answers.question_id', '=', 'questions.id')
-                    ->orderBy('questions.number_question', 'asc')
-                    ->select('answers.*');
-            },
             'answers.question.optionQuestions'
         ]);
-
-        $baby = Baby::where('mother_id', $postpartum->mother_id)->orderBy('date_of_birth', 'desc')->first();
+        if (!$postpartum->baby) {
+            abort(404, 'Data bayi terkait kunjungan ini tidak ditemukan.');
+        }
 
         return Inertia::render('postpartum/action/postpartum-show', [
             'postpartum' => new PostpartumVisitResource($postpartum),
-            'baby' => new BabyResource($baby),
+
+            'baby' => new BabyResource($postpartum->baby),
+
             'page_prop' => [
                 'enums' => [
                     'followup_types' => FollowUpTypeEnum::options(),
@@ -194,7 +193,7 @@ class PostpartumVisitController extends Controller
     public function export(Request $request)
     {
         $start = $request->start_date;
-        $end   = $request->end_date;
+        $end = $request->end_date;
 
         $data = $this->postpartumVisitExportService
             ->exportByDateRange($start, $end);
