@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('followups', function (Blueprint $table) {
             $table->foreignUuid('postpartum_visit_id')
-          ->constrained('postpartum_visits')
-          ->onDelete('cascade');
+                ->constrained('postpartum_visits')
+                ->onDelete('cascade');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-                Schema::table('followups', function (Blueprint $table) {
+        Schema::table('followups', function (Blueprint $table) {
             $table->dropForeign(['postpartum_visit_id']);
             $table->dropColumn('postpartum_visit_id');
         });

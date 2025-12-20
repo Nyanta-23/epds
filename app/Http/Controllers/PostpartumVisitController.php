@@ -16,17 +16,22 @@ use App\Http\Resources\PatientResource;
 use App\Http\Resources\PostpartumVisitResource;
 use App\Models\Baby;
 use App\Models\PostpartumVisit;
+use App\Service\PostpartumVisit\PostpartumVisitExportService;
 use App\Service\PostpartumVisit\PostpartumVisitService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PostpartumVisitExport;
+
 
 class PostpartumVisitController extends Controller
 {
 
     public function __construct(
         private PostpartumVisitService $postpartumVisitService,
-    ) {
-    }
+        private PostpartumVisitExportService $postpartumVisitExportService
+    ) {}
 
     public function index(Request $request)
     {
@@ -35,6 +40,10 @@ class PostpartumVisitController extends Controller
             'only_trash' => $request->boolean('only_trash', false),
             'is_followed' => $request->boolean('is_followed', false),
             'filter_list' => [
+                'date_filter' => [
+                    'start_date' => $request->input('start_date'),
+                    'end_date' => $request->input('end_date'),
+                ],
                 'select_filter' => [
                     'is_verified' => $request->input('is_verified'),
                     'is_can_visit' => $request->input('is_can_visit'),
@@ -180,5 +189,20 @@ class PostpartumVisitController extends Controller
                 'error' => $err->getMessage()
             ], 500);
         }
+    }
+
+    public function export(Request $request)
+    {
+        $start = $request->start_date;
+        $end   = $request->end_date;
+
+        $data = $this->postpartumVisitExportService
+            ->exportByDateRange($start, $end);
+
+
+        return Excel::download(
+            new PostpartumVisitExport($data),
+            $this->postpartumVisitExportService->fileName($start, $end)
+        );
     }
 }

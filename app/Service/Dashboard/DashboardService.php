@@ -19,7 +19,7 @@ class DashboardService
         $data = PostpartumVisit::selectRaw('DATE(date_filled) as date, count(*) as total')
             ->whereBetween('date_filled', [$startDate, $endDate])
             ->groupBy('date')
-            ->pluck('total', 'date'); 
+            ->pluck('total', 'date');
 
         $results = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -48,7 +48,7 @@ class DashboardService
             $end = $weekDate->copy()->endOfWeek();
 
             $count = PostpartumVisit::whereBetween('date_filled', [
-                $start->toDateString(), 
+                $start->toDateString(),
                 $end->toDateString()
             ])->count();
 
@@ -70,7 +70,7 @@ class DashboardService
     public function postpartumScreeningLineMonth(): array
     {
         $startDate = now()->subMonths(11)->startOfMonth();
-        
+
         $data = PostpartumVisit::selectRaw('YEAR(date_filled) as year, MONTH(date_filled) as month, count(*) as total')
             ->where('date_filled', '>=', $startDate)
             ->groupBy('year', 'month')
@@ -100,14 +100,21 @@ class DashboardService
     public function followUpStats(): array
     {
         $totalVisits = PostpartumVisit::count();
-      
+
         $totalFollowUp = Followup::count();
 
         if ($totalVisits === 0) {
             return [
-                'follow_up_percentage' => 0,
-                'unfollow_up_percentage' => 0,
-                'total_visits' => 0
+                'follow_up' => [
+                    'label' => 'Sudah Follow Up',
+                    'data' => 0,
+                    'count' => 0
+                ],
+                'unfollow_up' => [
+                    'label' => 'Belum Follow Up',
+                    'data' => 0,
+                    'count' => 0
+                ]
             ];
         }
 
@@ -154,7 +161,7 @@ class DashboardService
             if (isset($stats[$category])) {
                 $stats[$category]++;
             } else {
-                $stats['High Risk']++; 
+                $stats['High Risk']++;
             }
         }
 

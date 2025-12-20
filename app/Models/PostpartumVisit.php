@@ -89,15 +89,19 @@ class PostpartumVisit extends Model
         return $this->hasMany(Answer::class);
     }
 
-    public function followup()
+    public function followup(): HasOne
     {
         return $this->hasOne(Followup::class);
     }
 
-    public function mother()
+    public function mother(): BelongsTo
     {
-        // belongsTo(ModelTujuan, NamaKolomForeign, NamaKolomOwner)
         return $this->belongsTo(User::class, 'mother_id', 'id');
+    }
+
+    public function baby(): BelongsTo
+    {
+        return $this->belongsTo(Baby::class, 'baby_id', 'id');
     }
 
     /**

@@ -24,6 +24,7 @@ class BabyFactory extends Factory
             // 'baby_condition' => fake()->randomElement(['healthy', 'premature', 'low_bw', 'nicu']),
             'baby_condition' => fake()->numberBetween(0, 3),
             // 'typeof_delivery' => fake()->randomElement(['normal', 'caesar', 'forsep']),
+            'feed_type' => fake()->numberBetween(0, 2),
             'typeof_delivery' => fake()->numberBetween(0, 2),
             'gender' => fake()->randomElement(['male', 'female']),
         ];

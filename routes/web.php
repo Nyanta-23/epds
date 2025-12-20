@@ -134,6 +134,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Hasil Skrining EPDS (Read/View)
         Route::prefix('postpartum')->group(function () {
+            Route::get('/export', [PostpartumVisitController::class, 'export'])->name('postpartum.export');
+
             Route::get('/', [PostpartumVisitController::class, 'index'])->name('postpartum');
             Route::get('/{postpartum}', [PostpartumVisitController::class, 'show'])->name('postpartum.show');
             // Edit Skrining? Hati-hati, biasanya hasil medis tidak boleh diedit sembarangan.
