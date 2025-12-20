@@ -66,17 +66,17 @@ class PostpartumVisit extends Model
     protected function babyCaregiverLabel(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                $data = $this->baby_caregiver;
+        get: function () {
+            $data = $this->baby_caregiver;
 
-                if (is_string($data)) {
-                    $data = json_decode($data, true);
-                }
-                $safeIds = is_array($data) ? $data : [];
-
-                return BabyCaregiverEnum::getLabelsFromIds($safeIds);
+            if (is_string($data)) {
+                $data = json_decode($data, true);
             }
-        );
+            $safeIds = is_array($data) ? $data : [];
+
+            return BabyCaregiverEnum::getLabelsFromIds($safeIds);
+        }
+    );
     }
 
     public function result(): HasOne
@@ -84,9 +84,9 @@ class PostpartumVisit extends Model
         return $this->hasOne(Result::class);
     }
 
-    public function answers()
+    public function answers(): HasMany
     {
-        return $this->hasMany(Answer::class)->withAggregate('question', 'number_question')->orderBy('question_number_question');
+        return $this->hasMany(Answer::class);
     }
 
     public function followup(): HasOne
