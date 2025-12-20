@@ -74,7 +74,7 @@ class PostpartumVisitAnswerController extends Controller
 
                 $postpartumVisitReq->baby_healthy = $latestBaby->baby_condition->value_id();
                 $postpartumVisitReq->baby_caregiver = $validated['baby_caregiver'];
-                $postpartumVisitReq->feed_type = $latestBaby->->value_id();
+                $postpartumVisitReq->feed_type = $latestBaby->value_id();
 
                 $postpartumVisit = $this->postpartumVisitService->store($postpartumVisitReq);
 
