@@ -25,51 +25,65 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
 
     return (
         <section className="overflow-hidden rounded-b-md border border-t-0">
-            <Table>
-                <TableHeader className="bg-accent">
-                    <TableRow>
-                        <TableHead>Nomor Pasien</TableHead>
-                        <TableHead>Nama</TableHead>
-                        <TableHead>Kunjungan Nifas</TableHead>
-                        <TableHead>Status Hasil</TableHead>
-                        <TableHead className="text-right">Aksi</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data.map((postpartum) => (
-                        <TableRow key={postpartum.id}>
-                            <TableCell className="font-medium">
-                                {postpartum.mother.number_patient}
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                {postpartum.mother.name}
-                            </TableCell>
-                            <TableCell>KF-{postpartum.visit_number}</TableCell>
-                            <TableCell>
-                                {postpartum.result.followup_status.label_id}
-                            </TableCell>
-
-                            <TableCell className="flex justify-end gap-2">
-                                {/* <Link href={route('postpartum.edit', postpartum.id)}>
-                  <Button className="cursor-pointer">
-                    <Pencil />
-                  </Button>
-                </Link> */}
-                                <Link
-                                    href={route(
-                                        'postpartum.show',
-                                        postpartum.id,
-                                    )}
-                                >
-                                    <Button className="cursor-pointer">
-                                        <Eye />
-                                    </Button>
-                                </Link>
-                            </TableCell>
+            {/* Desktop Table + Mobile horizontal scroll */}
+            <div className="overflow-x-auto">
+                <Table className="min-w-full text-sm">
+                    <TableHeader className="bg-accent">
+                        <TableRow>
+                            <TableHead className="whitespace-nowrap">
+                                Nomor Pasien
+                            </TableHead>
+                            <TableHead className="whitespace-nowrap">
+                                Nama
+                            </TableHead>
+                            <TableHead className="whitespace-nowrap">
+                                Kunjungan Nifas
+                            </TableHead>
+                            <TableHead className="whitespace-nowrap">
+                                Status Hasil
+                            </TableHead>
+                            <TableHead className="sticky right-0 bg-accent text-right whitespace-nowrap shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.08)]">
+                                Aksi
+                            </TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {data.map((postpartum) => (
+                            <TableRow key={postpartum.id}>
+                                <TableCell className="font-medium whitespace-nowrap">
+                                    {postpartum.mother.number_patient}
+                                </TableCell>
+                                <TableCell className="font-medium whitespace-nowrap">
+                                    {postpartum.mother.name}
+                                </TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                    KF-{postpartum.visit_number}
+                                </TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                    {postpartum.result.followup_status.label_id}
+                                </TableCell>
+                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.08)]">
+                                    <div className="flex justify-end gap-2">
+                                        <Link
+                                            href={route(
+                                                'postpartum.show',
+                                                postpartum.id,
+                                            )}
+                                        >
+                                            <Button
+                                                size="sm"
+                                                className="cursor-pointer"
+                                            >
+                                                <Eye />
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </section>
     );
 }

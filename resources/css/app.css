@@ -1,22 +1,28 @@
 @import 'tailwindcss';
 
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+/* ─── Google Fonts: Plus Jakarta Sans ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+    /* ── Typography ─────────────────────────────────────────────────────── */
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
+    /* ── Border radii — friendlier, rounder ────────────────────────────── */
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
+    /* ── Semantic colour tokens (resolved from CSS vars below) ─────────── */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
 
@@ -61,75 +67,103 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ─── Light mode ─────────────────────────────────────────────────────────── */
+/*
+   Medical Pink palette
+   Primary  : #E91E63  (oklch ≈ 0.567 0.257 3.8)
+   Pink-50  : #FCE4EC  (oklch ≈ 0.956 0.035 3.8)
+   Background: #F9FAFB (oklch ≈ 0.982 0 0)
+*/
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --background: oklch(0.982 0.002 247); /* #F9FAFB — soft neutral gray */
+    --foreground: oklch(0.16 0.01 250); /* near-black with slight cool tint */
+    --card: oklch(1 0 0); /* pure white cards */
+    --card-foreground: oklch(0.16 0.01 250);
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.16 0.01 250);
+
+    /* Medical Pink */
+    --primary: oklch(0.567 0.257 3.8); /* #E91E63 */
+    --primary-foreground: oklch(1 0 0); /* white text on pink */
+
+    /* Soft pink tint for secondary / accent */
+    --secondary: oklch(0.956 0.035 3.8); /* #FCE4EC */
+    --secondary-foreground: oklch(0.4 0.15 3.8);
+
+    --muted: oklch(0.96 0.003 247);
+    --muted-foreground: oklch(0.5 0.008 250);
+
+    --accent: oklch(0.956 0.035 3.8); /* same as secondary */
+    --accent-foreground: oklch(0.4 0.15 3.8);
+
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
+
+    --border: oklch(0.918 0.004 247); /* very light gray border */
+    --input: oklch(0.918 0.004 247);
+    --ring: oklch(0.567 0.257 3.8); /* pink focus ring */
+
+    /* Charts */
+    --chart-1: oklch(0.567 0.257 3.8); /* pink */
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+
+    /* ── Global border-radius — rounded-xl equivalent ─────────────────── */
+    --radius: 0.75rem; /* 12 px — rounded-xl */
+
+    /* Sidebar — white glass with pink accents */
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.16 0.01 250);
+    --sidebar-primary: oklch(0.567 0.257 3.8);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.956 0.035 3.8); /* pink-50 hover */
+    --sidebar-accent-foreground: oklch(0.4 0.15 3.8);
+    --sidebar-border: oklch(0.93 0.006 3.8); /* faint pink-tinted border */
+    --sidebar-ring: oklch(0.567 0.257 3.8);
 }
 
+/* ─── Dark mode ──────────────────────────────────────────────────────────── */
 .dark {
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
+    --card: oklch(0.18 0.005 250);
     --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
+    --popover: oklch(0.18 0.005 250);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
+
+    /* Keep Medical Pink vibrant in dark mode */
+    --primary: oklch(0.63 0.25 3.8);
+    --primary-foreground: oklch(1 0 0);
+
+    --secondary: oklch(0.27 0.04 3.8);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
+    --accent: oklch(0.27 0.04 3.8);
     --accent-foreground: oklch(0.985 0 0);
+
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
     --border: oklch(0.269 0 0);
     --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
+    --ring: oklch(0.63 0.25 3.8);
+
+    --chart-1: oklch(0.63 0.25 3.8);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
+
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-primary: oklch(0.63 0.25 3.8);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.27 0.04 3.8);
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar-ring: oklch(0.63 0.25 3.8);
 }
 
 @layer base {
@@ -139,5 +173,60 @@
 
     body {
         @apply bg-background text-foreground;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Cards use rounded-xl + shadow-sm instead of harsh borders */
+    .card,
+    [data-slot='card'] {
+        @apply rounded-xl shadow-sm;
+    }
+}
+
+/* ─── Component utilities ────────────────────────────────────────────────── */
+@layer components {
+    /*
+     * .glass-card
+     * ──────────────────────────────────────────────────────────────────
+     * Glassmorphism container:
+     *   • white background at 80 % opacity
+     *   • backdrop-blur for the frosted effect
+     *   • subtle pink-100 border (matches Medical Pink palette)
+     *   • rounded-3xl for the friendly "bubbly" medical feel
+     *   • shadow-sm to lift the card off the background softly
+     */
+    .glass-card {
+        @apply rounded-3xl border border-pink-100 bg-white/80 shadow-sm backdrop-blur-sm;
+        @apply dark:border-pink-900/20 dark:bg-background/70;
+    }
+
+    /*
+     * .nav-glow
+     * ──────────────────────────────────────────────────────────────────
+     * Adds a diffuse pink drop-shadow on hover to sidebar nav items.
+     * The shadow is applied via filter: drop-shadow so it works even
+     * when the element is a flex container with icon + text children.
+     * On active items the glow is always visible at reduced opacity.
+     */
+    .nav-glow {
+        filter: drop-shadow(0 0 0px transparent);
+        transition:
+            filter 200ms ease-out,
+            box-shadow 200ms ease-out;
+    }
+
+    .nav-glow:hover {
+        filter: drop-shadow(
+            0 0 8px color-mix(in oklch, var(--primary) 30%, transparent)
+        );
+    }
+
+    .nav-glow[data-active='true'],
+    .nav-glow[aria-current='page'] {
+        filter: drop-shadow(
+            0 0 6px color-mix(in oklch, var(--primary) 22%, transparent)
+        );
     }
 }

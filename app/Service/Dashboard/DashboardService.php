@@ -4,193 +4,287 @@ namespace App\Service\Dashboard;
 
 use App\Models\PostpartumVisit;
 use App\Models\Followup;
+use App\Models\User;
 
 class DashboardService
 {
-    /**
-     * Grafik Harian (7 Hari Terakhir)
-     * Menggunakan Group By SQL agar cuma 1 query, bukan 7.
-     */
-    public function postpartumScreeningLineDay(): array
-    {
-        $startDate = now()->subDays(6)->startOfDay();
-        $endDate = now()->endOfDay();
+  /**
+   * Grafik Harian (7 Hari Terakhir)
+   * Menggunakan Group By SQL agar cuma 1 query, bukan 7.
+   */
+  public function postpartumScreeningLineDay(): array
+  {
+    $startDate = now()->subDays(6)->startOfDay();
+    $endDate = now()->endOfDay();
 
-        $data = PostpartumVisit::selectRaw('DATE(date_filled) as date, count(*) as total')
-            ->whereBetween('date_filled', [$startDate, $endDate])
-            ->groupBy('date')
-            ->pluck('total', 'date');
+    $data = PostpartumVisit::selectRaw('DATE(date_filled) as date, count(*) as total')
+      ->whereBetween('date_filled', [$startDate, $endDate])
+      ->groupBy('date')
+      ->pluck('total', 'date');
 
-        $results = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $dateString = $date->toDateString();
+    $results = [];
+    for ($i = 6; $i >= 0; $i--) {
+      $date = now()->subDays($i);
+      $dateString = $date->toDateString();
 
-            $results[] = [
-                'day' => $date->format('l'),
-                'date' => $dateString,
-                'total' => $data[$dateString] ?? 0
-            ];
-        }
-
-        return $results;
+      $results[] = [
+        'day' => $date->format('l'),
+        'date' => $dateString,
+        'total' => $data[$dateString] ?? 0
+      ];
     }
 
-    /**
-     * Grafik Mingguan (4 Minggu Terakhir)
-     */
-    public function postpartumScreeningLineWeekly(): array
-    {
-        $results = [];
-        for ($i = 3; $i >= 0; $i--) {
-            $weekDate = now()->subWeeks($i);
-            $start = $weekDate->copy()->startOfWeek();
-            $end = $weekDate->copy()->endOfWeek();
+    return $results;
+  }
 
-            $count = PostpartumVisit::whereBetween('date_filled', [
-                $start->toDateString(),
-                $end->toDateString()
-            ])->count();
+  /**
+   * Grafik Mingguan (4 Minggu Terakhir)
+   */
+  public function postpartumScreeningLineWeekly(): array
+  {
+    $results = [];
+    for ($i = 3; $i >= 0; $i--) {
+      $weekDate = now()->subWeeks($i);
+      $start = $weekDate->copy()->startOfWeek();
+      $end = $weekDate->copy()->endOfWeek();
 
-            $results[] = [
-                'week' => "Week " . (4 - $i),
-                'start' => $start->toDateString(),
-                'end' => $end->toDateString(),
-                'total' => $count
-            ];
-        }
+      $count = PostpartumVisit::whereBetween('date_filled', [
+        $start->toDateString(),
+        $end->toDateString()
+      ])->count();
 
-        return $results;
+      $results[] = [
+        'week' => "Week " . (4 - $i),
+        'start' => $start->toDateString(),
+        'end' => $end->toDateString(),
+        'total' => $count
+      ];
     }
 
-    /**
-     * Grafik Bulanan (12 Bulan Terakhir)
-     * Menggunakan SQL Group By Year-Month
-     */
-    public function postpartumScreeningLineMonth(): array
-    {
-        $startDate = now()->subMonths(11)->startOfMonth();
+    return $results;
+  }
 
-        $data = PostpartumVisit::selectRaw('YEAR(date_filled) as year, MONTH(date_filled) as month, count(*) as total')
-            ->where('date_filled', '>=', $startDate)
-            ->groupBy('year', 'month')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [$item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item->total];
-            });
+  /**
+   * Grafik Bulanan (12 Bulan Terakhir)
+   * Menggunakan SQL Group By Year-Month
+   */
+  public function postpartumScreeningLineMonth(): array
+  {
+    $startDate = now()->subMonths(11)->startOfMonth();
 
-        $results = [];
-        for ($i = 11; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $key = $date->format('Y-m');
+    $data = PostpartumVisit::selectRaw('YEAR(date_filled) as year, MONTH(date_filled) as month, count(*) as total')
+      ->where('date_filled', '>=', $startDate)
+      ->groupBy('year', 'month')
+      ->get()
+      ->mapWithKeys(function ($item) {
+        return [$item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item->total];
+      });
 
-            $results[] = [
-                'month' => $date->format('F'),
-                'year' => $date->year,
-                'total' => $data[$key] ?? 0
-            ];
-        }
+    $results = [];
+    for ($i = 11; $i >= 0; $i--) {
+      $date = now()->subMonths($i);
+      $key = $date->format('Y-m');
 
-        return $results;
+      $results[] = [
+        'month' => $date->format('F'),
+        'year' => $date->year,
+        'total' => $data[$key] ?? 0
+      ];
     }
 
-    /**
-     * Statistik Follow Up (Persentase)
-     */
-    public function followUpStats(): array
-    {
-        $totalVisits = PostpartumVisit::count();
+    return $results;
+  }
 
-        $totalFollowUp = Followup::count();
+  /**
+   * Statistik Follow Up (Persentase)
+   */
+  public function followUpStats(): array
+  {
+    $totalVisits = PostpartumVisit::count();
 
-        if ($totalVisits === 0) {
-            return [
-                'follow_up' => [
-                    'label' => 'Sudah Follow Up',
-                    'data' => 0,
-                    'count' => 0
-                ],
-                'unfollow_up' => [
-                    'label' => 'Belum Follow Up',
-                    'data' => 0,
-                    'count' => 0
-                ]
-            ];
-        }
+    $totalFollowUp = Followup::count();
 
-        $percentageFollowUp = ($totalFollowUp / $totalVisits) * 100;
-        $percentageUnFollowUp = 100 - $percentageFollowUp;
-
-        return [
-            'follow_up' => [
-                'label' => 'Sudah Follow Up',
-                'data' => round($percentageFollowUp),
-                'count' => $totalFollowUp
-            ],
-            'unfollow_up' => [
-                'label' => 'Belum Follow Up',
-                'data' => round($percentageUnFollowUp),
-                'count' => $totalVisits - $totalFollowUp
-            ]
-        ];
+    if ($totalVisits === 0) {
+      return [
+        'follow_up' => [
+          'label' => 'Sudah Follow Up',
+          'data' => 0,
+          'count' => 0
+        ],
+        'unfollow_up' => [
+          'label' => 'Belum Follow Up',
+          'data' => 0,
+          'count' => 0
+        ]
+      ];
     }
 
-    /**
-     * Distribusi Risiko Minggu Ini
-     */
-    public function riskDistribution(): array
-    {
-        $visits = PostpartumVisit::with('result:id,postpartum_visit_id,total_score')
-            ->whereBetween('date_filled', [
-                now()->startOfWeek()->toDateString(),
-                now()->endOfWeek()->toDateString(),
-            ])
-            ->get();
+    $percentageFollowUp = ($totalFollowUp / $totalVisits) * 100;
+    $percentageUnFollowUp = 100 - $percentageFollowUp;
 
-        $stats = [
-            'Normal' => 0,
-            'Low Risk' => 0,
-            'High Risk' => 0,
-        ];
+    return [
+      'follow_up' => [
+        'label' => 'Sudah Follow Up',
+        'data' => round($percentageFollowUp),
+        'count' => $totalFollowUp
+      ],
+      'unfollow_up' => [
+        'label' => 'Belum Follow Up',
+        'data' => round($percentageUnFollowUp),
+        'count' => $totalVisits - $totalFollowUp
+      ]
+    ];
+  }
 
-        foreach ($visits as $visit) {
-            if (!$visit->result) continue;
+  /**
+   * Distribusi Risiko Minggu Ini
+   */
+  public function riskDistribution(): array
+  {
+    $visits = PostpartumVisit::with('result:id,postpartum_visit_id,total_score')
+      ->whereBetween('date_filled', [
+        now()->startOfWeek()->toDateString(),
+        now()->endOfWeek()->toDateString(),
+      ])
+      ->get();
 
-            $category = category_score($visit->result->total_score);
+    $stats = [
+      'Normal' => 0,
+      'Low Risk' => 0,
+      'High Risk' => 0,
+    ];
 
-            if (isset($stats[$category])) {
-                $stats[$category]++;
-            } else {
-                $stats['High Risk']++;
-            }
-        }
+    foreach ($visits as $visit) {
+      if (!$visit->result)
+        continue;
 
-        return [
-            ['label' => 'Normal', 'value' => $stats['Normal'] ?? 0],
-            ['label' => 'Low Risk', 'value' => $stats['Low Risk'] ?? 0],
-            ['label' => 'High Risk', 'value' => $stats['High Risk'] ?? 0],
-        ];
+      $category = category_score($visit->result->total_score);
+
+      if (isset($stats[$category])) {
+        $stats[$category]++;
+      } else {
+        $stats['High Risk']++;
+      }
     }
 
-    /**
-     * Data Terbaru
-     */
-    public function latestPostpartumData(): array
-    {
-        $visits = PostpartumVisit::with(['mother', 'result'])
-            ->latest('created_at')
-            ->take(6)
-            ->get();
+    return [
+      ['label' => 'Normal', 'value' => $stats['Normal'] ?? 0],
+      ['label' => 'Low Risk', 'value' => $stats['Low Risk'] ?? 0],
+      ['label' => 'High Risk', 'value' => $stats['High Risk'] ?? 0],
+    ];
+  }
 
-        return $visits->map(function ($visit) {
-            return [
-                'number_patient' => $visit->mother?->number_patient ?? '-',
-                'name' => $visit->mother?->name ?? 'Unknown',
-                'date_filled' => $visit->date_filled,
-                'risk' => $visit->result
-                    ? category_score($visit->result->total_score)
-                    : 'No Result',
-            ];
-        })->toArray();
+  /**
+   * Data Terbaru
+   */
+  public function latestPostpartumData(): array
+  {
+    $visits = PostpartumVisit::with(['mother', 'result'])
+      ->latest('created_at')
+      ->take(6)
+      ->get();
+
+    return $visits->map(function ($visit) {
+      return [
+        'id' => $visit->id,
+        'number_patient' => $visit->mother?->number_patient ?? '-',
+        'name' => $visit->mother?->name ?? 'Unknown',
+        'date_filled' => $visit->date_filled,
+        'risk' => $visit->result
+          ? category_score($visit->result->total_score)
+          : 'No Result',
+      ];
+    })->toArray();
+  }
+
+  /**
+   * Summary statistics for the stat-card row.
+   * Returns four counters plus a 7-point sparkline for each.
+   */
+  public function summaryStats(): array
+  {
+    // ── Totals ────────────────────────────────────────────────────────
+    $totalPatients = User::whereHas('role', fn($q) => $q->where('slug', 'patient'))->count();
+    $totalScreenings = PostpartumVisit::count();
+    $totalFollowups = Followup::count();
+    $totalHighRisk = PostpartumVisit::with('result')
+      ->get()
+      ->filter(fn($v) => $v->result && category_score($v->result->total_score) === 'High Risk')
+      ->count();
+
+    // ── Sparklines: last 7 days per metric ───────────────────────────
+    $screeningSparkline = PostpartumVisit::selectRaw('DATE(date_filled) as date, count(*) as total')
+      ->whereBetween('date_filled', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
+      ->groupBy('date')
+      ->pluck('total', 'date');
+
+    $followupSparkline = Followup::selectRaw('DATE(created_at) as date, count(*) as total')
+      ->whereBetween('created_at', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
+      ->groupBy('date')
+      ->pluck('total', 'date');
+
+    $sparkScreening = [];
+    $sparkFollowup = [];
+    for ($i = 6; $i >= 0; $i--) {
+      $key = now()->subDays($i)->toDateString();
+      $sparkScreening[] = (int) ($screeningSparkline[$key] ?? 0);
+      $sparkFollowup[] = (int) ($followupSparkline[$key] ?? 0);
     }
+
+    // Patient + high-risk sparklines: use weekly new-patients / daily high-risk
+    $patientSparkline = User::selectRaw('DATE(created_at) as date, count(*) as total')
+      ->whereHas('role', fn($q) => $q->where('slug', 'patient'))
+      ->whereBetween('created_at', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
+      ->groupBy('date')
+      ->pluck('total', 'date');
+
+    $highRiskRaw = PostpartumVisit::with('result')
+      ->whereBetween('date_filled', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
+      ->get()
+      ->groupBy(fn($v) => $v->date_filled instanceof \Carbon\Carbon
+        ? $v->date_filled->toDateString()
+        : substr($v->date_filled, 0, 10));
+
+    $sparkPatient = [];
+    $sparkHighRisk = [];
+    for ($i = 6; $i >= 0; $i--) {
+      $key = now()->subDays($i)->toDateString();
+      $sparkPatient[] = (int) ($patientSparkline[$key] ?? 0);
+      $dayVisits = $highRiskRaw[$key] ?? collect();
+      $sparkHighRisk[] = $dayVisits->filter(
+        fn($v) => $v->result && category_score($v->result->total_score) === 'High Risk'
+      )->count();
+    }
+
+    return [
+      [
+        'key' => 'patients',
+        'label' => 'Total Pasien',
+        'value' => $totalPatients,
+        'trend' => $sparkPatient,
+        'icon' => 'users',
+      ],
+      [
+        'key' => 'screenings',
+        'label' => 'Total Skrining',
+        'value' => $totalScreenings,
+        'trend' => $sparkScreening,
+        'icon' => 'scan-heart',
+      ],
+      [
+        'key' => 'followups',
+        'label' => 'Total Tindak Lanjut',
+        'value' => $totalFollowups,
+        'trend' => $sparkFollowup,
+        'icon' => 'activity',
+      ],
+      [
+        'key' => 'high_risk',
+        'label' => 'Risiko Tinggi',
+        'value' => $totalHighRisk,
+        'trend' => $sparkHighRisk,
+        'icon' => 'alert-triangle',
+      ],
+    ];
+  }
 }
