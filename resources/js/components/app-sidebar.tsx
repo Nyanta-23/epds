@@ -61,7 +61,7 @@ const mainNavItems: NavItem[] = [
         canAccess: ['super_admin'],
     },
     {
-        title: 'Hasil Skrining',
+        title: 'Hasil Deteksi Dini',
         href: '/postpartum',
         icon: ScanHeart,
         canAccess: ['super_admin', 'admin', 'midwife'],
@@ -79,7 +79,14 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+            {/*
+             * ── Glass sidebar panel ────────────────────────────────────
+             * bg-sidebar/90 + backdrop-blur-xl gives the "frosted glass"
+             * feel while border-pink-100 ties into the Medical Pink palette.
+             */}
+            <SidebarHeader className="relative border-b border-pink-100/60 bg-sidebar/90 pb-3 backdrop-blur-xl dark:border-pink-900/30">
+                {/* Thin Medical-Pink top-stripe accent */}
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-primary/60 via-primary to-primary/60" />
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -91,12 +98,12 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            {/* Scrollable nav with pink-tinted scrollbar */}
+            <SidebarContent className="bg-sidebar/90 backdrop-blur-xl">
                 <NavMain items={filteredNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
-                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
+            <SidebarFooter className="border-t border-pink-100/60 bg-sidebar/90 backdrop-blur-xl dark:border-pink-900/30">
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
