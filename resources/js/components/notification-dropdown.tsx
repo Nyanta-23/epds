@@ -1,14 +1,30 @@
+import { Button } from '@/components/ui/button';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { requestFcmPermission } from '@/hooks/use-fcm';
 import { PageProps } from '@inertiajs/core';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Bell, Calendar, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+    AlertTriangle,
+    Bell,
+    BellOff,
+    Calendar,
+    CheckCheck,
+    Info,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface NotificationData {
     title: string;
     body: string;
     action_url: string;
     type: 'danger' | 'info' | string;
-    icon?: string; 
+    icon?: string;
 }
 
 interface NotificationItem {
@@ -23,11 +39,7 @@ interface NotificationItem {
 }
 
 interface AuthProps {
-    user: {
-        id: string;
-        name: string;
-        email: string;
-    };
+    user: { id: string; name: string; email: string };
     notifications: NotificationItem[];
     unreadCount: number;
 }
@@ -36,24 +48,85 @@ interface SharedProps extends PageProps {
     auth: AuthProps;
 }
 
+/* ── tiny Web Audio beep — no external file needed ─────────────────── */
+function playNotificationSound() {
+    try {
+        const ctx = new AudioContext();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(880, ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
+        g.gain.setValueAtTime(0.3, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+        o.start(ctx.currentTime);
+        o.stop(ctx.currentTime + 0.4);
+    } catch (_) {
+        /* silently ignore if AudioContext not available */
+    }
+}
+
+function NotifIcon({ type, icon }: { type: string; icon?: string }) {
+    if (type === 'danger')
+        return <AlertTriangle size={15} className="text-rose-600" />;
+    if (icon === 'calendar' || type === 'warning')
+        return <Calendar size={15} className="text-violet-600" />;
+    return <Info size={15} className="text-primary" />;
+}
+
+function notifIconBg(type: string, icon?: string) {
+    if (type === 'danger') return 'bg-rose-100';
+    if (type === 'warning' || icon === 'calendar') return 'bg-violet-100';
+    return 'bg-primary/10';
+}
+
 export default function NotificationDropdown() {
     const { auth } = usePage<SharedProps>().props;
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [open, setOpen] = useState(false);
+    const [blocked, setBlocked] = useState(false);
+    const prevUnread = useRef(auth.unreadCount);
 
-
+    /* ── Poll every 30s ─────────────────────────────────────────────── */
     useEffect(() => {
-        const interval = setInterval(() => {
-            router.reload({ only: ['auth'] });
-        }, 3000);
-
-        return () => clearInterval(interval);
+        const id = setInterval(() => router.reload({ only: ['auth'] }), 30_000);
+        return () => clearInterval(id);
     }, []);
 
-    const markAsRead = (id: string, url?: string) => {
-        const endpoint = route('notifications.read', id);
+    /* ── Sound + reload on foreground FCM push ──────────────────────── */
+    useEffect(() => {
+        const handler = () => {
+            playNotificationSound();
+            router.reload({ only: ['auth'] });
+        };
+        window.addEventListener('fcm:foreground', handler);
+        return () => window.removeEventListener('fcm:foreground', handler);
+    }, []);
 
+    /* ── Sound when unread count grows (e.g. from polling) ─────────── */
+    useEffect(() => {
+        if (auth.unreadCount > prevUnread.current) {
+            playNotificationSound();
+        }
+        prevUnread.current = auth.unreadCount;
+    }, [auth.unreadCount]);
+
+    /* ── Bell click: request FCM permission ─────────────────────────── */
+    const handleBellClick = async () => {
+        const perm =
+            'Notification' in window ? Notification.permission : 'denied';
+        if (perm === 'denied') {
+            setBlocked(true);
+            return;
+        }
+        setBlocked(false);
+        await requestFcmPermission();
+    };
+
+    const markAsRead = (id: string, url?: string) => {
         router.post(
-            endpoint,
+            route('notifications.read', id),
             {},
             {
                 preserveScroll: true,
@@ -73,132 +146,162 @@ export default function NotificationDropdown() {
     };
 
     return (
-        <div className="relative">
-            {/* Trigger Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="relative rounded-full p-2 text-gray-600 transition hover:bg-gray-100 focus:ring-2 focus:ring-pink-300 focus:outline-none"
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
+                    onClick={handleBellClick}
+                >
+                    <Bell size={20} />
+                    {auth.unreadCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 animate-pulse items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] leading-none font-bold text-white ring-2 ring-background">
+                            {auth.unreadCount > 99 ? '99+' : auth.unreadCount}
+                        </span>
+                    )}
+                </Button>
+            </PopoverTrigger>
+
+            <PopoverContent
+                align="end"
+                sideOffset={8}
+                className="w-80 p-0 shadow-lg"
             >
-                <Bell size={24} />
-                {auth.unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex translate-x-1/4 -translate-y-1/4 transform animate-pulse items-center justify-center rounded-full bg-red-600 px-2 py-1 text-xs leading-none font-bold text-red-100">
-                        {auth.unreadCount > 99 ? '99+' : auth.unreadCount}
-                    </span>
-                )}
-            </button>
-            {isOpen && (
-                <>
-                    <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setIsOpen(false)}
-                    />
-
-                    <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-md border border-gray-200 bg-white shadow-xl ring-1 ring-black ring-opacity-5">
-                        <div className="flex items-center justify-between border-b bg-gray-50 px-4 py-3">
-                            <span className="text-sm font-semibold text-gray-700">
-                                Notifikasi
+                {/* ── Header ─────────────────────────────────────────── */}
+                <div className="flex items-center justify-between px-4 py-3">
+                    <div className="flex items-center gap-2">
+                        <Bell size={15} className="text-primary" />
+                        <span className="text-sm font-semibold">
+                            Notifikasi
+                        </span>
+                        {auth.unreadCount > 0 && (
+                            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                                {auth.unreadCount}
                             </span>
-                            {auth.unreadCount > 0 && (
-                                <button
-                                    onClick={markAllRead}
-                                    className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                                >
-                                    Tandai semua dibaca
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="scrollbar-thin scrollbar-thumb-gray-200 max-h-96 overflow-y-auto">
-                            {auth.notifications.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center p-8 text-center text-gray-400">
-                                    <Bell
-                                        size={32}
-                                        className="mb-2 opacity-20"
-                                    />
-                                    <span className="text-sm">
-                                        Tidak ada notifikasi baru.
-                                    </span>
-                                </div>
-                            ) : (
-                                auth.notifications.map((notif) => {
-                                    let IconComponent = CheckCircle;
-                                    let iconColorClass = "text-blue-600";
-                                    let bgIconClass = "bg-blue-100";
-
-                                    if (notif.data.type === 'danger') {
-                                        IconComponent = AlertTriangle;
-                                        iconColorClass = "text-red-600";
-                                        bgIconClass = "bg-red-100";
-                                    } 
-                                    else if (notif.data.icon === 'calendar') {
-                                        IconComponent = Calendar;
-                                        iconColorClass = "text-purple-600";
-                                        bgIconClass = "bg-purple-100";
-                                    }
-                                    else {
-                                        IconComponent = Info;
-                                    }
-
-                                    return (
-                                        <div
-                                            key={notif.id}
-                                            onClick={() =>
-                                                markAsRead(
-                                                    notif.id,
-                                                    notif.data.action_url,
-                                                )
-                                            }
-                                            className={`flex cursor-pointer items-start gap-3 border-b p-4 transition-colors duration-200 hover:bg-gray-50 ${
-                                                notif.read_at
-                                                    ? 'bg-white opacity-60'
-                                                    : 'bg-blue-50/10'
-                                            }`}
-                                        >
-                                            <div className={`flex-shrink-0 rounded-full p-2 ${bgIconClass}`}>
-                                                <IconComponent size={16} className={iconColorClass} />
-                                            </div>
-
-                                            <div className="flex-1">
-                                                <p
-                                                    className={`text-sm ${!notif.read_at ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}
-                                                >
-                                                    {notif.data.title}
-                                                </p>
-                                                <p className="mt-1 line-clamp-2 text-xs text-gray-600">
-                                                    {notif.data.body}
-                                                </p>
-                                                <p className="mt-2 font-mono text-[10px] text-gray-400">
-                                                    {new Date(
-                                                        notif.created_at,
-                                                    ).toLocaleString('id-ID', {
-                                                        day: 'numeric',
-                                                        month: 'short',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
-                                                    })}
-                                                </p>
-                                            </div>
-                                            
-                                            {!notif.read_at && (
-                                                <div className="mt-2 h-2 w-2 rounded-full bg-blue-600"></div>
-                                            )}
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
-
-                        <div className="border-t bg-gray-50 px-4 py-2 text-center">
-                            <Link
-                                href="/notifications"
-                                className="block w-full py-1 text-xs font-medium text-gray-600 hover:text-gray-900"
-                            >
-                                Lihat Semua Riwayat
-                            </Link>
-                        </div>
+                        )}
                     </div>
-                </>
-            )}
-        </div>
+                    {auth.unreadCount > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-primary"
+                            onClick={markAllRead}
+                        >
+                            <CheckCheck size={13} />
+                            Baca semua
+                        </Button>
+                    )}
+                </div>
+
+                <Separator />
+
+                {/* ── Push blocked warning ────────────────────────────── */}
+                {blocked && (
+                    <>
+                        <div className="flex items-start gap-2.5 bg-amber-50 px-4 py-3">
+                            <BellOff
+                                size={15}
+                                className="mt-0.5 shrink-0 text-amber-600"
+                            />
+                            <p className="text-xs leading-relaxed text-amber-800">
+                                Notifikasi push <strong>diblokir</strong>{' '}
+                                browser. Buka Pengaturan Situs → Notifikasi →
+                                ubah ke <em>Izinkan</em>, lalu muat ulang.
+                            </p>
+                        </div>
+                        <Separator />
+                    </>
+                )}
+
+                {/* ── List ─────────────────────────────────────────────── */}
+                <ScrollArea className="max-h-[380px]">
+                    {auth.notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+                            <div className="rounded-full bg-muted p-3">
+                                <Bell
+                                    size={20}
+                                    className="text-muted-foreground/50"
+                                />
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                                Tidak ada notifikasi baru
+                            </p>
+                        </div>
+                    ) : (
+                        auth.notifications.map((notif, i) => (
+                            <div key={notif.id}>
+                                <button
+                                    onClick={() =>
+                                        markAsRead(
+                                            notif.id,
+                                            notif.data.action_url,
+                                        )
+                                    }
+                                    className={`flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-accent/60 ${!notif.read_at ? 'bg-primary/5' : ''}`}
+                                >
+                                    {/* unread bar */}
+                                    {!notif.read_at && (
+                                        <span className="absolute left-0 h-full w-0.5 rounded-r bg-primary" />
+                                    )}
+
+                                    {/* icon */}
+                                    <div
+                                        className={`mt-0.5 shrink-0 rounded-full p-1.5 ${notifIconBg(notif.data.type, notif.data.icon)}`}
+                                    >
+                                        <NotifIcon
+                                            type={notif.data.type}
+                                            icon={notif.data.icon}
+                                        />
+                                    </div>
+
+                                    {/* text */}
+                                    <div className="min-w-0 flex-1">
+                                        <p
+                                            className={`text-sm leading-snug ${!notif.read_at ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}
+                                        >
+                                            {notif.data.title}
+                                        </p>
+                                        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                                            {notif.data.body}
+                                        </p>
+                                        <p className="mt-1.5 font-mono text-[10px] text-muted-foreground/60">
+                                            {new Date(
+                                                notif.created_at,
+                                            ).toLocaleString('id-ID', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })}
+                                        </p>
+                                    </div>
+
+                                    {/* unread dot */}
+                                    {!notif.read_at && (
+                                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                                    )}
+                                </button>
+                                {i < auth.notifications.length - 1 && (
+                                    <Separator className="mx-4 w-auto" />
+                                )}
+                            </div>
+                        ))
+                    )}
+                </ScrollArea>
+
+                {/* ── Footer ───────────────────────────────────────────── */}
+                <Separator />
+                <div className="px-4 py-2.5">
+                    <Link
+                        href="/notifications"
+                        className="block w-full rounded-md py-1.5 text-center text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
+                        onClick={() => setOpen(false)}
+                    >
+                        Lihat semua riwayat →
+                    </Link>
+                </div>
+            </PopoverContent>
+        </Popover>
     );
 }

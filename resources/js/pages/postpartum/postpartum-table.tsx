@@ -3,6 +3,8 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -24,13 +26,13 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
     const [result, setResult] = useState<PostpartumVisit>();
 
     return (
-        <section className="overflow-hidden rounded-b-md border border-t-0">
+        <TableContainer>
             {/* Desktop Table + Mobile horizontal scroll */}
             <div className="overflow-x-auto">
                 <Table className="min-w-full text-sm">
-                    <TableHeader className="bg-accent">
+                    <TableHeader>
                         <TableRow>
-                            <TableHead className="whitespace-nowrap">
+                            <TableHead className="pl-4 whitespace-nowrap">
                                 Nomor Pasien
                             </TableHead>
                             <TableHead className="whitespace-nowrap">
@@ -42,15 +44,18 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                             <TableHead className="whitespace-nowrap">
                                 Status Hasil
                             </TableHead>
-                            <TableHead className="sticky right-0 bg-accent text-right whitespace-nowrap shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.08)]">
+                            <TableHead className="sticky right-0 bg-primary/5 text-right whitespace-nowrap shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
                                 Aksi
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((postpartum) => (
+                        {data.length === 0 ? (
+                            <TableEmpty colSpan={5} />
+                        ) : (
+                        data.map((postpartum) => (
                             <TableRow key={postpartum.id}>
-                                <TableCell className="font-medium whitespace-nowrap">
+                                <TableCell className="pl-4 font-medium whitespace-nowrap">
                                     {postpartum.mother.number_patient}
                                 </TableCell>
                                 <TableCell className="font-medium whitespace-nowrap">
@@ -62,7 +67,7 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                                 <TableCell className="whitespace-nowrap">
                                     {postpartum.result.followup_status.label_id}
                                 </TableCell>
-                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.08)]">
+                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
                                     <div className="flex justify-end gap-2">
                                         <Link
                                             href={route(
@@ -80,10 +85,11 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
-        </section>
+        </TableContainer>
     );
 }

@@ -29,7 +29,7 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
         const strValue = value?.toString() ?? '';
 
         if (field === 'province_id') {
-            const province = provinces.find((r) => r.id == strValue)
+            const province = provinces.find((r) => r.id == strValue);
             onProvinceChange(strValue);
             handleInputChange('province', province?.name ?? '');
             handleInputChange('regency_id', null);
@@ -78,6 +78,7 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
                                     data={data}
                                     errors={errors}
                                     process={processing || loading}
+                                    loadingRegion={loading}
                                     handleInputChange={onFieldChange}
                                     action={() => createUser()}
                                 />

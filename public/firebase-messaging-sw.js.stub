@@ -1,0 +1,11 @@
+/**
+ * THIS FILE IS A PLACEHOLDER ONLY.
+ *
+ * The real Firebase Messaging Service Worker is served dynamically
+ * by Laravel at the same URL (/firebase-messaging-sw.js) so that
+ * Firebase config values are injected from .env at request time.
+ *
+ * Route: GET /firebase-messaging-sw.js → routes/web.php → resources/views/firebase-sw.blade.php
+ *
+ * Do NOT put real config here — this file is committed to source control.
+ */

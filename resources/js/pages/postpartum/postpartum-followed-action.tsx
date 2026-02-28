@@ -1,55 +1,66 @@
-import { Button } from "@/components/ui/button";
-import { Filter } from "@/types";
-import { router } from "@inertiajs/react";
-import { Archive, ArchiveRestore, Clipboard, ClipboardPenLine } from "lucide-react";
-
+import { Button } from '@/components/ui/button';
+import { Filter } from '@/types';
+import { router } from '@inertiajs/react';
+import { Clipboard, ClipboardPenLine } from 'lucide-react';
 
 interface PostpartumFollowedActionProps {
-  filter: Filter;
-  link: string;
+    filter: Filter;
+    link: string;
 }
 
+export default function PostpartumFollowedAction({
+    filter,
+    link,
+}: PostpartumFollowedActionProps) {
+    const { is_followed, search, preset, risk, filter_list } = filter;
 
-export default function PostpartumFollowedAction({ filter, link }: PostpartumFollowedActionProps) {
+    const { date_filter } = filter_list ?? {};
+    const { start_date, end_date } = date_filter ?? {};
 
-  const { is_followed, search, filter_list } = filter;
+    // Carry all active filter params when toggling the tab
+    const sharedParams = { search, preset, risk, start_date, end_date };
 
-  const { date_filter } = filter_list ?? {};
-  const { start_date, end_date } = date_filter ?? {};
+    return (
+        <div className="flex gap-1 shadow-sm">
+            <Button
+                className={`h-12 w-14 cursor-pointer rounded-none rounded-t-md p-0 ${!is_followed ? 'bg-muted text-foreground hover:bg-muted' : 'bg-background text-muted-foreground hover:bg-muted'}`}
+                onClick={() =>
+                    router.get(
+                        link,
+                        {
+                            ...sharedParams,
+                            is_followed: false,
+                        },
+                        {
+                            preserveState: true,
+                            preserveScroll: true,
+                            replace: true,
+                        },
+                    )
+                }
+            >
+                <Clipboard style={{ width: 28, height: 28 }} />
+            </Button>
 
-  return (
-    <div className="flex shadow-sm gap-1">
-      <Button
-        className={`h-12 w-14 p-0 rounded-none rounded-t-md cursor-pointer ${!is_followed ? 'bg-muted hover:bg-muted text-foreground' : 'bg-background text-muted-foreground hover:bg-muted'}`}
-        onClick={() => router.get(link, {
-          is_followed: false,
-          search,
-          start_date,
-          end_date
-        }, {
-          preserveState: true,
-          preserveScroll: true,
-          replace: true
-        })}
-      >
-        <Clipboard style={{ width: 28, height: 28 }} />
-      </Button>
-
-      <Button
-        className={`h-12 w-14 p-0 rounded-none rounded-t-md cursor-pointer ${is_followed ? 'bg-muted hover:bg-muted text-foreground' : 'bg-background text-muted-foreground hover:bg-muted'}`}
-        onClick={() => router.get(link, {
-          is_followed: true,
-          search,
-          start_date,
-          end_date
-        }, {
-          preserveState: true,
-          preserveScroll: true,
-          replace: true
-        })}
-      >
-        <ClipboardPenLine style={{ width: 28, height: 38 }} />
-      </Button>
-    </div>
-  )
+            <Button
+                className={`h-12 w-14 cursor-pointer rounded-none rounded-t-md p-0 ${is_followed ? 'bg-muted text-foreground hover:bg-muted' : 'bg-background text-muted-foreground hover:bg-muted'}`}
+                onClick={() =>
+                    router.get(
+                        link,
+                        {
+                            ...sharedParams,
+                            is_followed: true,
+                        },
+                        {
+                            preserveState: true,
+                            preserveScroll: true,
+                            replace: true,
+                        },
+                    )
+                }
+            >
+                <ClipboardPenLine style={{ width: 28, height: 38 }} />
+            </Button>
+        </div>
+    );
 }

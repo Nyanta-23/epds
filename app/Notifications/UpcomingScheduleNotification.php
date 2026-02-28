@@ -2,39 +2,66 @@
 
 namespace App\Notifications;
 
+use App\Service\FcmService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UpcomingScheduleNotification extends Notification implements ShouldQueue
+class UpcomingScheduleNotification extends Notification
 {
-    use Queueable;
+  use Queueable;
 
-    public $motherName;
-    public $visitLabel;
-    public $babyAge;
-    public $motherId;
+  public function __construct(
+    public readonly string $motherName,
+    public readonly string $visitLabel,
+    public readonly mixed $motherId,
+  ) {
+  }
 
-    public function __construct($motherName, $visitLabel, $motherId)
-    {
-        $this->motherName = $motherName;
-        $this->visitLabel = $visitLabel;
-        $this->motherId = $motherId;
+  /* ── Channels ──────────────────────────────────────────────────── */
+
+  public function via(mixed $notifiable): array
+  {
+    return ['database'];
+  }
+
+  /* ── Database channel (in-app bell) ────────────────────────────── */
+
+  public function toArray(mixed $notifiable): array
+  {
+    $title = "Jadwal Skrining: {$this->visitLabel}";
+    $body  = "Ibu {$this->motherName} memasuki periode {$this->visitLabel}.";
+
+    $payload = [
+      'title'      => $title,
+      'body'       => $body,
+      'action_url' => route('postpartum'),
+      'type'       => 'info',
+      'icon'       => 'calendar',
+    ];
+
+    // Fire FCM synchronously — no queue worker needed (shared hosting safe)
+    $this->sendFcm($notifiable, $title, $body);
+
+    return $payload;
+  }
+
+  /* ── FCM push — called synchronously inside toArray() ─────────── */
+
+  private function sendFcm(mixed $notifiable, string $title, string $body): void
+  {
+    if (blank($notifiable->fcm_token)) {
+      return;
     }
 
-    public function via($notifiable)
-    {
-        return ['database'];
-    }
-
-    public function toArray($notifiable)
-    {
-        return [
-            'title' => "📅 Jadwal Skrining: {$this->visitLabel}",
-            'body' => "Ibu {$this->motherName} memasuki periode {$this->visitLabel}).",
-            'action_url' => route('postpartum'),
-            'type' => 'info',
-            'icon' => 'calendar',
-        ];
-    }
+    app(FcmService::class)->send(
+      $notifiable->fcm_token,
+      $title,
+      $body,
+      [
+        'action_url' => route('postpartum'),
+        'mother_id'  => (string) $this->motherId,
+        'type'       => 'schedule_reminder',
+      ]
+    );
+  }
 }
