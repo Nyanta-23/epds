@@ -4,9 +4,10 @@ namespace App\Notifications;
 
 use App\Service\FcmService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class UpcomingScheduleNotification extends Notification
+class UpcomingScheduleNotification extends Notification implements ShouldQueue
 {
   use Queueable;
 
@@ -28,39 +29,32 @@ class UpcomingScheduleNotification extends Notification
 
   public function toArray(mixed $notifiable): array
   {
-    $title = "Jadwal Skrining: {$this->visitLabel}";
-    $body  = "Ibu {$this->motherName} memasuki periode {$this->visitLabel}.";
-
-    $payload = [
-      'title'      => $title,
-      'body'       => $body,
+    return [
+      'title' => "Jadwal Skrining: {$this->visitLabel}",
+      'body' => "Ibu {$this->motherName} memasuki periode {$this->visitLabel}.",
       'action_url' => route('postpartum'),
-      'type'       => 'info',
-      'icon'       => 'calendar',
+      'type' => 'info',
+      'icon' => 'calendar',
     ];
-
-    // Fire FCM synchronously — no queue worker needed (shared hosting safe)
-    $this->sendFcm($notifiable, $title, $body);
-
-    return $payload;
   }
 
-  /* ── FCM push — called synchronously inside toArray() ─────────── */
+  /* ── Firebase push — called after database channel is written ──── */
 
-  private function sendFcm(mixed $notifiable, string $title, string $body): void
+  public function afterSend(mixed $notifiable, string $channel): void
   {
-    if (blank($notifiable->fcm_token)) {
+    if ($channel !== 'database')
       return;
-    }
+    if (blank($notifiable->fcm_token))
+      return;
 
     app(FcmService::class)->send(
       $notifiable->fcm_token,
-      $title,
-      $body,
+      "Jadwal Skrining: {$this->visitLabel}",
+      "Ibu {$this->motherName} memasuki periode {$this->visitLabel}.",
       [
         'action_url' => route('postpartum'),
-        'mother_id'  => (string) $this->motherId,
-        'type'       => 'schedule_reminder',
+        'mother_id' => (string) $this->motherId,
+        'type' => 'schedule_reminder',
       ]
     );
   }

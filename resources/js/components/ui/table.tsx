@@ -1,7 +1,6 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { SearchX } from "lucide-react"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -120,35 +119,9 @@ function TableCaption({
   )
 }
 
-/* TableEmpty — empty-state row shown when data.length === 0 */
-function TableEmpty({
-  colSpan = 999,
-  message = "Data tidak ditemukan",
-}: {
-  colSpan?: number;
-  message?: string;
-}) {
-  return (
-    <tr data-slot="table-empty">
-      <td colSpan={colSpan} className="py-14 text-center">
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <span className="flex size-12 items-center justify-center rounded-full bg-primary/10">
-            <SearchX className="size-5 text-primary/60" />
-          </span>
-          <p className="text-sm font-medium">{message}</p>
-          <p className="text-xs text-muted-foreground/60">
-            Coba ubah kata kunci pencarian atau filter yang digunakan
-          </p>
-        </div>
-      </td>
-    </tr>
-  )
-}
-
 export {
   Table,
   TableContainer,
-  TableEmpty,
   TableHeader,
   TableBody,
   TableFooter,

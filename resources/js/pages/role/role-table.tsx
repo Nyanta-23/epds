@@ -3,7 +3,6 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -29,17 +28,13 @@ export default function RoleTable({ data }: RoleTableProps) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.length === 0 ? (
-                        <TableEmpty colSpan={1} />
-                    ) : (
-                    data.map((role) => (
+                    {data.map((role) => (
                         <TableRow key={role.id}>
                             <TableCell className="pl-4 font-medium">
                                 {roleIdentifier(role.name)}
                             </TableCell>
                         </TableRow>
-                    ))
-                    )}
+                    ))}
                 </TableBody>
             </Table>
         </TableContainer>

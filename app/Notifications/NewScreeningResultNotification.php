@@ -4,9 +4,10 @@ namespace App\Notifications;
 
 use App\Service\FcmService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class NewScreeningResultNotification extends Notification
+class NewScreeningResultNotification extends Notification implements ShouldQueue
 {
   use Queueable;
 
@@ -30,36 +31,43 @@ class NewScreeningResultNotification extends Notification
   {
     $isHighRisk = $this->result->total_score >= 13;
 
-    $payload = [
+    return [
       'title' => $isHighRisk ? '⚠️ BAHAYA: Pasien Risiko Tinggi' : 'Hasil Skrining Baru',
       'body' => "Ibu {$this->motherName} memiliki skor EPDS: {$this->result->total_score}",
       'action_url' => route('postpartum.show', $this->postpartumId),
       'type' => $isHighRisk ? 'danger' : 'info',
       'created_at' => now(),
     ];
-
-    // Fire FCM synchronously — no queue worker needed (shared hosting safe)
-    $this->sendFcm($notifiable, $isHighRisk, $payload['title'], $payload['body']);
-
-    return $payload;
   }
 
-  /* ── FCM push — called synchronously inside toArray() ─────────── */
+  /* ── Called by the queue worker after database channel is written ── */
 
-  private function sendFcm(mixed $notifiable, bool $isHighRisk, string $title, string $body): void
+  public function withDelay(mixed $notifiable): int
   {
-    if (blank($notifiable->fcm_token)) {
+    return 0;
+  }
+
+  /**
+   * afterCommit() ensures the DB write is committed before FCM fires.
+   * Called automatically by the queue worker for ShouldQueue notifications.
+   */
+  public function afterSend(mixed $notifiable, string $channel): void
+  {
+    if ($channel !== 'database')
       return;
-    }
+    if (blank($notifiable->fcm_token))
+      return;
+
+    $isHighRisk = $this->result->total_score >= 13;
 
     app(FcmService::class)->send(
       $notifiable->fcm_token,
-      $title,
-      $body,
+      $isHighRisk ? '⚠️ BAHAYA: Pasien Risiko Tinggi' : 'Hasil Skrining Baru',
+      "Ibu {$this->motherName} memiliki skor EPDS: {$this->result->total_score}",
       [
-        'action_url'     => route('postpartum.show', $this->postpartumId),
-        'postpartum_id'  => (string) $this->postpartumId,
-        'type'           => 'screening_result',
+        'action_url' => route('postpartum.show', $this->postpartumId),
+        'postpartum_id' => (string) $this->postpartumId,
+        'type' => 'screening_result',
       ]
     );
   }

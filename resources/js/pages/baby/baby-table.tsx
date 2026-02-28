@@ -6,7 +6,6 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -47,10 +46,7 @@ export default function BabyTable({ data, filter }: UserTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 ? (
-                            <TableEmpty colSpan={8} />
-                        ) : (
-                        data.map((baby) => (
+                        {data.map((baby) => (
                             <TableRow key={baby.id}>
                                 <TableCell className="pl-4 font-medium">
                                     {baby.mother.name}
@@ -130,8 +126,7 @@ export default function BabyTable({ data, filter }: UserTableProps) {
                                     )}
                                 </TableCell>
                             </TableRow>
-                        ))
-                        )}
+                        ))}
                     </TableBody>
                 </Table>
             </div>

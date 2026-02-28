@@ -4,7 +4,6 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -48,10 +47,7 @@ export default function RecomendationRuleTable({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.length === 0 ? (
-                        <TableEmpty colSpan={5} />
-                    ) : (
-                    data.map((rule) => (
+                    {data.map((rule) => (
                         <TableRow key={rule.id}>
                             <TableCell className="pl-4 font-medium">
                                 {rule.name}
@@ -74,8 +70,7 @@ export default function RecomendationRuleTable({
                                 </Link>
                             </TableCell>
                         </TableRow>
-                    ))
-                    )}
+                    ))}
                 </TableBody>
             </Table>
         </TableContainer>

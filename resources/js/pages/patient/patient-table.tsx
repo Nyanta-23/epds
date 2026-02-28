@@ -4,7 +4,6 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -45,10 +44,7 @@ export default function PatientTable({ data }: PatientTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 ? (
-                            <TableEmpty colSpan={6} />
-                        ) : (
-                        data.map((patient) => (
+                        {data.map((patient) => (
                             <TableRow key={patient.id}>
                                 <TableCell
                                     className={`pl-4 font-medium whitespace-nowrap ${patient?.name == null ? 'text-center' : ''}`}
@@ -105,8 +101,7 @@ export default function PatientTable({ data }: PatientTableProps) {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ))
-                        )}
+                        ))}
                     </TableBody>
                 </Table>
             </div>
