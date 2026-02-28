@@ -4,6 +4,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -47,30 +48,34 @@ export default function RecomendationRuleTable({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.map((rule) => (
-                        <TableRow key={rule.id}>
-                            <TableCell className="pl-4 font-medium">
-                                {rule.name}
-                            </TableCell>
-                            <TableCell>
-                                {!rule.description ? '-' : rule.description}
-                            </TableCell>
-                            <TableCell className="text-center">
-                                {!rule.min_score ? '-' : rule.min_score}
-                            </TableCell>
-                            <TableCell className="text-center">
-                                {!rule.max_score ? '-' : rule.max_score}
-                            </TableCell>
+                    {data.length === 0 ? (
+                        <TableEmpty colSpan={5} />
+                    ) : (
+                        data.map((rule) => (
+                            <TableRow key={rule.id}>
+                                <TableCell className="pl-4 font-medium">
+                                    {rule.name}
+                                </TableCell>
+                                <TableCell>
+                                    {!rule.description ? '-' : rule.description}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    {!rule.min_score ? '-' : rule.min_score}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    {!rule.max_score ? '-' : rule.max_score}
+                                </TableCell>
 
-                            <TableCell className="flex justify-end gap-2 pr-4">
-                                <Link href={route('rule.edit', rule.id)}>
-                                    <Button className="cursor-pointer">
-                                        <Pencil />
-                                    </Button>
-                                </Link>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                <TableCell className="flex justify-end gap-2 pr-4">
+                                    <Link href={route('rule.edit', rule.id)}>
+                                        <Button className="cursor-pointer">
+                                            <Pencil />
+                                        </Button>
+                                    </Link>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
                 </TableBody>
             </Table>
         </TableContainer>

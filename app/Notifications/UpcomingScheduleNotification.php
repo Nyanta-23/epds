@@ -4,10 +4,9 @@ namespace App\Notifications;
 
 use App\Service\FcmService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class UpcomingScheduleNotification extends Notification implements ShouldQueue
+class UpcomingScheduleNotification extends Notification
 {
   use Queueable;
 
@@ -29,28 +28,32 @@ class UpcomingScheduleNotification extends Notification implements ShouldQueue
 
   public function toArray(mixed $notifiable): array
   {
-    return [
+    $payload = [
       'title' => "Jadwal Skrining: {$this->visitLabel}",
       'body' => "Ibu {$this->motherName} memasuki periode {$this->visitLabel}.",
       'action_url' => route('postpartum'),
       'type' => 'info',
       'icon' => 'calendar',
     ];
+
+    // FCM dikirim synchronous — tidak butuh queue worker (shared hosting safe)
+    $this->sendFcm($notifiable, $payload['title'], $payload['body']);
+
+    return $payload;
   }
 
-  /* ── Firebase push — called after database channel is written ──── */
+  /* ── FCM push — dipanggil synchronous dari toArray() ──────────── */
 
-  public function afterSend(mixed $notifiable, string $channel): void
+  private function sendFcm(mixed $notifiable, string $title, string $body): void
   {
-    if ($channel !== 'database')
+    if (blank($notifiable->fcm_token)) {
       return;
-    if (blank($notifiable->fcm_token))
-      return;
+    }
 
     app(FcmService::class)->send(
       $notifiable->fcm_token,
-      "Jadwal Skrining: {$this->visitLabel}",
-      "Ibu {$this->motherName} memasuki periode {$this->visitLabel}.",
+      $title,
+      $body,
       [
         'action_url' => route('postpartum'),
         'mother_id' => (string) $this->motherId,

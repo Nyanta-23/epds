@@ -6,6 +6,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -46,87 +47,92 @@ export default function BabyTable({ data, filter }: UserTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((baby) => (
-                            <TableRow key={baby.id}>
-                                <TableCell className="pl-4 font-medium">
-                                    {baby.mother.name}
-                                </TableCell>
-                                <TableCell className="text-center">
-                                    {baby.which_child}
-                                </TableCell>
-                                <TableCell>
-                                    {new Date(
-                                        baby.date_of_birth,
-                                    ).toLocaleDateString('id-ID', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric',
-                                    })}
-                                </TableCell>
-                                <TableCell>
-                                    {baby.baby_condition_label}
-                                </TableCell>
-                                <TableCell>
-                                    {baby.typeof_delivery_label}
-                                </TableCell>
-                                <TableCell>
-                                    {baby.baby_feeding_method_label}
-                                </TableCell>
-                                <TableCell>
-                                    {baby.gender === 'male'
-                                        ? 'Laki - Laki'
-                                        : 'Perempuan'}
-                                </TableCell>
+                        {data.length === 0 ? (
+                            <TableEmpty colSpan={8} />
+                        ) : (
+                            data.map((baby) => (
+                                <TableRow key={baby.id}>
+                                    <TableCell className="pl-4 font-medium">
+                                        {baby.mother.name}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {baby.which_child}
+                                    </TableCell>
+                                    <TableCell>
+                                        {new Date(
+                                            baby.date_of_birth,
+                                        ).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                        })}
+                                    </TableCell>
+                                    <TableCell>
+                                        {baby.baby_condition_label}
+                                    </TableCell>
+                                    <TableCell>
+                                        {baby.typeof_delivery_label}
+                                    </TableCell>
+                                    <TableCell>
+                                        {baby.baby_feeding_method_label}
+                                    </TableCell>
+                                    <TableCell>
+                                        {baby.gender === 'male'
+                                            ? 'Laki - Laki'
+                                            : 'Perempuan'}
+                                    </TableCell>
 
-                                <TableCell className="flex justify-end gap-2 pr-4">
-                                    {!only_trash ? (
-                                        <>
-                                            <Link
-                                                href={route(
-                                                    'baby.edit',
-                                                    baby.id,
-                                                )}
-                                            >
-                                                <Button className="cursor-pointer">
-                                                    <Pencil />
-                                                </Button>
-                                            </Link>
-
-                                            <ButtonConfirmation
-                                                content={{
-                                                    title: 'Apakah kamu yakin?',
-                                                    description:
-                                                        'Menghapus data bayi ini?',
-                                                }}
-                                                onConfirm={() =>
-                                                    deleteBaby(baby.id)
-                                                }
-                                            >
-                                                <Button
-                                                    disabled={
-                                                        processingId === baby.id
-                                                    }
-                                                    className="cursor-pointer"
-                                                >
-                                                    {processingId ===
-                                                    baby.id ? (
-                                                        <Spinner />
-                                                    ) : (
-                                                        <Trash2 />
+                                    <TableCell className="flex justify-end gap-2 pr-4">
+                                        {!only_trash ? (
+                                            <>
+                                                <Link
+                                                    href={route(
+                                                        'baby.edit',
+                                                        baby.id,
                                                     )}
+                                                >
+                                                    <Button className="cursor-pointer">
+                                                        <Pencil />
+                                                    </Button>
+                                                </Link>
+
+                                                <ButtonConfirmation
+                                                    content={{
+                                                        title: 'Apakah kamu yakin?',
+                                                        description:
+                                                            'Menghapus data bayi ini?',
+                                                    }}
+                                                    onConfirm={() =>
+                                                        deleteBaby(baby.id)
+                                                    }
+                                                >
+                                                    <Button
+                                                        disabled={
+                                                            processingId ===
+                                                            baby.id
+                                                        }
+                                                        className="cursor-pointer"
+                                                    >
+                                                        {processingId ===
+                                                        baby.id ? (
+                                                            <Spinner />
+                                                        ) : (
+                                                            <Trash2 />
+                                                        )}
+                                                    </Button>
+                                                </ButtonConfirmation>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button className="cursor-pointer">
+                                                    <Undo2 />
                                                 </Button>
-                                            </ButtonConfirmation>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Button className="cursor-pointer">
-                                                <Undo2 />
-                                            </Button>
-                                        </>
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                            </>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>

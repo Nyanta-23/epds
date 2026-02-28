@@ -3,6 +3,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -35,16 +36,20 @@ export default function RecomendationVariationTable({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.map((variation) => (
-                        <TableRow key={variation.id}>
-                            <TableCell className="pl-4 font-medium whitespace-nowrap">
-                                {variation.generated_at}
-                            </TableCell>
-                            <TableCell className="max-w-[600px] font-medium break-words whitespace-normal">
-                                {variation.recomendation_text}
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {data.length === 0 ? (
+                        <TableEmpty colSpan={2} />
+                    ) : (
+                        data.map((variation) => (
+                            <TableRow key={variation.id}>
+                                <TableCell className="pl-4 font-medium whitespace-nowrap">
+                                    {variation.generated_at}
+                                </TableCell>
+                                <TableCell className="max-w-[600px] font-medium break-words whitespace-normal">
+                                    {variation.recomendation_text}
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
                 </TableBody>
             </Table>
         </TableContainer>

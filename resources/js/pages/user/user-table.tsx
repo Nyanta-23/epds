@@ -6,6 +6,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -47,76 +48,80 @@ export default function UserTable({ data, filter }: UserTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((user) => (
-                            <TableRow key={user.id}>
-                                <TableCell className="pl-4 font-medium whitespace-nowrap">
-                                    {user.name}
-                                </TableCell>
-                                <TableCell className="whitespace-nowrap">
-                                    {user.email}
-                                </TableCell>
-                                <TableCell className="whitespace-nowrap">
-                                    {roleIdentifier(user.role.name)}
-                                </TableCell>
+                        {data.length === 0 ? (
+                            <TableEmpty colSpan={4} />
+                        ) : (
+                            data.map((user) => (
+                                <TableRow key={user.id}>
+                                    <TableCell className="pl-4 font-medium whitespace-nowrap">
+                                        {user.name}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        {user.email}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        {roleIdentifier(user.role.name)}
+                                    </TableCell>
 
-                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
-                                    <div className="flex justify-end gap-2">
-                                        {!only_trash ? (
-                                            <>
-                                                <Link
-                                                    href={route(
-                                                        'user.edit',
-                                                        user.id,
-                                                    )}
-                                                >
-                                                    <Button
-                                                        size="sm"
-                                                        className="cursor-pointer"
-                                                    >
-                                                        <Pencil />
-                                                    </Button>
-                                                </Link>
-
-                                                <ButtonConfirmation
-                                                    content={{
-                                                        title: 'Apa kamu yakin?',
-                                                        description:
-                                                            'Menghapus pengguna ini?',
-                                                    }}
-                                                    onConfirm={() =>
-                                                        deleteUser(user.id)
-                                                    }
-                                                >
-                                                    <Button
-                                                        size="sm"
-                                                        disabled={
-                                                            processingId ===
-                                                            user.id
-                                                        }
-                                                        className="cursor-pointer"
-                                                    >
-                                                        {processingId ==
-                                                        user.id ? (
-                                                            <Spinner />
-                                                        ) : (
-                                                            <Trash2 />
+                                    <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
+                                        <div className="flex justify-end gap-2">
+                                            {!only_trash ? (
+                                                <>
+                                                    <Link
+                                                        href={route(
+                                                            'user.edit',
+                                                            user.id,
                                                         )}
-                                                    </Button>
-                                                </ButtonConfirmation>
-                                            </>
-                                        ) : (
-                                            <Button
-                                                size="sm"
-                                                className="cursor-pointer"
-                                            >
-                                                <Undo2 />
-                                            </Button>
-                                        )}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
+                                                    >
+                                                        <Button
+                                                            size="sm"
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <Pencil />
+                                                        </Button>
+                                                    </Link>
+
+                                                    <ButtonConfirmation
+                                                        content={{
+                                                            title: 'Apa kamu yakin?',
+                                                            description:
+                                                                'Menghapus pengguna ini?',
+                                                        }}
+                                                        onConfirm={() =>
+                                                            deleteUser(user.id)
+                                                        }
+                                                    >
+                                                        <Button
+                                                            size="sm"
+                                                            disabled={
+                                                                processingId ===
+                                                                user.id
+                                                            }
+                                                            className="cursor-pointer"
+                                                        >
+                                                            {processingId ==
+                                                            user.id ? (
+                                                                <Spinner />
+                                                            ) : (
+                                                                <Trash2 />
+                                                            )}
+                                                        </Button>
+                                                    </ButtonConfirmation>
+                                                </>
+                                            ) : (
+                                                <Button
+                                                    size="sm"
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Undo2 />
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>{' '}
                 </Table>
             </div>
         </TableContainer>
