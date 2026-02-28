@@ -58,13 +58,13 @@ export default function Dashboard({
                 <DashboardTableNewData latest_data={latest_postpartum_datas} />
                 {/* ── Charts row (2 pie charts only) ─────────────────── */}
                 <div className="grid auto-rows-min gap-3 md:grid-cols-2">
-                    <div className="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="relative aspect-video rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <ChartPieRisk
                             risk_distributions={risk_distributions}
                             filters={filters}
                         />
                     </div>
-                    <div className="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                    <div className="relative aspect-video rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <ChartPieFollowUp followups={followups} />
                     </div>
                 </div>

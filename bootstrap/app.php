@@ -7,8 +7,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
-use Inertia\Inertia;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
   ->withRouting(
@@ -30,14 +28,5 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
   })
   ->withExceptions(function (Exceptions $exceptions) {
-    // Render custom Inertia 403 page for any AccessDenied / forbidden exception
-    $exceptions->render(function (AccessDeniedHttpException $e, $request) {
-      if ($request->expectsJson()) {
-        return response()->json(['message' => $e->getMessage() ?: 'Forbidden'], 403);
-      }
-
-      return Inertia::render('errors/forbidden')
-        ->toResponse($request)
-        ->setStatusCode(403);
-    });
+    //
   })->create();

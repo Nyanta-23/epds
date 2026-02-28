@@ -6,7 +6,6 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -48,10 +47,7 @@ export default function UserTable({ data, filter }: UserTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 ? (
-                            <TableEmpty colSpan={4} />
-                        ) : (
-                        data.map((user) => (
+                        {data.map((user) => (
                             <TableRow key={user.id}>
                                 <TableCell className="pl-4 font-medium whitespace-nowrap">
                                     {user.name}
@@ -119,8 +115,7 @@ export default function UserTable({ data, filter }: UserTableProps) {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ))
-                        )}
+                        ))}
                     </TableBody>
                 </Table>
             </div>

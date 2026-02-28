@@ -12,12 +12,14 @@ axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*
- * Force all axios requests to go to the Laravel server (port 8000),
- * not the Vite dev server (port 5173). Without this, relative URLs
- * like /api/v1/fcm-token resolve against the wrong origin and
- * Sanctum can't match the session cookie → 401.
+ * Use window.location.origin so axios always resolves relative URLs
+ * against the current domain — works correctly in both local dev
+ * (localhost:8000) and production (https://postpartum.resincen.org).
+ *
+ * NEVER use VITE_APP_URL here — it gets baked in at build time and
+ * will point to the wrong host in production.
  */
-axios.defaults.baseURL = import.meta.env.VITE_APP_URL ?? window.location.origin;
+axios.defaults.baseURL = window.location.origin;
 
 /* ── 419 Page Expired handler ─────────────────────────────────────── */
 

@@ -39,10 +39,10 @@ class CheckEpdsSchedule extends Command
         $mother = $baby->mother;
         if (!$mother) return;
 
-        $midwives = User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))
-            ->where(function ($q) use ($mother) {
-                $q->where('village_id', $mother->village_id)
-                  ->orWhere('subdistrict_id', $mother->subdistrict_id);
+        $midwives = User::where('role', 'midwife')
+            ->where(function($q) use ($mother) {
+                $q->where('village_id', $mother->village_id) 
+                  ->orWhere('district_id', $mother->district_id);
             })
             ->get();
             

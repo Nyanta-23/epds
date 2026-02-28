@@ -4,7 +4,6 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -50,10 +49,7 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 ? (
-                            <TableEmpty colSpan={5} />
-                        ) : (
-                        data.map((postpartum) => (
+                        {data.map((postpartum) => (
                             <TableRow key={postpartum.id}>
                                 <TableCell className="pl-4 font-medium whitespace-nowrap">
                                     {postpartum.mother.number_patient}
@@ -85,8 +81,7 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ))
-                        )}
+                        ))}
                     </TableBody>
                 </Table>
             </div>
