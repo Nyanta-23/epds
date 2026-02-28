@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Inbox } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -119,6 +120,26 @@ function TableCaption({
   )
 }
 
+/* TableEmpty — empty-state row shown inside <TableBody> when data is empty */
+function TableEmpty({
+  colSpan,
+  message = "Tidak ada data",
+}: {
+  colSpan: number;
+  message?: string;
+}) {
+  return (
+    <tr>
+      <td colSpan={colSpan}>
+        <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
+          <Inbox className="h-10 w-10 opacity-30" strokeWidth={1.5} />
+          <p className="text-sm">{message}</p>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
 export {
   Table,
   TableContainer,
@@ -129,4 +150,5 @@ export {
   TableRow,
   TableCell,
   TableCaption,
+  TableEmpty,
 }

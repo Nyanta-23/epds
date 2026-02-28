@@ -12,48 +12,49 @@ use Illuminate\Support\Facades\Notification;
 
 class CheckEpdsSchedule extends Command
 {
-    protected $signature = 'epds:check-schedule';
-    protected $description = 'Cek jadwal nifas dan notifikasi bidan';
+  protected $signature = 'epds:check-schedule';
+  protected $description = 'Cek jadwal nifas dan notifikasi bidan';
 
-    public function handle()
-    {
-        $this->info('Memulai pengecekan jadwal...');
-        
-        $babies = Baby::with('mother')->where('date_of_birth', '>=', now()->subDays(45))->get();
+  public function handle()
+  {
+    $this->info('Memulai pengecekan jadwal...');
 
-        foreach ($babies as $baby) {
+    $babies = Baby::with('mother')->where('date_of_birth', '>=', now()->subDays(45))->get();
 
-           $response = app(PostpartumScheduleService::class)->getScheduleForMother($baby->mother_id);
-            
-            if ($response->canFill) {
-                $this->sendNotification($baby, $response->label, $response->visitNumber);
-            }
-        }
-        
-        $this->info('Selesai.');
+    foreach ($babies as $baby) {
+
+      $response = app(PostpartumScheduleService::class)->getScheduleForMother($baby->mother_id);
+
+      if ($response->canFill) {
+        $this->sendNotification($baby, $response->label, $response->visitNumber);
+      }
     }
 
-    private function sendNotification($baby, $label, $daysAge)
-    {
+    $this->info('Selesai.');
+  }
 
-        $mother = $baby->mother;
-        if (!$mother) return;
+  private function sendNotification($baby, $label, $daysAge)
+  {
 
-        $midwives = User::where('role', 'midwife')
-            ->where(function($q) use ($mother) {
-                $q->where('village_id', $mother->village_id) 
-                  ->orWhere('district_id', $mother->district_id);
-            })
-            ->get();
-            
-        $ageString = $daysAge < 1 ? "Baru Lahir" : "$daysAge Hari";
+    $mother = $baby->mother;
+    if (!$mother)
+      return;
 
-        Notification::send($midwives, new UpcomingScheduleNotification(
-            $mother->name, 
-            $label, 
-            $mother->id
-        ));
-        
-        $this->info("Notif $label dikirim untuk ibu: {$mother->name}");
-    }
+    $midwives = User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))
+      ->where(function ($q) use ($mother) {
+        $q->where('village_id', $mother->village_id)
+          ->orWhere('subdistrict_id', $mother->subdistrict_id);
+      })
+      ->get();
+
+    $ageString = $daysAge < 1 ? "Baru Lahir" : "$daysAge Hari";
+
+    Notification::send($midwives, new UpcomingScheduleNotification(
+      $mother->name,
+      $label,
+      $mother->id
+    ));
+
+    $this->info("Notif $label dikirim untuk ibu: {$mother->name}");
+  }
 }

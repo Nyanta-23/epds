@@ -4,6 +4,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -49,39 +50,46 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((postpartum) => (
-                            <TableRow key={postpartum.id}>
-                                <TableCell className="pl-4 font-medium whitespace-nowrap">
-                                    {postpartum.mother.number_patient}
-                                </TableCell>
-                                <TableCell className="font-medium whitespace-nowrap">
-                                    {postpartum.mother.name}
-                                </TableCell>
-                                <TableCell className="whitespace-nowrap">
-                                    KF-{postpartum.visit_number}
-                                </TableCell>
-                                <TableCell className="whitespace-nowrap">
-                                    {postpartum.result.followup_status.label_id}
-                                </TableCell>
-                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
-                                    <div className="flex justify-end gap-2">
-                                        <Link
-                                            href={route(
-                                                'postpartum.show',
-                                                postpartum.id,
-                                            )}
-                                        >
-                                            <Button
-                                                size="sm"
-                                                className="cursor-pointer"
+                        {data.length === 0 ? (
+                            <TableEmpty colSpan={5} />
+                        ) : (
+                            data.map((postpartum) => (
+                                <TableRow key={postpartum.id}>
+                                    <TableCell className="pl-4 font-medium whitespace-nowrap">
+                                        {postpartum.mother.number_patient}
+                                    </TableCell>
+                                    <TableCell className="font-medium whitespace-nowrap">
+                                        {postpartum.mother.name}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        KF-{postpartum.visit_number}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap">
+                                        {
+                                            postpartum.result.followup_status
+                                                .label_id
+                                        }
+                                    </TableCell>
+                                    <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
+                                        <div className="flex justify-end gap-2">
+                                            <Link
+                                                href={route(
+                                                    'postpartum.show',
+                                                    postpartum.id,
+                                                )}
                                             >
-                                                <Eye />
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                                <Button
+                                                    size="sm"
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Eye />
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </div>

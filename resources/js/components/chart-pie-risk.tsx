@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/chart';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
-import { LabelList, Pie, PieChart } from 'recharts';
+import { Cell, Pie, PieChart } from 'recharts';
 
 interface ChartPieRiskProps {
     risk_distributions: {
@@ -24,71 +24,142 @@ interface ChartPieRiskProps {
     filters?: DashboardFilters;
 }
 
-export const description = 'EPDS Risk Distribution Chart';
+/** Warna tetap per kategori risiko agar konsisten di semua rentang filter */
+const RISK_COLORS: Record<string, string> = {
+    Normal: 'var(--chart-2)',
+    'Low Risk': 'var(--chart-4)',
+    'High Risk': 'var(--chart-1)',
+};
 
 export default function ChartPieRisk({
     risk_distributions,
     filters,
 }: ChartPieRiskProps) {
-    // --- Map data ---
-    const chartData = risk_distributions
-        .filter((item) => item.value > 0)
-        .map((item, index) => ({
-            name: item.label,
-            value: item.value,
-            fill: `var(--chart-${index + 1})`,
-        }));
+    const total = risk_distributions.reduce((sum, d) => sum + d.value, 0);
+
+    const chartData = risk_distributions.map((item) => ({
+        name: item.label,
+        value: item.value,
+        fill: RISK_COLORS[item.label] ?? 'var(--chart-5)',
+        pct: total > 0 ? Math.round((item.value / total) * 100) : 0,
+    }));
 
     const chartConfig: ChartConfig = {
-        value: { label: 'Total' },
-        ...chartData.reduce((acc: any, item) => {
-            acc[item.name] = {
-                label: item.name,
-                color: item.fill,
-            };
-            return acc;
-        }, {}),
+        value: { label: 'Pasien' },
+        ...Object.fromEntries(
+            chartData.map((d) => [d.name, { label: d.name, color: d.fill }]),
+        ),
     };
 
     const subtitle = filters
         ? `${format(new Date(filters.date_from), 'd MMM yyyy', { locale: idLocale })} – ${format(new Date(filters.date_to), 'd MMM yyyy', { locale: idLocale })}`
         : 'Hasil Skrining Minggu ini';
 
+    const isEmpty = total === 0;
+
     return (
-        <Card className="flex flex-col">
+        <Card className="flex h-full flex-col">
             <CardHeader className="items-center pb-0">
-                <CardTitle>Distribusi Resiko</CardTitle>
+                <CardTitle>Distribusi Risiko</CardTitle>
                 <CardDescription>{subtitle}</CardDescription>
             </CardHeader>
 
-            <CardContent className="flex-1 pb-0">
-                <ChartContainer
-                    config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background"
-                >
-                    <PieChart>
-                        <ChartTooltip
-                            content={
-                                <ChartTooltipContent
-                                    hideLabel
-                                    formatter={(value) => value}
+            <CardContent className="flex flex-1 items-center justify-center px-4 pb-4">
+                {isEmpty ? (
+                    <p className="text-sm text-muted-foreground">
+                        Tidak ada data pada periode ini
+                    </p>
+                ) : (
+                    <div className="flex w-full items-center gap-4">
+                        {/* ── Donut (kiri) ───────────────────────────── */}
+                        <ChartContainer
+                            config={chartConfig}
+                            className="aspect-square w-full max-w-[160px] shrink-0"
+                        >
+                            <PieChart>
+                                <ChartTooltip
+                                    content={
+                                        <ChartTooltipContent
+                                            formatter={(value, name) => (
+                                                <span className="flex items-center gap-1.5">
+                                                    <span className="font-medium">
+                                                        {name}
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        {value} pasien
+                                                    </span>
+                                                </span>
+                                            )}
+                                            hideLabel
+                                        />
+                                    }
                                 />
-                            }
-                        />
+                                <Pie
+                                    data={chartData}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    innerRadius="55%"
+                                    outerRadius="80%"
+                                    paddingAngle={3}
+                                    strokeWidth={0}
+                                >
+                                    {chartData.map((entry) => (
+                                        <Cell
+                                            key={entry.name}
+                                            fill={entry.fill}
+                                        />
+                                    ))}
+                                </Pie>
+                                <text
+                                    x="50%"
+                                    y="46%"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    fontSize={26}
+                                    fontWeight={700}
+                                    fill="currentColor"
+                                >
+                                    {total}
+                                </text>
+                                <text
+                                    x="50%"
+                                    y="63%"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    fontSize={11}
+                                    fill="currentColor"
+                                    opacity={0.5}
+                                >
+                                    Total
+                                </text>
+                            </PieChart>
+                        </ChartContainer>
 
-                        <Pie data={chartData} dataKey="value" nameKey="name">
-                            <LabelList
-                                dataKey="name"
-                                className="fill-background"
-                                stroke="none"
-                                fontSize={12}
-                                formatter={(value: keyof typeof chartConfig) =>
-                                    chartConfig[value]?.label
-                                }
-                            />
-                        </Pie>
-                    </PieChart>
-                </ChartContainer>
+                        {/* ── Legend (kanan) ─────────────────────────── */}
+                        <div className="flex min-w-0 flex-1 flex-col gap-2">
+                            {chartData.map((item) => (
+                                <div
+                                    key={item.name}
+                                    className="flex items-center gap-2 text-sm"
+                                >
+                                    <span
+                                        className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
+                                        style={{ backgroundColor: item.fill }}
+                                    />
+                                    <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                                        {item.name}
+                                    </span>
+                                    <span className="shrink-0 font-medium tabular-nums">
+                                        {item.value}
+                                    </span>
+                                    <span className="w-8 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
+                                        {item.pct}%
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

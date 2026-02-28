@@ -65,7 +65,10 @@ export default function Dashboard({
                         />
                     </div>
                     <div className="relative aspect-video rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <ChartPieFollowUp followups={followups} />
+                        <ChartPieFollowUp
+                            followups={followups}
+                            filters={filters}
+                        />
                     </div>
                 </div>
 
