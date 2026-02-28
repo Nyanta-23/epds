@@ -239,20 +239,20 @@ export default function DashboardTableNewData({
                         <div className="hidden md:block">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-muted/30 hover:bg-muted/30">
-                                        <TableHead className="w-[150px] py-2 pl-5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                    <TableRow className="hover:bg-primary/[0.03]">
+                                        <TableHead className="w-[150px] py-2 pl-5 text-[11px] font-semibold tracking-wider text-primary/70 uppercase">
                                             No. Pasien
                                         </TableHead>
-                                        <TableHead className="py-2 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                        <TableHead className="py-2 text-[11px] font-semibold tracking-wider text-primary/70 uppercase">
                                             Nama
                                         </TableHead>
-                                        <TableHead className="py-2 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                        <TableHead className="py-2 text-[11px] font-semibold tracking-wider text-primary/70 uppercase">
                                             Tanggal Diisi
                                         </TableHead>
-                                        <TableHead className="py-2 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                        <TableHead className="py-2 text-[11px] font-semibold tracking-wider text-primary/70 uppercase">
                                             Status
                                         </TableHead>
-                                        <TableHead className="w-[60px] py-2 pr-4 text-right text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                        <TableHead className="w-[60px] py-2 pr-4 text-right text-[11px] font-semibold tracking-wider text-primary/70 uppercase">
                                             Aksi
                                         </TableHead>
                                     </TableRow>

@@ -17,241 +17,257 @@ use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
-    public function run(): void
-    {
-        // User::factory(10)->create();
+  /**
+   * Seed the application's database.
+   */
+  public function run(): void
+  {
+    // User::factory(10)->create();
 
-        // User::firstOrCreate(
-        //     ['email' => 'test@example.com'],
-        //     [
-        //         'name' => 'Test User',
-        //         'password' => 'test@example.com',
-        //         // 'email_verified_at' => now(),
-        //     ]
-        // );
+    // User::firstOrCreate(
+    //     ['email' => 'test@example.com'],
+    //     [
+    //         'name' => 'Test User',
+    //         'password' => 'test@example.com',
+    //         // 'email_verified_at' => now(),
+    //     ]
+    // );
 
 
 
-        $this->call([
-            RoleSeeder::class,
-            // PermissionSeeder::class,
-            QuestionAndOptionQuestionSeeder::class,
-            RecomendationRuleSeeder::class,
-            // RecomendationVariationSeeder::class
+    $this->call([
+      RoleSeeder::class,
+      PermissionSeeder::class,
+      QuestionAndOptionQuestionSeeder::class,
+      RecomendationRuleSeeder::class,
+      // RecomendationVariationSeeder::class
+    ]);
+
+    User::create([
+      'name' => 'Super Admin',
+      'email' => 'test@example.com',
+      'email_verified_at' => '2025-11-06 11:16:04',
+      'password' => Hash::make('test@example.com'),
+      'remember_token' => Str::random(10),
+      'role_id' => Role::where('slug', 'super_admin')->first()->id
+    ]);
+
+
+    User::create([
+      'id' => Str::uuid(), // karena primary key UUID
+      'name' => 'Yami Chan',
+      'email' => 'yami@example.com',
+      'email_verified_at' => now(),
+      'password' => Hash::make('yami@example.com'),
+      'remember_token' => Str::random(10),
+
+      // kolom tambahan
+      'phone_number' => '081234567890',
+      'birthplace' => 'Bandung',
+      'date_of_birth' => '1999-01-12',
+      'job' => 'Software Developer',
+      'married_status' => 'not_married', // married / not_married / divorced
+      'highest_education' => 'S1',
+
+      'province_id' => '32',
+      'city_or_district_id' => '3273',
+      'subdistrict_id' => '327301',
+      'village_id' => '32730101',
+
+      'province' => 'Jawa Barat',
+      'city_or_district' => 'Kota Bandung',
+      'subdistrict' => 'Antapani',
+      'village' => 'Antapani Wetan',
+
+      'address' => 'Jl. Contoh No. 123',
+
+      'is_verified' => true,
+      'is_can_visit' => true,
+
+      // role jika ada
+      'role_id' => Role::where('slug', 'patient')->first()->id,
+    ]);
+
+
+    // muhamadilhan02404@gmail.com
+
+    User::factory()->withRole('admin')->count(3)->create();
+    User::factory()->withRole('midwife')->count(10)->create();
+
+    $mothers = User::factory()->patient()->withRole('patient')->count(14)->create();
+
+
+    $permissions = Permission::pluck('id', 'slug')->toArray();
+
+    $superAdmin = Role::where('slug', 'super_admin')->first();
+    $admin = Role::where('slug', 'admin')->first();
+    $midwife = Role::where('slug', 'midwife')->first();
+    $patient = Role::where('slug', 'patient')->first();
+
+    $superAdmin->permissions()->sync(
+      array_map(fn($slug) => $permissions[$slug], ['system.manage_all'])
+    );
+
+    $adminPermissions = [
+      'system.manage_operational',
+      'export.data',
+      'import.data',
+      'user.view',
+      'user.list',
+      'user.create',
+      'user.update',
+      'user.delete',
+      'baby.list',
+      'baby.create',
+      'baby.edit',
+      'baby.delete',
+      'postpartum_visit.list',
+      'result.list',
+      'followup.lists',
+      'followup.view',
+    ];
+
+    $admin->permissions()->sync(
+      array_map(fn($slug) => $permissions[$slug], $adminPermissions)
+    );
+
+    $midwifePermissions = [
+      'user.view',
+      'user.update',
+      'baby.list',
+      'baby.create',
+      'baby.edit',
+      'postpartum_visit.list',
+      'result.list',
+      'followup.lists',
+      'followup.create',
+      'followup.update',
+      'followup.view',
+    ];
+
+    $midwife->permissions()->sync(
+      array_map(fn($slug) => $permissions[$slug], $midwifePermissions)
+    );
+
+    $patientPermissions = [
+      'baby.create',
+      'baby.list',
+      'postpartum_visit.create',
+      'postpartum_visit.list',
+      'answer.create',
+      'result.list',
+    ];
+
+    $patient->permissions()->sync(
+      array_map(fn($slug) => $permissions[$slug], $patientPermissions)
+    );
+
+    $mothers->each(function ($mother) {
+
+      $babies = Baby::factory()
+        ->count(rand(1, 3))
+        ->create([
+          'mother_id' => $mother->id
         ]);
 
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'test@example.com',
-            'email_verified_at' => '2025-11-06 11:16:04',
-            'password' => Hash::make('test@example.com'),
-            'remember_token' => Str::random(10),
-            'role_id' => Role::where('slug', 'super_admin')->first()->id
-        ]);
+
+      $babies->each(function ($baby) use ($mother) {
+
+        collect(range(1, 4))->each(function ($visitNumber) use ($mother, $baby) {
+
+          $visit = PostpartumVisit::factory()->create([
+            'mother_id' => $mother->id,
+            'baby_id' => $baby->id,
+            'visit_number' => $visitNumber,
+          ]);
 
 
-        User::create([
-            'id' => Str::uuid(), // karena primary key UUID
-            'name' => 'Yami Chan',
-            'email' => 'yami@example.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('yami@example.com'),
-            'remember_token' => Str::random(10),
+          $questions = Question::orderBy('number_question')->get();
 
-            // kolom tambahan
-            'phone_number'        => '081234567890',
-            'birthplace'          => 'Bandung',
-            'date_of_birth'       => '1999-01-12',
-            'job'                 => 'Software Developer',
-            'married_status'      => 'not_married', // married / not_married / divorced
-            'highest_education'   => 'S1',
-
-            'province_id'         => '32',
-            'city_or_district_id' => '3273',
-            'subdistrict_id'      => '327301',
-            'village_id'          => '32730101',
-
-            'province'            => 'Jawa Barat',
-            'city_or_district'    => 'Kota Bandung',
-            'subdistrict'         => 'Antapani',
-            'village'             => 'Antapani Wetan',
-
-            'address'             => 'Jl. Contoh No. 123',
-
-            'is_verified'         => true,
-            'is_can_visit'        => true,
-
-            // role jika ada
-            'role_id'             => Role::where('slug', 'patient')->first()->id,
-        ]);
+          $questions->each(function ($q) use ($visit) {
+            Answer::factory()->create([
+              'postpartum_visit_id' => $visit->id,
+              'question_id' => $q->id,
+              'answer' => fake()->randomElement(['a', 'b', 'c', 'd']),
+            ]);
+          });
 
 
-        // muhamadilhan02404@gmail.com
-
-        User::factory()->withRole('admin')->count(3)->create();
-        User::factory()->withRole('midwife')->count(10)->create();
-
-        $mothers =  User::factory()->patient()->withRole('patient')->count(14)->create();
+          $result = $visit->result()->create([
+            'total_score' => rand(0, 30),
+            'followup_status' => 0,
+          ]);
 
 
-        // $permissions = Permission::pluck('id', 'slug')->toArray();
+          if (rand(0, 1)) {
+            $followup = $visit->followup()->create([
+              'type' => rand(0, 2),
+              'notes' => fake()->text(),
+              'date_filled' => fake()->dateTime(),
+              'midwife_id' => User::whereHas(
+                'role',
+                fn($q) => $q->where('slug', 'midwife')
+              )->inRandomOrder()->value('id'),
+            ]);
 
-        // $superAdmin = Role::where('slug', 'super_admin')->first();
-        // $admin = Role::where('slug', 'admin')->first();
-        // $midwife = Role::where('slug', 'midwife')->first();
-        // $patient = Role::where('slug', 'patient')->first();
-
-        // $superAdmin->permissions()->sync(
-        //     array_map(fn($slug) => $permissions[$slug], ['system.manage_all'])
-        // );
-
-        // $adminPermissions = [
-        //     'system.manage_operational',
-        //     'export.data',
-        //     'import.data',
-        // ];
-
-        // $admin->permissions()->sync(
-        //     array_map(fn($slug) => $permissions[$slug], $adminPermissions)
-        // );
-
-        // $midwifePermissions = [
-        //     'user.view',
-        //     'user.update',
-        //     'baby.list',
-        //     'postpartum_visit.list',
-        //     'result.list',
-        //     'followup.create',
-        //     'followup.update',
-        //     'followup.view',
-        // ];
-
-        // $midwife->permissions()->sync(
-        //     array_map(fn($slug) => $permissions[$slug], $midwifePermissions)
-        // );
-
-        // $patientPermissions = [
-        //     'baby.create',
-        //     'baby.list',
-        //     'postpartum_visit.create',
-        //     'postpartum_visit.list',
-        //     'answer.create',
-        //     'result.list',
-        // ];
-
-        // $patient->permissions()->sync(
-        //     array_map(fn($slug) => $permissions[$slug], $patientPermissions)
-        // );
-
-        $mothers->each(function ($mother) {
-
-            $babies = Baby::factory()
-                ->count(rand(1, 3))
-                ->create([
-                    'mother_id' => $mother->id
-                ]);
-
-
-            $babies->each(function ($baby) use ($mother) {
-
-                collect(range(1, 4))->each(function ($visitNumber) use ($mother, $baby) {
-
-                    $visit = PostpartumVisit::factory()->create([
-                        'mother_id'   => $mother->id,
-                        'baby_id'     => $baby->id,
-                        'visit_number' => $visitNumber,
-                    ]);
-
-
-                    $questions = Question::orderBy('number_question')->get();
-
-                    $questions->each(function ($q) use ($visit) {
-                        Answer::factory()->create([
-                            'postpartum_visit_id' => $visit->id,
-                            'question_id' => $q->id,
-                            'answer' => fake()->randomElement(['a', 'b', 'c', 'd']),
-                        ]);
-                    });
-
-
-                    $result = $visit->result()->create([
-                        'total_score' => rand(0, 30),
-                        'followup_status' => 0,
-                    ]);
-
-
-                    if (rand(0, 1)) {
-                        $followup = $visit->followup()->create([
-                            'type' => rand(0, 2),
-                            'notes' => fake()->text(),
-                            'date_filled' => fake()->dateTime(),
-                            'midwife_id' => User::whereHas(
-                                'role',
-                                fn($q) => $q->where('slug', 'midwife')
-                            )->inRandomOrder()->value('id'),
-                        ]);
-
-                        $result->update([
-                            'followup_id' => $followup->id
-                        ]);
-                    }
-                });
-            });
+            $result->update([
+              'followup_id' => $followup->id
+            ]);
+          }
         });
+      });
+    });
 
 
 
-        // $mothers->each(function ($mother) {
-        //     Baby::factory()->count(rand(1, 3))->create(['mother_id' => $mother->id]);
+    // $mothers->each(function ($mother) {
+    //     Baby::factory()->count(rand(1, 3))->create(['mother_id' => $mother->id]);
 
-        //     $postpartums = PostpartumVisit::factory()->count(10)->create(['mother_id' => $mother->id]);
-
-
-        //     $postpartums->each(function ($visit) {
-
-        //         $questions = Question::orderBy('number_question')->get();
-
-        //         // dd($visit->id);
-
-        //         $questions->each(function ($q) use ($visit) {
-        //             Answer::factory()->create([
-        //                 'postpartum_visit_id' => $visit->id,
-        //                 'question_id' => $q->id,
-        //                 'answer' => fake()->randomElement(['a', 'b', 'c', 'd']),
-        //             ]);
-        //         });
+    //     $postpartums = PostpartumVisit::factory()->count(10)->create(['mother_id' => $mother->id]);
 
 
-        //         // $visit->result()->create([
-        //         //     'total_score' => rand(0, 30),
-        //         //     // 'followup_status' => rand(0, 3)
-        //         //     'followup_status' => 0
-        //         // ]);
+    //     $postpartums->each(function ($visit) {
 
-        //         $result = $visit->result()->create([
-        //             'total_score' => rand(0, 30),
-        //             'followup_status' => 0,
-        //         ]);
+    //         $questions = Question::orderBy('number_question')->get();
 
-        //         if (rand(0, 1) === 1) {
+    //         // dd($visit->id);
 
-        //             $followup = $visit->followup()->create([
-        //                 'type' => rand(0, 2),
-        //                 'notes' => fake()->text(),
-        //                 'date_filled' => fake()->dateTime(),
-        //                 'midwife_id' => User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))
-        //                     ->inRandomOrder()
-        //                     ->first()->id
-        //             ]);
+    //         $questions->each(function ($q) use ($visit) {
+    //             Answer::factory()->create([
+    //                 'postpartum_visit_id' => $visit->id,
+    //                 'question_id' => $q->id,
+    //                 'answer' => fake()->randomElement(['a', 'b', 'c', 'd']),
+    //             ]);
+    //         });
 
-        //             $result->update([
-        //                 'followup_id' => $followup->id
-        //             ]);
-        //         }
-        //     });
-        // });
-    }
+
+    //         // $visit->result()->create([
+    //         //     'total_score' => rand(0, 30),
+    //         //     // 'followup_status' => rand(0, 3)
+    //         //     'followup_status' => 0
+    //         // ]);
+
+    //         $result = $visit->result()->create([
+    //             'total_score' => rand(0, 30),
+    //             'followup_status' => 0,
+    //         ]);
+
+    //         if (rand(0, 1) === 1) {
+
+    //             $followup = $visit->followup()->create([
+    //                 'type' => rand(0, 2),
+    //                 'notes' => fake()->text(),
+    //                 'date_filled' => fake()->dateTime(),
+    //                 'midwife_id' => User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))
+    //                     ->inRandomOrder()
+    //                     ->first()->id
+    //             ]);
+
+    //             $result->update([
+    //                 'followup_id' => $followup->id
+    //             ]);
+    //         }
+    //     });
+    // });
+  }
 }

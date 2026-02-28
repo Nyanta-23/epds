@@ -3,6 +3,8 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
+    TableEmpty,
     TableHead,
     TableHeader,
     TableRow,
@@ -17,12 +19,12 @@ interface PatientTableProps {
 
 export default function PatientTable({ data }: PatientTableProps) {
     return (
-        <section className="overflow-hidden rounded-b-md border border-t-0">
+        <TableContainer>
             <div className="overflow-x-auto">
                 <Table className="min-w-full text-sm">
-                    <TableHeader className="bg-accent">
+                    <TableHeader>
                         <TableRow>
-                            <TableHead className="whitespace-nowrap">
+                            <TableHead className="pl-4 whitespace-nowrap">
                                 Nama
                             </TableHead>
                             <TableHead className="whitespace-nowrap">
@@ -37,16 +39,19 @@ export default function PatientTable({ data }: PatientTableProps) {
                             <TableHead className="whitespace-nowrap">
                                 Kota
                             </TableHead>
-                            <TableHead className="sticky right-0 bg-accent text-right whitespace-nowrap shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.08)]">
+                            <TableHead className="sticky right-0 bg-primary/5 text-right whitespace-nowrap shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
                                 Aksi
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.map((patient) => (
+                        {data.length === 0 ? (
+                            <TableEmpty colSpan={6} />
+                        ) : (
+                        data.map((patient) => (
                             <TableRow key={patient.id}>
                                 <TableCell
-                                    className={`font-medium whitespace-nowrap ${patient?.name == null ? 'text-center' : ''}`}
+                                    className={`pl-4 font-medium whitespace-nowrap ${patient?.name == null ? 'text-center' : ''}`}
                                 >
                                     {patient?.name}
                                 </TableCell>
@@ -69,7 +74,7 @@ export default function PatientTable({ data }: PatientTableProps) {
                                     {patient?.city_or_district ?? '-'}
                                 </TableCell>
 
-                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.08)]">
+                                <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
                                     <div className="flex justify-end gap-2">
                                         <Link
                                             href={route(
@@ -100,10 +105,11 @@ export default function PatientTable({ data }: PatientTableProps) {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ))
+                        )}
                     </TableBody>
                 </Table>
             </div>
-        </section>
+        </TableContainer>
     );
 }

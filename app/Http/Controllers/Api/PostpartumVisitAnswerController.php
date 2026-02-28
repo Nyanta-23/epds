@@ -127,8 +127,16 @@ class PostpartumVisitAnswerController extends Controller
         $midwives = User::whereHas('role', function ($query) {
           $query->where('name', 'Midwife');
         })
-          ->where('village_id', $user->village_id)
+          ->where('city_or_district_id', $user->city_or_district_id)
           ->get();
+
+        /* Fallback: if no midwife in the same city, notify all midwives */
+        if ($midwives->isEmpty()) {
+          $midwives = User::whereHas('role', function ($query) {
+            $query->where('name', 'Midwife');
+          })->get();
+        }
+
         Log::info('midwife', ['midwife' => $midwives]);
 
         Notification::send($midwives, new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id));

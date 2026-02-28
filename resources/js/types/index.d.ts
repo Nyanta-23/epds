@@ -20,7 +20,7 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
-    canAccess: List
+    canAccess?: List;
 }
 
 export interface SharedData {
@@ -43,14 +43,12 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
-
 export interface FlashProps {
     success?: string;
     error?: string;
     info?: string;
     warning?: string;
 }
-
 
 export interface Meta {
     path: string;
@@ -87,6 +85,8 @@ export interface Filter {
     search?: string | null;
     only_trash?: boolean | null;
     is_followed?: boolean | null;
+    preset?: 'all' | 'week' | 'month' | 'year' | 'custom' | null;
+    risk?: 'all' | 'normal' | 'low' | 'high' | null;
     filter_list?: FilterList;
 }
 
@@ -114,7 +114,6 @@ export type Enums<T = any> = Record<string, EnumOption<T>[]>;
 
 export type Extra<T = any> = Record<string, { data: T[] }>;
 
-
 // export interface DataTemplate {
 //     meta: Meta;
 //     data: Data;
@@ -139,9 +138,8 @@ export type Extra<T = any> = Record<string, { data: T[] }>;
 
 // }
 
-
 enum MarriedStatus {
-    Married = "married",
-    Not_Married = "not_married",
-    Divorced = "divorced"
+    Married = 'married',
+    Not_Married = 'not_married',
+    Divorced = 'divorced',
 }

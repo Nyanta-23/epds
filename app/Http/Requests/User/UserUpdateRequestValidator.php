@@ -2,63 +2,64 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UserUpdateRequestValidator extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
+  /**
+   * Determine if the user is authorized to make this request.
+   */
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
-    {
-        return [
-            'name' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'role_id' => [
-                'required',
-                Rule::exists('roles', 'id')->where(function ($query) {
-                    $query->where('deleted_at', null);
-                }),
+  /**
+   * Apakah role yang dipilih adalah Bidan (midwife)?
+   */
+  private function isMidwife(): bool
+  {
+    $roleId = $this->input('role_id');
+    if (!$roleId)
+      return false;
 
-            ],
-            'province_id' => [
-                'required',
-            ],
-            'regency_id' => [
-                'required'
-            ],
-            'district_id' => [
-                'required'
-            ],
-            'village_id' => [
-                'required'
-            ],
-            'village' => [
-                'required'
-            ],
-            'province' => [
-                'required'
-            ],
-            'regency' => [
-                'required'
-            ],
-            'district' => [
-                'required'
-            ]
-        ];
-    }
+    return Role::where('id', $roleId)
+      ->where('slug', 'midwife')
+      ->exists();
+  }
+
+  /**
+   * Get the validation rules that apply to the request.
+   *
+   * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+   */
+  public function rules(): array
+  {
+    $isMidwife = $this->isMidwife();
+
+    return [
+      'name' => [
+        'required',
+        'string',
+        'max:255'
+      ],
+      'role_id' => [
+        'required',
+        Rule::exists('roles', 'id')->where(function ($query) {
+          $query->where('deleted_at', null);
+        }),
+      ],
+      // Wilayah hanya wajib diisi untuk Bidan
+      'province_id' => [$isMidwife ? 'required' : 'nullable'],
+      'regency_id' => [$isMidwife ? 'required' : 'nullable'],
+      'district_id' => [$isMidwife ? 'required' : 'nullable'],
+      'village_id' => [$isMidwife ? 'required' : 'nullable'],
+      'village' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'province' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'regency' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+    ];
+  }
 }

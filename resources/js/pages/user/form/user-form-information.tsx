@@ -7,11 +7,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import roleIdentifier from '@/components/utils/role-identifier';
 import { FormUser } from '@/types/form';
 import { Region, Role } from '@/types/resource';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Loader2, MapPin } from 'lucide-react';
 import UserActionForm from './user-action-form';
-import roleIdentifier from '@/components/utils/role-identifier';
 
 type Errors = Partial<Record<keyof FormUser, string>>;
 
@@ -24,6 +24,7 @@ interface UserFormInformationProps {
     data: FormUser;
     errors: Errors;
     process: boolean;
+    loadingRegion?: boolean;
     handleInputChange: (
         field: keyof FormUser,
         value: string | number | null,
@@ -41,6 +42,7 @@ export default function UserFormInformation({
     data,
     errors,
     process,
+    loadingRegion = false,
     handleInputChange,
     action,
     withoutAuth,
@@ -54,9 +56,7 @@ export default function UserFormInformation({
     );
     const isMidwife =
         selectedRole?.name?.toLowerCase().includes('midwife') ||
-        selectedRole?.name?.toLowerCase().includes('bidan') ||
-        selectedRole?.name?.toLowerCase().includes('patient') ||
-        selectedRole?.name?.toLowerCase().includes('admin') 
+        selectedRole?.name?.toLowerCase().includes('bidan');
 
     return (
         <div className="space-y-4 p-6">
@@ -192,27 +192,44 @@ export default function UserFormInformation({
             </div>
 
             {isMidwife && (
-                <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                    <h3 className="mb-4 text-sm font-semibold text-gray-700">
-                        Wilayah Kerja
-                    </h3>
+                <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <div className="mb-4 flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <h3 className="text-sm font-semibold text-primary">
+                            Wilayah Kerja
+                        </h3>
+                        {loadingRegion && (
+                            <Loader2 className="ml-auto h-4 w-4 animate-spin text-muted-foreground" />
+                        )}
+                    </div>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {/* Provinsi */}
                         <div>
-                            <Label className="mb-2 block text-xs font-medium text-gray-500">
+                            <Label className="mb-2 block text-xs font-medium text-muted-foreground">
                                 Provinsi
                             </Label>
                             <Select
-                                value={data.province_id?.toString()}
+                                value={data.province_id?.toString() || ''}
                                 onValueChange={(val) =>
                                     handleInputChange('province_id', val)
                                 }
+                                disabled={
+                                    loadingRegion || provinces.length === 0
+                                }
                             >
-                                <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Pilih Provinsi" />
+                                <SelectTrigger className="cursor-pointer bg-background">
+                                    <SelectValue
+                                        placeholder={
+                                            provinces.length === 0
+                                                ? 'Memuat provinsi...'
+                                                : 'Pilih Provinsi'
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {provinces.map((p) => (
                                         <SelectItem
+                                            className="cursor-pointer"
                                             key={p.id}
                                             value={p.id.toString()}
                                         >
@@ -222,23 +239,34 @@ export default function UserFormInformation({
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        {/* Kota/Kabupaten */}
                         <div>
-                            <Label className="mb-2 block text-xs font-medium text-gray-500">
-                                Kota/Kab
+                            <Label className="mb-2 block text-xs font-medium text-muted-foreground">
+                                Kota / Kabupaten
                             </Label>
                             <Select
-                                value={data.regency_id?.toString()}
+                                value={data.regency_id?.toString() || ''}
                                 onValueChange={(val) =>
                                     handleInputChange('regency_id', val)
                                 }
-                                disabled={!data.province_id}
+                                disabled={!data.province_id || loadingRegion}
                             >
-                                <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Pilih Kota" />
+                                <SelectTrigger className="cursor-pointer bg-background">
+                                    <SelectValue
+                                        placeholder={
+                                            !data.province_id
+                                                ? 'Pilih provinsi dulu'
+                                                : loadingRegion
+                                                  ? 'Memuat...'
+                                                  : 'Pilih Kota/Kab'
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {cities.map((c) => (
                                         <SelectItem
+                                            className="cursor-pointer"
                                             key={c.id}
                                             value={c.id.toString()}
                                         >
@@ -249,23 +277,33 @@ export default function UserFormInformation({
                             </Select>
                         </div>
 
+                        {/* Kecamatan */}
                         <div>
-                            <Label className="mb-2 block text-xs font-medium text-gray-500">
+                            <Label className="mb-2 block text-xs font-medium text-muted-foreground">
                                 Kecamatan
                             </Label>
                             <Select
-                                value={data.district_id?.toString()}
+                                value={data.district_id?.toString() || ''}
                                 onValueChange={(val) =>
                                     handleInputChange('district_id', val)
                                 }
-                                disabled={!data.regency_id}
+                                disabled={!data.regency_id || loadingRegion}
                             >
-                                <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Pilih Kecamatan" />
+                                <SelectTrigger className="cursor-pointer bg-background">
+                                    <SelectValue
+                                        placeholder={
+                                            !data.regency_id
+                                                ? 'Pilih kota dulu'
+                                                : loadingRegion
+                                                  ? 'Memuat...'
+                                                  : 'Pilih Kecamatan'
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {districts.map((d) => (
                                         <SelectItem
+                                            className="cursor-pointer"
                                             key={d.id}
                                             value={d.id.toString()}
                                         >
@@ -276,26 +314,36 @@ export default function UserFormInformation({
                             </Select>
                         </div>
 
+                        {/* Desa / Kelurahan */}
                         <div>
-                            <Label className="mb-2 block text-xs font-medium text-gray-500">
+                            <Label className="mb-2 block text-xs font-medium text-muted-foreground">
                                 Desa / Kelurahan{' '}
-                                <span className="text-red-500">*</span>
+                                <span className="text-destructive">*</span>
                             </Label>
                             <Select
-                                value={data.village_id?.toString()}
+                                value={data.village_id?.toString() || ''}
                                 onValueChange={(val) =>
                                     handleInputChange('village_id', val)
                                 }
-                                disabled={!data.district_id}
+                                disabled={!data.district_id || loadingRegion}
                             >
                                 <SelectTrigger
-                                    className={`bg-white ${identityErrorClassName('village_id')}`}
+                                    className={`cursor-pointer bg-background ${identityErrorClassName('village_id')}`}
                                 >
-                                    <SelectValue placeholder="Pilih Desa" />
+                                    <SelectValue
+                                        placeholder={
+                                            !data.district_id
+                                                ? 'Pilih kecamatan dulu'
+                                                : loadingRegion
+                                                  ? 'Memuat...'
+                                                  : 'Pilih Desa'
+                                        }
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {villages.map((v) => (
                                         <SelectItem
+                                            className="cursor-pointer"
                                             key={v.id}
                                             value={v.id.toString()}
                                         >
@@ -305,7 +353,7 @@ export default function UserFormInformation({
                                 </SelectContent>
                             </Select>
                             {errors.village_id && (
-                                <p className="mt-1 text-sm text-red-500">
+                                <p className="mt-1 text-sm text-destructive">
                                     {errors.village_id}
                                 </p>
                             )}

@@ -21,9 +21,10 @@ class PostpartumVisitService
     $verified = filter_var($filters['filter_list']['select_filter']['is_verified'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     $isFollowed = filter_var($filters['is_followed'] ?? null, FILTER_VALIDATE_BOOLEAN);
+    $riskType = $filters['risk'] ?? 'all';  // all|normal|low|high
 
     $startDate = $filters['filter_list']['date_filter']['start_date'] ?? null;
-    $endDate   = $filters['filter_list']['date_filter']['end_date'] ?? null;
+    $endDate = $filters['filter_list']['date_filter']['end_date'] ?? null;
 
 
     $query = PostpartumVisit::with([
@@ -35,7 +36,6 @@ class PostpartumVisitService
     $query->when($search, function ($q, $search) {
       $q->whereHas('mother', fn($subQ) => $subQ->where('name', 'like', "%{$search}%"));
     });
-
 
     $query->when($startDate || $endDate, function ($q) use ($startDate, $endDate) {
       if ($startDate && $endDate) {
@@ -50,6 +50,18 @@ class PostpartumVisitService
       }
     });
 
+    // ── Risk filter via EPDS score thresholds ─────────────────────────
+    // Normal: total_score 0-9  |  Low Risk: 10-12  |  High Risk: ≥13
+    if ($riskType !== 'all') {
+      $query->whereHas('result', function ($q) use ($riskType) {
+        match ($riskType) {
+          'normal' => $q->whereBetween('total_score', [0, 9]),
+          'low' => $q->whereBetween('total_score', [10, 12]),
+          'high' => $q->where('total_score', '>=', 13),
+          default => null,
+        };
+      });
+    }
 
     if ($isFollowed) {
       $query->whereHas('result.followup');

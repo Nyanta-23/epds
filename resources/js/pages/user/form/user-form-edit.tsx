@@ -37,8 +37,8 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
 
         const strValue = value?.toString() ?? '';
 
-       if (field === 'province_id') {
-            const province = provinces.find((r) => r.id == strValue)
+        if (field === 'province_id') {
+            const province = provinces.find((r) => r.id == strValue);
             onProvinceChange(strValue);
             handleInputChange('province', province?.name ?? '');
             handleInputChange('regency_id', null);
@@ -72,9 +72,7 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
                                 <h3 className="text-lg font-medium">
                                     Edit pengguna.
                                 </h3>
-                                <p className="mt-1 text-sm">
-                                    Data pengguna
-                                </p>
+                                <p className="mt-1 text-sm">Data pengguna</p>
                             </div>
 
                             <div className="space-y-4 p-6">
@@ -87,6 +85,7 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
                                     data={data}
                                     errors={errors}
                                     process={processing}
+                                    loadingRegion={loading}
                                     handleInputChange={onFieldChange}
                                     action={() => updateUser(user.id)}
                                     withoutAuth={true}
