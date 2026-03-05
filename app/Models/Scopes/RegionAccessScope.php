@@ -45,8 +45,8 @@ class RegionAccessScope implements Scope
         });
         return;
       }
-      // Bidan tidak punya wilayah terdaftar — tidak bisa lihat data apapun
-      $builder->whereRaw('1 = 0');
+      // Bidan tidak punya wilayah terdaftar — tampilkan semua data
+      return;
     }
   }
 }
