@@ -93,7 +93,7 @@ export default function Welcome() {
                 <section className="mx-auto flex max-w-5xl flex-col items-center px-6 py-20 text-center md:py-28">
                     <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
                         <ShieldCheck className="size-3.5" />
-                        Sistem Informasi Monitoring Pasca Persalinan
+                        Sistem Monitoring Psikologis Ibu Nifas
                     </div>
 
                     <h1 className="mb-5 max-w-2xl text-4xl font-bold tracking-tight md:text-5xl">
@@ -103,8 +103,9 @@ export default function Welcome() {
                     </h1>
 
                     <p className="mb-8 max-w-xl text-base text-muted-foreground">
-                        SIMPONI membantu tenaga kesehatan melakukan skrining EPDS, memantau risiko
-                        pasien, dan mengelola tindak lanjut — semuanya dalam satu platform digital.
+                        SIMPONI membantu tenaga kesehatan melakukan skrining
+                        EPDS, memantau risiko pasien, dan mengelola tindak
+                        lanjut — semuanya dalam satu platform digital.
                     </p>
 
                     <div className="flex flex-col items-center gap-3 sm:flex-row">
@@ -131,9 +132,12 @@ export default function Welcome() {
                 {/* ── Features ───────────────────────────────────────── */}
                 <section className="mx-auto max-w-5xl px-6 py-16">
                     <div className="mb-10 text-center">
-                        <h2 className="mb-2 text-2xl font-bold tracking-tight">Fitur Utama</h2>
+                        <h2 className="mb-2 text-2xl font-bold tracking-tight">
+                            Fitur Utama
+                        </h2>
                         <p className="text-sm text-muted-foreground">
-                            Semua yang dibutuhkan untuk monitoring kesehatan ibu pasca persalinan
+                            Semua yang dibutuhkan untuk monitoring kesehatan ibu
+                            pasca persalinan
                         </p>
                     </div>
 
@@ -144,9 +148,14 @@ export default function Welcome() {
                                 className="rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
                             >
                                 <div className="mb-3 inline-flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <f.icon className="size-5" strokeWidth={1.75} />
+                                    <f.icon
+                                        className="size-5"
+                                        strokeWidth={1.75}
+                                    />
                                 </div>
-                                <h3 className="mb-1.5 text-sm font-semibold">{f.title}</h3>
+                                <h3 className="mb-1.5 text-sm font-semibold">
+                                    {f.title}
+                                </h3>
                                 <p className="text-xs leading-relaxed text-muted-foreground">
                                     {f.description}
                                 </p>
@@ -162,7 +171,9 @@ export default function Welcome() {
                             <div className="flex aspect-square size-6 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                 <AppLogoIcon className="size-3.5 fill-current text-white" />
                             </div>
-                            <span className="font-semibold text-primary">SIMPONI</span>
+                            <span className="font-semibold text-primary">
+                                SIMPONI
+                            </span>
                         </div>
                         <span>
                             Sistem Informasi Monitoring Pasca Persalinan &copy;{' '}
