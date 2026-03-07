@@ -72,7 +72,7 @@ export interface Baby {
   typeof_delivery: number;
   typeof_delivery_label: string;
   gender: string;
-  mother: Patient;
+  mother: Patient | null;
   baby_feeding_method_label: string
   baby_feeding_method: number
 }
@@ -121,8 +121,8 @@ export interface PostpartumVisit {
 
   feed_type: Enum;
 
-  mother: Patient;
-  result: Result;
+  mother: Patient | null;
+  result: Result | null;
   answers: Answer[];
   followup: FollowUp
 

@@ -53,7 +53,7 @@ export default function BabyTable({ data, filter }: UserTableProps) {
                             data.map((baby) => (
                                 <TableRow key={baby.id}>
                                     <TableCell className="pl-4 font-medium">
-                                        {baby.mother.name}
+                                        {baby.mother?.name ?? '-'}
                                     </TableCell>
                                     <TableCell className="text-center">
                                         {baby.which_child}
