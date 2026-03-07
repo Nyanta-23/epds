@@ -56,7 +56,8 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                             data.map((postpartum) => (
                                 <TableRow key={postpartum.id}>
                                     <TableCell className="pl-4 font-medium whitespace-nowrap">
-                                        {postpartum.mother?.number_patient ?? '-'}
+                                        {postpartum.mother?.number_patient ??
+                                            '-'}
                                     </TableCell>
                                     <TableCell className="font-medium whitespace-nowrap">
                                         {postpartum.mother?.name ?? '-'}
@@ -65,7 +66,8 @@ export default function PostpartumTable({ data, enums }: PostpartumTableProps) {
                                         KF-{postpartum.visit_number}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap">
-                                        {postpartum.result?.followup_status?.label_id ?? '-'}
+                                        {postpartum.result?.followup_status
+                                            ?.label_id ?? '-'}
                                     </TableCell>
                                     <TableCell className="sticky right-0 bg-background shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)]">
                                         <div className="flex justify-end gap-2">
