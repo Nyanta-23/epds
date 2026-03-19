@@ -50,6 +50,7 @@ class DashboardController extends Controller
         'date_from' => $from->toDateString(),
         'date_to' => $to->toDateString(),
       ],
+      'unreadNotifications' => auth()->user()?->unreadNotifications()->count() ?? 0,
     ]);
   }
 

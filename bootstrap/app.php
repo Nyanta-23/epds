@@ -38,4 +38,13 @@ return Application::configure(basePath: dirname(__DIR__))
           ->setStatusCode(403);
       }
     });
-  })->create();
+  })
+  ->withSchedule(function ($schedule) {
+    // Notify missed EPDS schedules daily at 07:00
+    $schedule->command('notify:missed-epds')
+      ->daily()
+      ->at('07:00')
+      ->onOneServer()
+      ->withoutOverlapping();
+  })
+  ->create();

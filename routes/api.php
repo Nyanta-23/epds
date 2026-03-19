@@ -60,5 +60,30 @@ Route::prefix('v1')->group(function () {
     Route::post('/fcm-token', [FcmTokenController::class, 'store']);
     Route::delete('/fcm-token', [FcmTokenController::class, 'destroy']);
 
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+      Route::get('/', function (Request $request) {
+        return response()->json([
+          'unread' => $request->user()->unreadNotifications()->count(),
+          'notifications' => $request->user()->unreadNotifications()
+            ->orderByDesc('created_at')
+            ->take(10)
+            ->get(),
+        ]);
+      });
+
+      Route::post('/{id}/read', function (Request $request, $id) {
+        $notification = $request->user()->notifications()
+          ->where('id', $id)
+          ->first();
+
+        if ($notification) {
+          $notification->markAsRead();
+        }
+
+        return response()->json(['ok' => true]);
+      });
+    });
+
   });
 });
