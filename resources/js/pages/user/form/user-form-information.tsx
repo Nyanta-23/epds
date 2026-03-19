@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import {
     Select,
     SelectContent,
@@ -104,11 +105,8 @@ export default function UserFormInformation({
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
-                            <Label className="mb-2 block text-sm font-medium">
-                                Password <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                type="password"
+                            <PasswordInput
+                                label="Password"
                                 value={data.password}
                                 onChange={(e) =>
                                     handleInputChange(
@@ -120,20 +118,12 @@ export default function UserFormInformation({
                                 placeholder="Enter password"
                                 required
                                 maxLength={200}
+                                error={errors.password}
                             />
-                            {errors.password && (
-                                <p className="mt-1 text-sm text-red-500">
-                                    {errors.password}
-                                </p>
-                            )}
                         </div>
                         <div>
-                            <Label className="mb-2 block text-sm font-medium">
-                                Confirm Password{' '}
-                                <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                type="password"
+                            <PasswordInput
+                                label="Confirm Password"
                                 value={data.password_confirmation}
                                 onChange={(e) =>
                                     handleInputChange(
@@ -145,6 +135,11 @@ export default function UserFormInformation({
                                 placeholder="Confirm password"
                                 required
                                 maxLength={200}
+                                error={
+                                    errors.password_confirmation ||
+                                    errors.password
+                                }
+                                showError={!!errors.password_confirmation}
                             />
                         </div>
                     </div>
