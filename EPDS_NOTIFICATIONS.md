@@ -16,11 +16,11 @@ Sistem notifikasi otomatis untuk mengingatkan admin/bidan ketika jadwal pengisia
 
 Setiap kali ada jadwal EPDS yang terlewat, notifikasi akan dikirim ke:
 
-| Role | Diterima | Keterangan |
-|------|----------|-----------|
-| **Super Admin** | ✅ Ya | Otomatis diberitahu |
-| **Admin** | ✅ Ya | Otomatis diberitahu |
-| **Midwife** | ✅ Ya | **SEMUA** midwife diberitahu (broadcast) |
+| Role              | Diterima | Keterangan                                 |
+| ----------------- | -------- | ------------------------------------------ |
+| **Super Admin**   | ✅ Ya    | Otomatis diberitahu                        |
+| **Admin**         | ✅ Ya    | Otomatis diberitahu                        |
+| **Midwife**       | ✅ Ya    | **SEMUA** midwife diberitahu (broadcast)   |
 | **Patient (Ibu)** | ❌ Tidak | Opsional - bisa diaktifkan jika diperlukan |
 
 **Catatan:** Notifikasi dikirim ke **semua midwife** karena belum ada sistem assignment (siapa midwife yang bertanggung jawab untuk ibu tertentu). Jika Anda ingin membatasi hanya ke midwife yang assigned, silakan implementasikan assignment system terlebih dahulu. Lihat `NOTIFICATION_RECIPIENTS_UPDATE.md` untuk detail lebih lanjut.

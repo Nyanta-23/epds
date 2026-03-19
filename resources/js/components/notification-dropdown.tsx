@@ -166,10 +166,10 @@ export default function NotificationDropdown() {
             <PopoverContent
                 align="end"
                 sideOffset={8}
-                className="w-80 max-h-[500px] p-0 shadow-lg flex flex-col"
+                className="flex max-h-[500px] w-80 flex-col p-0 shadow-lg"
             >
                 {/* ── Header ─────────────────────────────────────────── */}
-                <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+                <div className="flex flex-shrink-0 items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-2">
                         <Bell size={15} className="text-primary" />
                         <span className="text-sm font-semibold">
@@ -199,7 +199,7 @@ export default function NotificationDropdown() {
                 {/* ── Push blocked warning ────────────────────────────── */}
                 {blocked && (
                     <>
-                        <div className="flex items-start gap-2.5 bg-amber-50 px-4 py-3 flex-shrink-0">
+                        <div className="flex flex-shrink-0 items-start gap-2.5 bg-amber-50 px-4 py-3">
                             <BellOff
                                 size={15}
                                 className="mt-0.5 shrink-0 text-amber-600"
@@ -242,7 +242,7 @@ export default function NotificationDropdown() {
                                 >
                                     {/* unread bar */}
                                     {!notif.read_at && (
-                                        <span className="absolute left-0 top-0 bottom-0 w-0.5 rounded-r bg-primary flex-shrink-0" />
+                                        <span className="absolute top-0 bottom-0 left-0 w-0.5 flex-shrink-0 rounded-r bg-primary" />
                                     )}
 
                                     {/* icon */}
@@ -262,10 +262,10 @@ export default function NotificationDropdown() {
                                         >
                                             {notif.data.title}
                                         </p>
-                                        <p className="mt-0.5 line-clamp-3 text-xs text-muted-foreground break-words">
+                                        <p className="mt-0.5 line-clamp-3 text-xs break-words text-muted-foreground">
                                             {notif.data.body}
                                         </p>
-                                        <p className="mt-1.5 font-mono text-[10px] text-muted-foreground/60 flex-shrink-0">
+                                        <p className="mt-1.5 flex-shrink-0 font-mono text-[10px] text-muted-foreground/60">
                                             {new Date(
                                                 notif.created_at,
                                             ).toLocaleString('id-ID', {
@@ -292,7 +292,7 @@ export default function NotificationDropdown() {
 
                 {/* ── Footer ───────────────────────────────────────────── */}
                 <Separator className="flex-shrink-0" />
-                <div className="px-4 py-2.5 flex-shrink-0">
+                <div className="flex-shrink-0 px-4 py-2.5">
                     <Link
                         href="/notifications"
                         className="block w-full rounded-md py-1.5 text-center text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-primary"

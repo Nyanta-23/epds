@@ -1,11 +1,13 @@
 # 🔔 Notifikasi Missed EPDS - Fix Summary
 
 ## Problem
+
 Notifikasi missed EPDS hanya terkirim ke **admin** saja, **bidan tidak menerima notifikasi**.
 
 ---
 
 ## Root Cause
+
 Di method `getNotificationRecipients()` command `NotifyMissedEpds.php`:
 
 ```php
@@ -18,6 +20,7 @@ if ($visit->baby && $visit->baby->midwife_id) {
 ```
 
 **Masalah:**
+
 1. Model `Baby` tidak memiliki field `midwife_id`
 2. Tidak ada mekanisme assignment midwife ke ibu
 3. Akibatnya: Hanya admin yang ternotifikasi
@@ -25,6 +28,7 @@ if ($visit->baby && $visit->baby->midwife_id) {
 ---
 
 ## Solution ✅
+
 Ubah logic untuk **notify semua admin + semua bidan**:
 
 ```php
@@ -47,15 +51,18 @@ return $admins->merge($midwives)->unique('id');
 ## Test Results ✅
 
 **Before Fix:**
+
 ```
 Found 1 missed EPDS schedules.
   ✓ Notified Karen (karen@gmail.com)
   ✓ Notified Kartika Putri (kartika@gmail.com)
 Completed: 2 created, 2 skipped.
 ```
+
 ❌ Bidan tidak ternotifikasi
 
 **After Fix:**
+
 ```
 Found 1 missed EPDS schedules.
   ✓ Notified Super Admin (test@example.com)
@@ -65,18 +72,19 @@ Found 1 missed EPDS schedules.
   ✓ Notified Bidan Test (bidantest@gmail.com)
 Completed: 5 created, 0 skipped.
 ```
+
 ✅ Semua admin dan bidan ternotifikasi!
 
 ---
 
 ## Recipients Table
 
-| Role | Count | Notified |
-|------|-------|----------|
-| Super Admin | 1 | ✅ |
-| Admin | 3 | ✅ |
-| Midwife | 1 | ✅ |
-| **TOTAL** | **5** | **✅** |
+| Role        | Count | Notified |
+| ----------- | ----- | -------- |
+| Super Admin | 1     | ✅       |
+| Admin       | 3     | ✅       |
+| Midwife     | 1     | ✅       |
+| **TOTAL**   | **5** | **✅**   |
 
 ---
 
@@ -91,6 +99,7 @@ Completed: 5 created, 0 skipped.
 ## Deployment Status
 
 ✅ **Ready for Production**
+
 - Backward compatible (no migrations needed)
 - Idempotency still works
 - Safe to deploy immediately
@@ -102,16 +111,17 @@ Completed: 5 created, 0 skipped.
 Jika diperlukan assignment per midwife ke ibu tertentu:
 
 1. **Add field ke users table:**
-   ```sql
-   ALTER TABLE users ADD COLUMN assigned_mother_id CHAR(36);
-   ```
+
+    ```sql
+    ALTER TABLE users ADD COLUMN assigned_mother_id CHAR(36);
+    ```
 
 2. **Update command logic:**
-   ```php
-   $assignedMidwife = User::where('assigned_mother_id', $visit->mother_id)
-     ->whereHas('role', fn($q) => $q->where('slug', 'midwife'))
-     ->first();
-   ```
+    ```php
+    $assignedMidwife = User::where('assigned_mother_id', $visit->mother_id)
+      ->whereHas('role', fn($q) => $q->where('slug', 'midwife'))
+      ->first();
+    ```
 
 Lihat `NOTIFICATION_RECIPIENTS_UPDATE.md` untuk detail lengkap.
 

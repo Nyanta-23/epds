@@ -3,6 +3,7 @@
 ## Masalah yang Ditemukan
 
 Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
+
 - ❌ Tidak bisa di-scroll dengan baik
 - ❌ Text overflow keluar dari container
 - ❌ Popover dropdown terlalu kecil untuk notifikasi banyak
@@ -14,12 +15,14 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 ## Root Cause
 
 ### **1. Notification Dropdown (`notification-dropdown.tsx`)**
+
 - `max-h-[380px]` terlalu kecil → tidak bisa scroll banyak notifikasi
 - Tidak ada `flex-shrink-0` untuk header/footer → collapse ketika content besar
 - `line-clamp-2` tanpa `break-words` → text menonjol keluar
 - Container tidak menggunakan flexbox layout yang proper
 
 ### **2. Notifications Page (`notifications.tsx`)**
+
 - Tidak ada height constraint pada outer container
 - List tidak scrollable saat banyak notifikasi
 - Pagination tidak responsive
@@ -43,7 +46,7 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 <PopoverContent className="w-80 max-h-[500px] p-0 shadow-lg flex flex-col">
   {/* Header */}
   <div className="flex-shrink-0">...</div>
-  
+
   {/* List - Scrollable */}
   <ScrollArea className="flex-1 overflow-hidden">
     <div className="min-w-0">
@@ -51,13 +54,14 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
       <p className="line-clamp-3">...</p> {/* More lines allowed */}
     </div>
   </ScrollArea>
-  
+
   {/* Footer */}
   <div className="flex-shrink-0">...</div>
 </PopoverContent>
 ```
 
 **Perubahan utama:**
+
 - ✅ Tambah `max-h-[500px]` untuk height maksimal
 - ✅ Ubah ke `flex flex-col` untuk proper flex layout
 - ✅ Tambah `flex-shrink-0` ke header/footer agar tidak collapse
@@ -83,20 +87,21 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 h-screen flex flex-col">
   {/* Header */}
   <div className="mb-6 flex-shrink-0">...</div>
-  
+
   {/* List - Scrollable */}
   <div className="flex-1 overflow-hidden rounded-xl flex flex-col">
     <ul className="divide-y divide-border overflow-y-auto">
       {/* Scrollable content */}
     </ul>
   </div>
-  
+
   {/* Pagination */}
   <div className="flex-shrink-0">...</div>
 </div>
 ```
 
 **Perubahan utama:**
+
 - ✅ Tambah `h-screen flex flex-col` ke parent
 - ✅ Tambah `flex-shrink-0` ke header
 - ✅ Ubah list container menjadi `flex-1 overflow-hidden flex flex-col`
@@ -111,22 +116,23 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 
 ## Test Results ✅
 
-| Skenario | Sebelum | Sesudah |
-|----------|---------|--------|
-| **Dropdown 1-3 notifikasi** | ✅ OK | ✅ OK |
-| **Dropdown 10+ notifikasi** | ❌ Overflow | ✅ Scroll |
-| **Dropdown long text** | ❌ Menonjol | ✅ Wrap |
-| **Page 1-5 notifikasi** | ✅ OK | ✅ OK |
-| **Page 50+ notifikasi** | ❌ Tidak scroll | ✅ Scroll |
-| **Text panjang** | ❌ Rusak | ✅ Wrap + clamp |
-| **Pagination** | ❌ Break | ✅ OK |
-| **Mobile responsive** | ⚠️ Partial | ✅ OK |
+| Skenario                    | Sebelum         | Sesudah         |
+| --------------------------- | --------------- | --------------- |
+| **Dropdown 1-3 notifikasi** | ✅ OK           | ✅ OK           |
+| **Dropdown 10+ notifikasi** | ❌ Overflow     | ✅ Scroll       |
+| **Dropdown long text**      | ❌ Menonjol     | ✅ Wrap         |
+| **Page 1-5 notifikasi**     | ✅ OK           | ✅ OK           |
+| **Page 50+ notifikasi**     | ❌ Tidak scroll | ✅ Scroll       |
+| **Text panjang**            | ❌ Rusak        | ✅ Wrap + clamp |
+| **Pagination**              | ❌ Break        | ✅ OK           |
+| **Mobile responsive**       | ⚠️ Partial      | ✅ OK           |
 
 ---
 
 ## CSS Classes yang Ditambahkan
 
 ### Flexbox Layout
+
 - `flex flex-col` - Column layout
 - `flex-shrink-0` - Prevent shrinking
 - `flex-1` - Take remaining space
@@ -134,12 +140,14 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 - `overflow-y-auto` - Scrollable vertical
 
 ### Text Handling
+
 - `break-words` - Break long words
 - `break-all` - Break all text
 - `whitespace-nowrap` - No line break
 - `line-clamp-3` - Max 3 lines (diperbaiki dari 2)
 
 ### Height
+
 - `h-screen` - Full screen height
 - `max-h-[500px]` - Max height (diperbaiki dari 380px)
 
@@ -148,6 +156,7 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 ## Before & After Comparison
 
 ### Dropdown - Before
+
 ```
 ┌─────────────────────┐
 │ Notifikasi    Baca  │
@@ -164,6 +173,7 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 ```
 
 ### Dropdown - After
+
 ```
 ┌─────────────────────┐
 │ Notifikasi (3) Baca │
@@ -194,6 +204,7 @@ Ketika ada banyak notifikasi atau text notifikasi panjang, layout menjadi rusak:
 ## Deployment Status
 
 ✅ **Ready for Production**
+
 - CSS-only changes
 - No API/backend changes
 - Fully backward compatible

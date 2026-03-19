@@ -20,6 +20,7 @@ if ($visit->baby && $visit->baby->midwife_id) {
 ```
 
 **Masalah:**
+
 1. Model `Baby` tidak memiliki field `midwife_id`
 2. Table `babies` tidak memiliki kolom `midwife_id`
 3. Tidak ada mekanisme assignment antara `midwife` dan `ibu/bayi`
@@ -63,6 +64,7 @@ Completed: 3 created, 2 skipped.
 ```
 
 **Recipients:**
+
 - ✅ Karen (admin)
 - ✅ Kartika Putri (admin)
 - ✅ Bidan Test (midwife)
@@ -72,39 +74,43 @@ Completed: 3 created, 2 skipped.
 ## 📌 Implikasi & Rekomendasi
 
 ### Kelebihan Solusi Saat Ini
+
 - ✅ Semua midwife mendapat notifikasi
 - ✅ Tidak ada midwife yang terlewat
 - ✅ Idempotency tetap berjalan (duplicate prevention)
 - ✅ Sederhana dan maintainable
 
 ### Potential Improvement di Masa Depan
+
 Jika ingin **limit notifikasi hanya ke midwife yang assigned** untuk ibu tertentu:
 
 1. **Tambahkan field di table `users`:**
-   ```sql
-   ALTER TABLE users ADD COLUMN assigned_mother_id CHAR(36) NULLABLE;
-   ALTER TABLE users ADD FOREIGN KEY (assigned_mother_id) REFERENCES users(id);
-   ```
+
+    ```sql
+    ALTER TABLE users ADD COLUMN assigned_mother_id CHAR(36) NULLABLE;
+    ALTER TABLE users ADD FOREIGN KEY (assigned_mother_id) REFERENCES users(id);
+    ```
 
 2. **Update logic di command:**
-   ```php
-   // Cari midwife yang assigned ke mother ini
-   $assignedMidwife = User::where('assigned_mother_id', $visit->mother_id)
-     ->whereHas('role', fn($q) => $q->where('slug', 'midwife'))
-     ->get();
-   ```
+
+    ```php
+    // Cari midwife yang assigned ke mother ini
+    $assignedMidwife = User::where('assigned_mother_id', $visit->mother_id)
+      ->whereHas('role', fn($q) => $q->where('slug', 'midwife'))
+      ->get();
+    ```
 
 3. **Atau buat table pivot `user_mother_assignments`:**
-   ```sql
-   CREATE TABLE user_mother_assignments (
-     id CHAR(36) PRIMARY KEY,
-     midwife_id CHAR(36),
-     mother_id CHAR(36),
-     assigned_at TIMESTAMP,
-     FOREIGN KEY (midwife_id) REFERENCES users(id),
-     FOREIGN KEY (mother_id) REFERENCES users(id)
-   );
-   ```
+    ```sql
+    CREATE TABLE user_mother_assignments (
+      id CHAR(36) PRIMARY KEY,
+      midwife_id CHAR(36),
+      mother_id CHAR(36),
+      assigned_at TIMESTAMP,
+      FOREIGN KEY (midwife_id) REFERENCES users(id),
+      FOREIGN KEY (mother_id) REFERENCES users(id)
+    );
+    ```
 
 ---
 
