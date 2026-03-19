@@ -34,7 +34,7 @@ const mainNavItems: NavItem[] = [
         title: 'Pengguna',
         href: '/user',
         icon: Users,
-        canAccess: ['super_admin', 'admin'],
+        canAccess: ['super_admin', 'admin', 'midwife'],
     },
     {
         title: 'Peran',

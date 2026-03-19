@@ -115,7 +115,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
   // 4. USER MANAGEMENT (Akses: Super Admin & Admin)
   // ---------------------------------------------------
   // Bidan tidak boleh membuat user baru.
-  Route::middleware(['role:super_admin,admin'])->prefix('user')->group(function () {
+  Route::middleware(['role:super_admin,admin,midwife'])->prefix('user')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('user');
     Route::get('/create', [UserController::class, 'create'])->name('user.create');
     Route::get('/{user}/edit', [UserController::class, 'edit'])->name('user.edit');

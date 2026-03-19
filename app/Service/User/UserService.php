@@ -32,7 +32,7 @@ class UserService
         $q->whereHas('role', fn($r) => $r->whereNotIn('slug', ['super_admin', 'admin']));
       })
       ->when($whoAmI->role->slug === 'midwife', function ($q) {
-        $q->whereHas('role', fn($r) => $r->whereNotIn('slug', ['super_admin', 'admin', 'midwife']));
+        $q->whereHas('role', fn($r) => $r->whereNotIn('slug', ['super_admin', 'admin']));
       })
       ->when($role, function ($q, $role) {
         $q->whereHas('role', fn($r) => $r->where('slug', $role));
