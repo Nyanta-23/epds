@@ -5,12 +5,25 @@ Sistem notifikasi otomatis untuk mengingatkan admin/bidan ketika jadwal pengisia
 ## Fitur
 
 - ✅ Deteksi otomatis PostpartumVisit yang `date_filled <= hari kemarin` tanpa Result
-- ✅ Notifikasi ke admins + midwife yang bertugas
+- ✅ Notifikasi ke **semua admin + semua bidan** (broadcast notification)
 - ✅ Idempotency: tidak ada duplikat notifikasi
 - ✅ Disimpan di database (notifications table)
 - ✅ API endpoint untuk fetch & mark as read
 - ✅ Dashboard badge menampilkan jumlah unread
 - ✅ Cocok untuk shared hosting (cron + external webhook fallback)
+
+## 👥 Penerima Notifikasi
+
+Setiap kali ada jadwal EPDS yang terlewat, notifikasi akan dikirim ke:
+
+| Role | Diterima | Keterangan |
+|------|----------|-----------|
+| **Super Admin** | ✅ Ya | Otomatis diberitahu |
+| **Admin** | ✅ Ya | Otomatis diberitahu |
+| **Midwife** | ✅ Ya | **SEMUA** midwife diberitahu (broadcast) |
+| **Patient (Ibu)** | ❌ Tidak | Opsional - bisa diaktifkan jika diperlukan |
+
+**Catatan:** Notifikasi dikirim ke **semua midwife** karena belum ada sistem assignment (siapa midwife yang bertanggung jawab untuk ibu tertentu). Jika Anda ingin membatasi hanya ke midwife yang assigned, silakan implementasikan assignment system terlebih dahulu. Lihat `NOTIFICATION_RECIPIENTS_UPDATE.md` untuk detail lebih lanjut.
 
 ## Instalasi
 

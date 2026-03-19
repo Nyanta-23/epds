@@ -98,29 +98,28 @@ class NotifyMissedEpds extends Command
 
   /**
    * Determine which users should be notified for a missed PostpartumVisit.
-   * Recipients: Admins + Super admins + assigned midwife (if any)
+   * Recipients: Admins + Super admins + ALL Midwives
+   * 
+   * Note: Jika diperlukan, bisa dikustomisasi untuk hanya midwife yang assigned ke ibu tertentu.
+   * Saat ini, semua midwife diberitahu karena belum ada explicit assignment.
    */
   private function getNotificationRecipients(PostpartumVisit $visit)
   {
-    // 1. Admins & Super admins
+    // 1. Admins & Super admins - WAJIB notifikasi
     $admins = User::query()
       ->whereHas('role', fn(Builder $q) => $q->whereIn('slug', ['admin', 'super_admin']))
       ->get();
 
-    // 2. Midwife who filled the visit (if any)
-    $midwives = collect([]);
-    if ($visit->baby && $visit->baby->midwife_id) {
-      $midwife = User::find($visit->baby->midwife_id);
-      if ($midwife) {
-        $midwives->push($midwife);
-      }
-    }
+    // 2. Semua Midwife - WAJIB notifikasi (karena tidak ada explicit assignment)
+    // Jika diperlukan assignment per midwife, silakan tambahkan logic di sini
+    $midwives = User::query()
+      ->whereHas('role', fn(Builder $q) => $q->where('slug', 'midwife'))
+      ->get();
 
-    // 3. Mother herself (ibu) as well - optional
-    if ($visit->mother) {
-      // If you want to notify the mother/patient too, uncomment:
-      // $admins->push($visit->mother);
-    }
+    // 3. (Optional) Notify mother/patient juga
+    // if ($visit->mother) {
+    //   $admins->push($visit->mother);
+    // }
 
     return $admins->merge($midwives)->unique('id');
   }
