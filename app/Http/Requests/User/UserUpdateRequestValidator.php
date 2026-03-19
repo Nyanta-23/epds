@@ -58,8 +58,8 @@ class UserUpdateRequestValidator extends FormRequest
       'village_id' => [$isMidwife ? 'required' : 'nullable'],
       'village' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'province' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
-      'regency' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
-      'district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'city_or_district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'subdistrict' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
     ];
   }
 }

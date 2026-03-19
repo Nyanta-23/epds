@@ -26,7 +26,7 @@ class RoleService
 
     if ($authUser->role->slug === 'midwife') {
       return $roles
-        ->whereNotIn('slug', ['super_admin', 'admin', 'patient'])
+        ->whereIn('slug', ['midwife', 'patient'])
         ->get();
     }
   }
