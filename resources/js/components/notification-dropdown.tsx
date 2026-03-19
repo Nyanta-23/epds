@@ -166,10 +166,10 @@ export default function NotificationDropdown() {
             <PopoverContent
                 align="end"
                 sideOffset={8}
-                className="w-80 p-0 shadow-lg"
+                className="w-80 max-h-[500px] p-0 shadow-lg flex flex-col"
             >
                 {/* ── Header ─────────────────────────────────────────── */}
-                <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
                     <div className="flex items-center gap-2">
                         <Bell size={15} className="text-primary" />
                         <span className="text-sm font-semibold">
@@ -194,12 +194,12 @@ export default function NotificationDropdown() {
                     )}
                 </div>
 
-                <Separator />
+                <Separator className="flex-shrink-0" />
 
                 {/* ── Push blocked warning ────────────────────────────── */}
                 {blocked && (
                     <>
-                        <div className="flex items-start gap-2.5 bg-amber-50 px-4 py-3">
+                        <div className="flex items-start gap-2.5 bg-amber-50 px-4 py-3 flex-shrink-0">
                             <BellOff
                                 size={15}
                                 className="mt-0.5 shrink-0 text-amber-600"
@@ -210,12 +210,12 @@ export default function NotificationDropdown() {
                                 ubah ke <em>Izinkan</em>, lalu muat ulang.
                             </p>
                         </div>
-                        <Separator />
+                        <Separator className="flex-shrink-0" />
                     </>
                 )}
 
                 {/* ── List ─────────────────────────────────────────────── */}
-                <ScrollArea className="max-h-[380px]">
+                <ScrollArea className="flex-1 overflow-hidden">
                     {auth.notifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
                             <div className="rounded-full bg-muted p-3">
@@ -230,7 +230,7 @@ export default function NotificationDropdown() {
                         </div>
                     ) : (
                         auth.notifications.map((notif, i) => (
-                            <div key={notif.id}>
+                            <div key={notif.id} className="min-w-0">
                                 <button
                                     onClick={() =>
                                         markAsRead(
@@ -238,11 +238,11 @@ export default function NotificationDropdown() {
                                             notif.data.action_url,
                                         )
                                     }
-                                    className={`flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-accent/60 ${!notif.read_at ? 'bg-primary/5' : ''}`}
+                                    className={`relative flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-accent/60 ${!notif.read_at ? 'bg-primary/5' : ''}`}
                                 >
                                     {/* unread bar */}
                                     {!notif.read_at && (
-                                        <span className="absolute left-0 h-full w-0.5 rounded-r bg-primary" />
+                                        <span className="absolute left-0 top-0 bottom-0 w-0.5 rounded-r bg-primary flex-shrink-0" />
                                     )}
 
                                     {/* icon */}
@@ -258,14 +258,14 @@ export default function NotificationDropdown() {
                                     {/* text */}
                                     <div className="min-w-0 flex-1">
                                         <p
-                                            className={`text-sm leading-snug ${!notif.read_at ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}
+                                            className={`text-sm leading-snug break-words ${!notif.read_at ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}
                                         >
                                             {notif.data.title}
                                         </p>
-                                        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                                        <p className="mt-0.5 line-clamp-3 text-xs text-muted-foreground break-words">
                                             {notif.data.body}
                                         </p>
-                                        <p className="mt-1.5 font-mono text-[10px] text-muted-foreground/60">
+                                        <p className="mt-1.5 font-mono text-[10px] text-muted-foreground/60 flex-shrink-0">
                                             {new Date(
                                                 notif.created_at,
                                             ).toLocaleString('id-ID', {
@@ -283,7 +283,7 @@ export default function NotificationDropdown() {
                                     )}
                                 </button>
                                 {i < auth.notifications.length - 1 && (
-                                    <Separator className="mx-4 w-auto" />
+                                    <Separator className="mx-4 w-auto flex-shrink-0" />
                                 )}
                             </div>
                         ))
@@ -291,8 +291,8 @@ export default function NotificationDropdown() {
                 </ScrollArea>
 
                 {/* ── Footer ───────────────────────────────────────────── */}
-                <Separator />
-                <div className="px-4 py-2.5">
+                <Separator className="flex-shrink-0" />
+                <div className="px-4 py-2.5 flex-shrink-0">
                     <Link
                         href="/notifications"
                         className="block w-full rounded-md py-1.5 text-center text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
