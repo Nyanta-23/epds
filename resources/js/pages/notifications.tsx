@@ -116,9 +116,9 @@ export default function NotificationIndex({ auth, notifications }: PageProps) {
             <Head title="Riwayat Notifikasi" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto flex h-screen max-w-4xl flex-col px-4 sm:px-6 lg:px-8">
                     {/* ── Page header ──────────────────────────────────── */}
-                    <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="mb-6 flex flex-shrink-0 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="flex items-center gap-2 text-xl font-bold text-foreground">
                                 <Bell className="h-5 w-5 text-primary" />
@@ -178,9 +178,9 @@ export default function NotificationIndex({ auth, notifications }: PageProps) {
                     </div>
 
                     {/* ── Notification list ─────────────────────────────── */}
-                    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+                    <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                         {notifications.data.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <div className="flex flex-1 flex-col items-center justify-center py-20 text-center">
                                 <div className="mb-4 rounded-full bg-muted p-5">
                                     <Bell className="h-8 w-8 text-muted-foreground/40" />
                                 </div>
@@ -192,7 +192,7 @@ export default function NotificationIndex({ auth, notifications }: PageProps) {
                                 </p>
                             </div>
                         ) : (
-                            <ul className="divide-y divide-border">
+                            <ul className="divide-y divide-border overflow-y-auto">
                                 {notifications.data.map((notif) => (
                                     <li
                                         key={notif.id}
@@ -215,26 +215,26 @@ export default function NotificationIndex({ auth, notifications }: PageProps) {
                                         <div className="min-w-0 flex-1">
                                             <div className="flex items-start justify-between gap-3">
                                                 <p
-                                                    className={`text-sm leading-snug ${!notif.read_at ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}
+                                                    className={`text-sm leading-snug break-words ${!notif.read_at ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}
                                                 >
                                                     {notif.title}
                                                 </p>
-                                                <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground/70">
+                                                <span className="flex shrink-0 items-center gap-1 text-xs whitespace-nowrap text-muted-foreground/70">
                                                     <Clock className="h-3 w-3" />
                                                     {notif.created_at_human}
                                                 </span>
                                             </div>
-                                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                                            <p className="mt-1 line-clamp-3 text-sm break-words text-muted-foreground">
                                                 {notif.body}
                                             </p>
-                                            <p className="mt-2 font-mono text-[10px] text-muted-foreground/50">
+                                            <p className="mt-2 font-mono text-[10px] break-all text-muted-foreground/50">
                                                 {notif.created_at}
                                             </p>
                                         </div>
 
                                         {/* Unread dot */}
                                         {!notif.read_at && (
-                                            <div className="absolute top-1/2 right-5 -translate-y-1/2">
+                                            <div className="absolute top-1/2 right-5 shrink-0 -translate-y-1/2">
                                                 <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-sm ring-2 ring-background" />
                                             </div>
                                         )}
@@ -247,8 +247,8 @@ export default function NotificationIndex({ auth, notifications }: PageProps) {
                     {/* ── Pagination ───────────────────────────────────── */}
                     {notifications.last_page > 1 && (
                         <>
-                            <Separator className="my-4" />
-                            <div className="flex flex-wrap justify-center gap-1.5">
+                            <Separator className="my-4 flex-shrink-0" />
+                            <div className="flex flex-shrink-0 flex-wrap justify-center gap-1.5">
                                 {notifications.links.map((link, index) => {
                                     const label = link.label
                                         .replace('&laquo;', '«')
