@@ -33,6 +33,24 @@ Route::get('/firebase-messaging-sw.js', function () {
     ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
 })->name('firebase.sw');
 
+// Webhook untuk external cron (jika shared hosting tidak support cron system)
+// Akses: GET /cron/notify-missed-epds/SECRET_TOKEN
+// Gunakan layanan like cron-job.org, EasyCron, atau GitHub Actions untuk hit URL ini secara berkala
+Route::get('/cron/notify-missed-epds/{token}', function ($token) {
+  // Verify token from .env APP_CRON_SECRET
+  if ($token !== config('app.cron_secret')) {
+    abort(403, 'Invalid cron token');
+  }
+
+  \Artisan::call('notify:missed-epds');
+
+  return response()->json([
+    'status' => 'ok',
+    'message' => 'Missed EPDS notification job executed',
+    'timestamp' => now(),
+  ]);
+})->name('cron.notify-missed-epds');
+
 // Route Verifikasi Email (Harus Public/Signed Only, tapi di luar grup Auth standar)
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
   ->middleware(['signed', 'throttle:6,1'])

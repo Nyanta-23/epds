@@ -7,10 +7,13 @@ import DashboardFilter, {
 import DashboardStats from '@/components/dashboard-stats';
 import DashboardTableNewData from '@/components/dashboard-table-new-data';
 import { type StatCardData } from '@/components/stat-card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Bell } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -34,6 +37,7 @@ interface DashboardProps {
     latest_postpartum_datas: LatestPostpartumItem[];
     stats: StatCardData[];
     filters: DashboardFilters;
+    unreadNotifications?: number;
 }
 
 export default function Dashboard({
@@ -43,12 +47,35 @@ export default function Dashboard({
     latest_postpartum_datas,
     stats,
     filters,
+    unreadNotifications = 0,
 }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
             <div className="flex h-full flex-1 flex-col gap-3 overflow-x-auto p-3 md:p-0">
+                {/* ── Unread Notifications Alert ──────────────────────── */}
+                {unreadNotifications > 0 && (
+                    <Alert className="border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20">
+                        <Bell className="h-4 w-4 text-amber-600" />
+                        <AlertTitle className="text-amber-900 dark:text-amber-100">
+                            Notifikasi Pengingat EPDS
+                        </AlertTitle>
+                        <AlertDescription className="text-amber-800 dark:text-amber-200">
+                            Anda memiliki {unreadNotifications} notifikasi
+                            jadwal pengisian kuesioner EPDS yang terlewat.
+                            <Link href={route('notifications.index')}>
+                                <Button
+                                    variant="link"
+                                    className="h-auto p-0 pl-2 text-amber-700 underline dark:text-amber-300"
+                                >
+                                    Lihat detail
+                                </Button>
+                            </Link>
+                        </AlertDescription>
+                    </Alert>
+                )}
+
                 {/* ── Filter bar ──────────────────────────────────────── */}
                 <DashboardFilter filters={filters} />
 
