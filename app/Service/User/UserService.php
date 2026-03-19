@@ -74,18 +74,78 @@ class UserService
   public function update(UserUpdateAttributeRequest $request, string $id)
   {
     return DB::transaction(function () use ($request, $id) {
-      User::findOrFail($id)->update([
+      $user = User::findOrFail($id);
+      $newRole = \App\Models\Role::find($request->role_id);
+
+      $updateData = [
         'name' => $request->name,
         'role_id' => $request->role_id,
-        'province_id' => $request->province_id,
-        'city_or_district_id' => $request->regency_id,
-        'subdistrict_id' => $request->district_id,
-        'village_id' => $request->village_id,
-        'province' => $request->province,
-        'city_or_district' => $request->regency,
-        'subdistrict' => $request->district,
-        'village' => $request->village
-      ]);
+      ];
+
+      // Only update location data if the new role is midwife
+      // For patient role, we keep existing location data (don't clear it)
+      if ($newRole && $newRole->slug === 'midwife') {
+        // Update with form data for midwife, or keep existing if not provided
+        if ($request->province_id !== null) {
+          $updateData['province_id'] = $request->province_id;
+        } elseif ($user->province_id) {
+          // Keep existing if not provided
+          $updateData['province_id'] = $user->province_id;
+        }
+
+        if ($request->regency_id !== null) {
+          $updateData['city_or_district_id'] = $request->regency_id;
+        } elseif ($user->city_or_district_id) {
+          // Keep existing if not provided
+          $updateData['city_or_district_id'] = $user->city_or_district_id;
+        }
+
+        if ($request->district_id !== null) {
+          $updateData['subdistrict_id'] = $request->district_id;
+        } elseif ($user->subdistrict_id) {
+          // Keep existing if not provided
+          $updateData['subdistrict_id'] = $user->subdistrict_id;
+        }
+
+        if ($request->village_id !== null) {
+          $updateData['village_id'] = $request->village_id;
+        } elseif ($user->village_id) {
+          // Keep existing if not provided
+          $updateData['village_id'] = $user->village_id;
+        }
+
+        if ($request->province !== null) {
+          $updateData['province'] = $request->province;
+        } elseif ($user->province) {
+          // Keep existing if not provided
+          $updateData['province'] = $user->province;
+        }
+
+        if ($request->city_or_district !== null) {
+          $updateData['city_or_district'] = $request->city_or_district;
+        } elseif ($user->city_or_district) {
+          // Keep existing if not provided
+          $updateData['city_or_district'] = $user->city_or_district;
+        }
+
+        if ($request->subdistrict !== null) {
+          $updateData['subdistrict'] = $request->subdistrict;
+        } elseif ($user->subdistrict) {
+          // Keep existing if not provided
+          $updateData['subdistrict'] = $user->subdistrict;
+        }
+
+        if ($request->village !== null) {
+          $updateData['village'] = $request->village;
+        } elseif ($user->village) {
+          // Keep existing if not provided
+          $updateData['village'] = $user->village;
+        }
+      }
+      // If changing to patient, keep existing location data (don't update, don't clear)
+      // This preserves location history for future reference if they become midwife again
+
+      $user->update($updateData);
     });
   }
 
