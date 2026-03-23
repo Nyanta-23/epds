@@ -48,6 +48,8 @@ class User extends Authenticatable implements MustVerifyEmail
     'is_can_visit',
     'number_patient',
     'fcm_token',
+    'instansi',
+    'nama_instansi',
   ];
 
   /**

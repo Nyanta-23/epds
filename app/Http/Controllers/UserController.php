@@ -91,6 +91,8 @@ class UserController extends Controller
       $userReq->regency = $validated['regency'] ?? null;
       $userReq->district = $validated['district'] ?? null;
       $userReq->village = $validated['village'] ?? null;
+      $userReq->instansi = $validated['instansi'] ?? null;
+      $userReq->nama_instansi = $validated['nama_instansi'] ?? null;
 
       $this->userService->store($userReq);
 
@@ -137,6 +139,8 @@ class UserController extends Controller
       $userReq->subdistrict = $validated['subdistrict'] ?? null;
       $userReq->regency = $validated['regency'] ?? null;
       $userReq->village = $validated['village'] ?? null;
+      $userReq->instansi = $validated['instansi'] ?? null;
+      $userReq->nama_instansi = $validated['nama_instansi'] ?? null;
 
       $this->userService->update($userReq, $user->id);
 

@@ -15,4 +15,6 @@ class UserUpdateAttributeRequest
   public ?string $province;
   public ?string $city_or_district;
   public ?string $subdistrict;
+  public ?string $instansi;
+  public ?string $nama_instansi;
 }

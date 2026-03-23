@@ -12,6 +12,8 @@ export interface FormUser {
     city_or_district: string;
     subdistrict: string,
     village: string
+    instansi?: string;
+    nama_instansi?: string;
     [key: string]: any;
 }
 

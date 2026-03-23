@@ -27,7 +27,9 @@ export function useUserAction(user?: User) {
         province: user?.province ?? '',
         city_or_district: user?.city_or_district ?? '',
         subdistrict: user?.subdistrict ?? '',
-        village: user?.village ?? ''
+        village: user?.village ?? '',
+        instansi: user?.instansi ?? '',
+        nama_instansi: user?.nama_instansi ?? '',
     });
 
     const [processingId, setProcessingId] = useState<string | null>(null);

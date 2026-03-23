@@ -16,4 +16,6 @@ class UserStoreAttributeRequest
   public string $regency;
   public string $district;
   public string $village;
+  public ?string $instansi;
+  public ?string $nama_instansi;
 }
