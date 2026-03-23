@@ -71,6 +71,15 @@ class UserStoreRequestValidator extends FormRequest
       'regency' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'village' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'instansi' => [
+        $isMidwife ? 'required' : 'nullable',
+        Rule::in(['TPMB', 'Puskesmas', 'Klinik', 'RS']),
+      ],
+      'nama_instansi' => [
+        $isMidwife ? 'required' : 'nullable',
+        'string',
+        'max:255',
+      ],
     ];
   }
 }

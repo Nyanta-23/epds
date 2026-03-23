@@ -17,6 +17,8 @@ export interface User {
     city_or_district: string;
     subdistrict: string;
     village: string;
+    instansi?: string;
+    nama_instansi?: string;
 }
 
 export interface Role {

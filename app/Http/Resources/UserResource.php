@@ -26,7 +26,9 @@ class UserResource extends JsonResource
       'province' => $this->province ?? '',
       'city_or_district' => $this->city_or_district ?? '',
       'subdistrict' => $this->subdistrict ?? '',
-      'village' => $this->village ?? ''
+      'village' => $this->village ?? '',
+      'instansi' => $this->instansi ?? '',
+      'nama_instansi' => $this->nama_instansi ?? '',
     ];
   }
 }

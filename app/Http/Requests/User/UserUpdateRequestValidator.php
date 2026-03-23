@@ -60,6 +60,15 @@ class UserUpdateRequestValidator extends FormRequest
       'province' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'city_or_district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'subdistrict' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'instansi' => [
+        $isMidwife ? 'required' : 'nullable',
+        Rule::in(['TPMB', 'Puskesmas', 'Klinik', 'RS']),
+      ],
+      'nama_instansi' => [
+        $isMidwife ? 'required' : 'nullable',
+        'string',
+        'max:255',
+      ],
     ];
   }
 }

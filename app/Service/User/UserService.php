@@ -65,7 +65,9 @@ class UserService
         'province' => $request->province,
         'city_or_district' => $request->regency,
         'subdistrict' => $request->district,
-        'village' => $request->village
+        'village' => $request->village,
+        'instansi' => $request->instansi,
+        'nama_instansi' => $request->nama_instansi,
       ]);
     }));
 
@@ -140,6 +142,20 @@ class UserService
         } elseif ($user->village) {
           // Keep existing if not provided
           $updateData['village'] = $user->village;
+        }
+
+        if ($request->instansi !== null) {
+          $updateData['instansi'] = $request->instansi;
+        } elseif ($user->instansi) {
+          // Keep existing if not provided
+          $updateData['instansi'] = $user->instansi;
+        }
+
+        if ($request->nama_instansi !== null) {
+          $updateData['nama_instansi'] = $request->nama_instansi;
+        } elseif ($user->nama_instansi) {
+          // Keep existing if not provided
+          $updateData['nama_instansi'] = $user->nama_instansi;
         }
       }
       // If changing to patient, keep existing location data (don't update, don't clear)

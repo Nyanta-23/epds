@@ -197,6 +197,79 @@ export default function UserFormInformation({
                             <Loader2 className="ml-auto h-4 w-4 animate-spin text-muted-foreground" />
                         )}
                     </div>
+
+                    {/* Instansi */}
+                    <div className="mb-4">
+                        <Label className="mb-2 block text-xs font-medium text-muted-foreground">
+                            Instansi{' '}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <Select
+                            value={data.instansi ?? ''}
+                            onValueChange={(val) =>
+                                handleInputChange('instansi', val)
+                            }
+                        >
+                            <SelectTrigger
+                                className={`cursor-pointer bg-background ${
+                                    errors.instansi
+                                        ? 'border-red-500 focus:ring-red-500'
+                                        : ''
+                                }`}
+                            >
+                                <SelectValue placeholder="Pilih Instansi" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {['TPMB', 'Puskesmas', 'Klinik', 'RS'].map(
+                                    (opt) => (
+                                        <SelectItem
+                                            key={opt}
+                                            value={opt}
+                                            className="cursor-pointer"
+                                        >
+                                            {opt}
+                                        </SelectItem>
+                                    ),
+                                )}
+                            </SelectContent>
+                        </Select>
+                        {errors.instansi && (
+                            <p className="mt-1 text-sm text-destructive">
+                                {errors.instansi}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Nama Instansi */}
+                    <div className="mb-4">
+                        <Label className="mb-2 block text-xs font-medium text-muted-foreground">
+                            Nama Instansi{' '}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            type="text"
+                            value={data.nama_instansi ?? ''}
+                            onChange={(e) =>
+                                handleInputChange(
+                                    'nama_instansi',
+                                    e.target.value,
+                                )
+                            }
+                            placeholder="Masukkan nama instansi"
+                            maxLength={255}
+                            className={`bg-background ${
+                                errors.nama_instansi
+                                    ? 'border-red-500 focus:ring-red-500'
+                                    : ''
+                            }`}
+                        />
+                        {errors.nama_instansi && (
+                            <p className="mt-1 text-sm text-destructive">
+                                {errors.nama_instansi}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {/* Provinsi */}
                         <div>
