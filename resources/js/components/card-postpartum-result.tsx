@@ -17,17 +17,17 @@ export default function CardPostpartumResult({
 
     if (score !== null) {
         if (score <= 9) {
-            colorClass = 'text-emerald-600';
+            colorClass = 'text-emerald-700 dark:text-emerald-400';
             label = 'Normal / Risiko Rendah';
             badgeVariant = 'default';
             ringColor = 'stroke-emerald-500';
         } else if (score <= 12) {
-            colorClass = 'text-amber-600';
+            colorClass = 'text-amber-700 dark:text-amber-400';
             label = 'Risiko Postpartum Blues';
             badgeVariant = 'secondary';
             ringColor = 'stroke-amber-500';
         } else {
-            colorClass = 'text-red-600';
+            colorClass = 'text-destructive';
             label = 'Risiko Depresi Postpartum';
             badgeVariant = 'destructive';
             ringColor = 'stroke-red-500';
