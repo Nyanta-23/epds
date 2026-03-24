@@ -19,17 +19,17 @@ export default function HeaderPostpartumDetail({ postpartum }: HeaderPostpartumD
             badgeVariant = 'default';
             label = 'Risiko Rendah';
             icon = <CheckCircle className="w-4 h-4 ml-1.5 opacity-80" />;
-            badgeBg = 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none';
+            badgeBg = 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 border-none';
         } else if (score <= 12) {
             badgeVariant = 'secondary';
             label = 'Risiko Postpartum Blues';
             icon = <AlertTriangle className="w-4 h-4 ml-1.5 opacity-80" />;
-            badgeBg = 'bg-amber-100 text-amber-800 hover:bg-amber-100 border-none';
+            badgeBg = 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border-none';
         } else {
             badgeVariant = 'destructive';
             label = 'Risiko Tinggi Depresi';
             icon = <XCircle className="w-4 h-4 ml-1.5 opacity-80" />;
-            badgeBg = 'bg-red-100 text-red-800 hover:bg-red-100 border-none';
+            badgeBg = 'bg-destructive/10 text-destructive hover:bg-destructive/10 border-none';
         }
     }
 
@@ -46,7 +46,7 @@ export default function HeaderPostpartumDetail({ postpartum }: HeaderPostpartumD
                     <h1 className="text-xl md:text-2xl font-bold tracking-tight">
                         {postpartum.mother?.name ?? 'Nama Pasien'}
                     </h1>
-                    <p className="text-sm text-slate-500 font-medium font-mono">
+                    <p className="text-sm text-muted-foreground font-medium font-mono">
                         {postpartum.mother?.number_patient ?? 'P-XXX-XXX'}
                     </p>
                 </div>

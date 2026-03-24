@@ -31,25 +31,25 @@ function getRowStyle(
 
     if (isQ10 && score !== null && score > 0) {
         return { 
-            rowClass: 'bg-red-50', 
+            rowClass: 'bg-destructive/10', 
             badgeVariant: 'destructive',
-            badgeClass: 'bg-red-600 border-none'
+            badgeClass: 'bg-destructive text-destructive-foreground border-none'
         };
     }
 
-    const alternateBg = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+    const alternateBg = index % 2 === 0 ? 'bg-transparent' : 'bg-muted/50';
 
     if (score === null || score === 0) {
-        return { rowClass: alternateBg, badgeVariant: 'outline', badgeClass: 'text-slate-500 border-slate-200' };
+        return { rowClass: alternateBg, badgeVariant: 'outline', badgeClass: 'text-muted-foreground border-border' };
     }
     if (score === 1) {
-        return { rowClass: alternateBg, badgeVariant: 'secondary', badgeClass: 'bg-slate-100 text-slate-700 hover:bg-slate-100 border-none' };
+        return { rowClass: alternateBg, badgeVariant: 'secondary', badgeClass: 'bg-muted text-foreground hover:bg-muted border-none' };
     }
     if (score === 2) {
-        return { rowClass: alternateBg, badgeVariant: 'secondary', badgeClass: 'bg-amber-100 text-amber-800 hover:bg-amber-100 border-none' };
+        return { rowClass: alternateBg, badgeVariant: 'secondary', badgeClass: 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border-none' };
     }
     // score >= 3
-    return { rowClass: alternateBg, badgeVariant: 'destructive', badgeClass: 'bg-red-600 border-none' };
+    return { rowClass: alternateBg, badgeVariant: 'destructive', badgeClass: 'bg-destructive text-destructive-foreground border-none' };
 }
 
 export default function CardPostpartumAnswer({
@@ -75,7 +75,7 @@ export default function CardPostpartumAnswer({
                         Detail Jawaban EPDS
                     </CardTitle>
                     {hasQ10Alert && (
-                        <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50/50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                        <div className="flex items-center gap-2 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive">
                             <AlertTriangle className="h-4 w-4" />
                             Pertanyaan no.10 terindikasi risiko!
                         </div>
@@ -110,17 +110,17 @@ export default function CardPostpartumAnswer({
                                             {qNum}
                                         </td>
                                         <td className="px-3 py-2.5 leading-snug">
-                                            <span className={isQ10 ? 'text-red-700 font-semibold' : ''}>
+                                            <span className={isQ10 ? 'text-destructive font-semibold' : ''}>
                                                 {answer.question.question}
                                             </span>
                                             {/* On mobile: show answer inline below question */}
-                                            <p className={`mt-0.5 text-xs sm:hidden ${isQ10 ? 'text-red-700/80 font-medium' : 'text-muted-foreground'}`}>
+                                            <p className={`mt-0.5 text-xs sm:hidden ${isQ10 ? 'text-destructive/80 font-medium' : 'text-muted-foreground'}`}>
                                                 {answer.question.options.find(
                                                     (opt) => opt.option === answer.answer,
                                                 )?.option_text ?? answer.answer}
                                             </p>
                                         </td>
-                                        <td className={`hidden px-3 py-2.5 sm:table-cell ${isQ10 ? 'text-red-700/80 font-medium' : 'text-muted-foreground'}`}><p>
+                                        <td className={`hidden px-3 py-2.5 sm:table-cell ${isQ10 ? 'text-destructive/80 font-medium' : 'text-muted-foreground'}`}><p>
                                             {answer.question.options.find(
                                                 (opt) => opt.option === answer.answer,
                                             )?.option_text ?? answer.answer}

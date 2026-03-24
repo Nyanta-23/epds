@@ -39,7 +39,7 @@ export default function CardPostpartumFollowUp({
                 
                 <div className="flex-1 flex flex-col justify-center mb-6">
                     {!postpartum.followup ? (
-                        <div className="bg-slate-50 rounded-md p-4 text-center border ">
+                        <div className="bg-muted rounded-md p-4 text-center border">
                             <p className="text-sm text-muted-foreground">Belum ada tindak lanjut</p>
                         </div>
                     ) : (
@@ -71,9 +71,9 @@ export default function CardPostpartumFollowUp({
                         <div className="flex flex-col sm:flex-row gap-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full sm:w-1/2 justify-between border-primary text-primary hover:bg-primary/5 shadow-sm">
-                                        Rujuk Pasien
-                                        <ChevronDown className="w-4 h-4 ml-2 opacity-50" />
+                                    <Button variant="outline" className="w-full sm:flex-1 h-auto min-h-10 py-2 whitespace-normal justify-between border-primary text-primary hover:bg-primary/5 shadow-sm text-xs sm:text-sm lg:text-xs xl:text-sm px-2 sm:px-3">
+                                        <span className="text-left">Rujuk Pasien</span>
+                                        <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 opacity-50 shrink-0" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56" align="start">
@@ -95,7 +95,7 @@ export default function CardPostpartumFollowUp({
                             </DropdownMenu>
 
                             <Button 
-                                className="w-full sm:w-1/2 bg-primary hover:bg-teal-700 text-white shadow-sm"
+                                className="w-full sm:flex-1 h-auto min-h-10 py-2 whitespace-normal bg-primary hover:bg-teal-700 text-white shadow-sm text-xs sm:text-sm lg:text-xs xl:text-sm px-2 sm:px-3 leading-tight"
                                 onClick={() => {
                                     setInitialType(defaultTypeOption ? Number(defaultTypeOption.value) : null);
                                     setInitialStatus(null);
@@ -114,7 +114,7 @@ export default function CardPostpartumFollowUp({
                                 setResult(postpartum);
                                 setOpenDialog(true);
                             }}
-                            className="w-full bg-primary hover:bg-teal-700 text-white shadow-sm"
+                            className="w-full bg-primary hover:bg-teal-700 text-white shadow-sm text-xs sm:text-sm"
                         >
                             {postpartum.followup ? 'Edit Tindak Lanjut' : 'Tambah Tindak Lanjut +'}
                         </Button>

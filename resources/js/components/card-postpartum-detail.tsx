@@ -20,9 +20,9 @@ function InfoBlock({ label, value }: { label: string; value: React.ReactNode }) 
 }
 
 function InfoBadgeBlock({ label, value, isGood, isNeutral, isDanger }: { label: string, value: string, isGood?: boolean, isNeutral?: boolean, isDanger?: boolean }) {
-    let variantClass = "bg-slate-100 text-slate-700 border-none";
-    if (isGood) variantClass = "bg-teal-50 text-teal-700 border border-teal-200 shadow-sm";
-    if (isDanger) variantClass = "bg-red-50 text-red-700 border border-red-200 shadow-sm";
+    let variantClass = "bg-muted text-foreground border-none";
+    if (isGood) variantClass = "bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-900/50 shadow-sm";
+    if (isDanger) variantClass = "bg-destructive/10 text-destructive border-transparent shadow-sm";
 
     return (
         <div className="space-y-1.5 flex flex-col items-start w-full">
@@ -38,15 +38,15 @@ function InfoBadgeBlock({ label, value, isGood, isNeutral, isDanger }: { label: 
 
 function DangerBadgeBlock({ label, hasRisk, note }: { label: string, hasRisk: boolean, note?: string | null }) {
     const variantClass = hasRisk 
-        ? "bg-red-100 text-red-800 border-none shadow-sm font-semibold" 
-        : "bg-slate-100 text-slate-600 border-none font-medium";
+        ? "bg-destructive/10 text-destructive border-none shadow-sm font-semibold" 
+        : "bg-muted text-muted-foreground border-none font-medium";
 
     const value = hasRisk ? 'Ya' : 'Tidak';
 
     return (
          <div className="space-y-1.5 flex flex-col items-start w-full">
-            <div className={`flex w-full justify-between flex-col px-3 py-1.5 rounded-md ${hasRisk ? 'bg-red-50 border border-red-100' : 'border '}`}>
-                <span className={`text-sm ${hasRisk ? 'text-red-700 font-medium' : 'text-slate-600 font-medium'}`}>
+            <div className={`flex w-full justify-between flex-col px-3 py-1.5 rounded-md ${hasRisk ? 'bg-destructive/5 border border-destructive/10' : 'border border-border'}`}>
+                <span className={`text-sm ${hasRisk ? 'text-destructive font-medium' : 'text-foreground font-medium'}`}>
                     {label}
                 </span>
                 <Badge className={`rounded-md ${variantClass}`} variant="outline">
@@ -54,7 +54,7 @@ function DangerBadgeBlock({ label, hasRisk, note }: { label: string, hasRisk: bo
                 </Badge>
             </div>
             {hasRisk && note && (
-                <p className="text-xs text-red-600 italic mt-1 ml-1">Catatan : {note}</p>
+                <p className="text-xs text-destructive italic mt-1 ml-1">Catatan : {note}</p>
             )}
         </div>
     );

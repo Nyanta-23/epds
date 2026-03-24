@@ -21,7 +21,7 @@ function getCategory(score: number): ScoreCategory {
         return {
             label: 'Normal / Risiko Rendah',
             interpretasi: 'Kondisi psikologis ibu dalam batas normal.',
-            color: 'bg-emerald-50 border-emerald-200',
+            color: 'bg-emerald-50/50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-900/50',
             badgeVariant: 'default',
             icon: <CheckCircle className="h-5 w-5 text-emerald-500" />,
             tindakan: [
@@ -40,7 +40,7 @@ function getCategory(score: number): ScoreCategory {
             label: 'Risiko Postpartum Blues / Depresi Ringan',
             interpretasi:
                 'Ibu mulai menunjukkan gejala kesedihan, cemas, atau kelelahan emosional.',
-            color: 'bg-amber-50 border-amber-200',
+            color: 'bg-amber-50/50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-900/50',
             badgeVariant: 'secondary',
             icon: <AlertTriangle className="h-5 w-5 text-amber-500" />,
             tindakan: [
@@ -61,7 +61,7 @@ function getCategory(score: number): ScoreCategory {
     return {
         label: 'Risiko Depresi Postpartum',
         interpretasi: 'Gejala depresi cukup signifikan.',
-        color: 'bg-red-50 border-red-200',
+        color: 'bg-destructive/10 border-destructive/20',
         badgeVariant: 'destructive',
         icon: <XCircle className="h-5 w-5 text-red-500" />,
         tindakan: [
@@ -92,7 +92,7 @@ export default function CardRencanaTindakan({ totalScore }: CardRencanaTindakanP
     const category = getCategory(totalScore);
 
     return (
-        <Card className={`border px-4`}>
+        <Card className={`border px-4 shadow-sm ${category.color}`}>
             <CardHeader className="">
                 <CardTitle className="flex items-center gap-2 text-base">
                     {category.icon}
