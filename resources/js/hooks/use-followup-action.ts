@@ -5,13 +5,15 @@ import { useForm } from '@inertiajs/react';
 export function useFollowUpAction(
     result?: PostpartumVisit,
     onSuccessCallBack?: () => void,
+    initialType?: number | null,
+    initialStatus?: number | null,
 ) {
     const { data, setData, reset, errors, clearErrors, put, post, processing } =
         useForm<FormFollowUp>({
-            type: result?.followup?.type.value ?? 0,
-            followup_status: result?.result.followup_status.value ?? 0,
+            type: initialType ?? result?.followup?.type.value ?? 0,
+            followup_status: initialStatus ?? result?.result?.followup_status?.value ?? 0,
             notes: result?.followup?.notes ?? '',
-            result_id: result?.result.id ?? '',
+            result_id: result?.result?.id ?? '',
         });
 
     // const storeFollowUp = () => {

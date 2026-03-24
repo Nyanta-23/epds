@@ -18,7 +18,6 @@ export default function CardPostpartumDetailBaby({
     postpartum,
     baby,
 }: CardPostpartumDetailBabyProps) {
-    console.log();
     return (
         <Card className="p-4">
             <CardHeader>
@@ -28,7 +27,7 @@ export default function CardPostpartumDetailBaby({
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 <section>
-                    <Table>
+                    <Table className="min-w-[700px]">
                         <TableHeader className="bg-accent">
                             <TableRow>
                                 <TableHead>No</TableHead>

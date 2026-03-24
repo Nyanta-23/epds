@@ -17,7 +17,7 @@ interface PostpartumShowProps {
 }
 
 export default function PostpartumShow({postpartum, baby, page_prop}: PostpartumShowProps) {
-  const title: string = 'List Skrining';
+  const title: string = 'List Hasil Deteksi Dini';
   const link: string = '/postpartum';
 
   const breadcrumbs: BreadcrumbItem[] = [
@@ -26,7 +26,7 @@ export default function PostpartumShow({postpartum, baby, page_prop}: Postpartum
       href: link,
     },
     {
-      title: `Detail Skrining Pasien`,
+      title: `Detail Hasil Deteksi Dini`,
       href: `${link}/${postpartum.data.id}`
     }
   ];

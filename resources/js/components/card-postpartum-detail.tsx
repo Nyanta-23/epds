@@ -1,7 +1,6 @@
 import { Baby, PostpartumVisit } from '@/types/resource';
 import { Badge } from './ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Separator } from './ui/separator';
 import marriedStatus from './utils/married_status';
 
 interface CardPostpartumDetailProps {
@@ -9,246 +8,149 @@ interface CardPostpartumDetailProps {
     baby: Baby;
 }
 
+function InfoBlock({ label, value }: { label: string; value: React.ReactNode }) {
+    return (
+        <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {label}
+            </p>
+            <div className="text-sm font-medium">{value}</div>
+        </div>
+    );
+}
+
+function InfoBadgeBlock({ label, value, isGood, isNeutral, isDanger }: { label: string, value: string, isGood?: boolean, isNeutral?: boolean, isDanger?: boolean }) {
+    let variantClass = "bg-slate-100 text-slate-700 border-none";
+    if (isGood) variantClass = "bg-teal-50 text-teal-700 border border-teal-200 shadow-sm";
+    if (isDanger) variantClass = "bg-red-50 text-red-700 border border-red-200 shadow-sm";
+
+    return (
+        <div className="space-y-1.5 flex flex-col items-start w-full">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {label}
+            </p>
+            <Badge className={`px-2.5 py-1 whitespace-normal break-words text-left max-w-full h-auto rounded-md font-medium ${variantClass}`} variant="outline">
+                {value}
+            </Badge>
+        </div>
+    );
+}
+
+function DangerBadgeBlock({ label, hasRisk, note }: { label: string, hasRisk: boolean, note?: string | null }) {
+    const variantClass = hasRisk 
+        ? "bg-red-100 text-red-800 border-none shadow-sm font-semibold" 
+        : "bg-slate-100 text-slate-600 border-none font-medium";
+
+    const value = hasRisk ? 'Ya' : 'Tidak';
+
+    return (
+         <div className="space-y-1.5 flex flex-col items-start w-full">
+            <div className={`flex w-full justify-between flex-col px-3 py-1.5 rounded-md ${hasRisk ? 'bg-red-50 border border-red-100' : 'border '}`}>
+                <span className={`text-sm ${hasRisk ? 'text-red-700 font-medium' : 'text-slate-600 font-medium'}`}>
+                    {label}
+                </span>
+                <Badge className={`rounded-md ${variantClass}`} variant="outline">
+                    {value}
+                </Badge>
+            </div>
+            {hasRisk && note && (
+                <p className="text-xs text-red-600 italic mt-1 ml-1">Catatan : {note}</p>
+            )}
+        </div>
+    );
+}
+
 export default function CardPostpartumDetail({
     baby,
     postpartum,
 }: CardPostpartumDetailProps) {
     return (
-        <Card className="p-4">
-            <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                    Detail Postpartum
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-                <div className="grid grid-cols-2 gap-3">
-                    <div>
-                        <p className="font-medium">Kunjungan ke</p>
-                        <p className="text-muted-foreground">
-                            {postpartum.visit_number}
-                        </p>
+        <div className="space-y-6">
+            
+            {/* CARD 3 - Identitas Pasien */}
+            <Card className="shadow-sm">
+                <CardHeader className="pb-3 px-6 pt-6 border-b ">
+                    <CardTitle className="text-base font-semibold">
+                        Identitas Pasien
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 py-5">
+                    <div className="grid grid-cols-2 lg:grid-cols-2 gap-y-6 gap-x-8">
+                        <InfoBlock label="Nama" value={postpartum.mother?.name || '-'} />
+                        <InfoBlock label="Status" value={marriedStatus(postpartum.mother?.married_status ?? '')} />
+                        <InfoBlock label="Pekerjaan" value={postpartum.mother?.job || '-'} />
+                        <InfoBlock label="Pendidikan" value={postpartum.mother?.highest_education || '-'} />
+                        <InfoBlock label="Tempat, Tgl Lahir" value={`${postpartum.mother?.birthplace}, ${postpartum.mother?.date_of_birth}`} />
                     </div>
-                    <div>
-                        <p className="font-medium">Tanggal Persalinan</p>
-                        <p className="text-muted-foreground">
-                            {new Date(baby.date_of_birth).toLocaleDateString(
-                                'id-ID',
-                                {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric',
-                                },
-                            )}
-                        </p>
+                </CardContent>
+            </Card>
+
+            {/* CARD 4 - Kondisi Sosial & Dukungan */}
+            <Card className=" shadow-sm">
+                <CardHeader className="pb-3 px-6 pt-6 border-b ">
+                    <CardTitle className="text-base font-semibold">
+                        Kondisi Sosial & Dukungan
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 py-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-y-6 gap-x-6">
+                        <InfoBadgeBlock 
+                            label="Kualitas Tidur" 
+                            value={postpartum.sleep_quality.label_id} 
+                            isGood={['Baik', 'Cukup'].includes(postpartum.sleep_quality.label_id)}
+                        />
+                        <InfoBadgeBlock 
+                            label="Dukungan Suami" 
+                            value={postpartum.partner_support.label_id} 
+                            isGood={postpartum.partner_support.label_id !== 'Kurang'}
+                        />
+                        <InfoBadgeBlock 
+                            label="Tinggal Bersama" 
+                            value={postpartum.live_with_partner ? 'Ya' : 'Tidak'} 
+                            isGood={postpartum.live_with_partner}
+                        />
+                        <InfoBadgeBlock 
+                            label="Pendapatan/Bulan" 
+                            value={postpartum.family_salary_permonth.label_id} 
+                        />
+                        <InfoBadgeBlock 
+                            label="Apakah Pendapatan Cukup" 
+                            value={postpartum.is_salary_sufficient.label_id} 
+                            isGood={postpartum.is_salary_sufficient.label_id === 'Cukup'}
+                        />
+                        <InfoBadgeBlock 
+                            label="Tanggungan" 
+                            value={`${postpartum.dependent_family_count.label_id} Orang`} 
+                        />
                     </div>
-                    <div>
-                        <p className="font-medium">Tanggal diisi</p>
-                        <p className="text-muted-foreground">
-                            {postpartum.date_filled}
-                        </p>
-                    </div>
-                    <div>
-                        <p className="font-medium">Nomor Pasien</p>
-                        <p className="text-muted-foreground">
-                            {postpartum.mother.number_patient}
-                        </p>
-                    </div>
+                </CardContent>
+            </Card>
 
-                    <div>
-                        <p className="font-medium">Nama</p>
-                        <p className="text-muted-foreground">
-                            {postpartum.mother.name}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="font-medium">Tempat, Tanggal Lahir</p>
-                        <p className="text-muted-foreground">{`${postpartum.mother.birthplace}, ${postpartum.mother.date_of_birth}`}</p>
-                    </div>
-                    <div>
-                        <p className="font-medium">Pekerjaan</p>
-                        <p className="text-muted-foreground">
-                            {postpartum.mother.job}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="font-medium">Status Pernikahan</p>
-                        <p className="text-muted-foreground">
-                            {marriedStatus(postpartum.mother.married_status)}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="font-medium">Pendidikan Terakhir</p>
-                        <p className="text-muted-foreground">
-                            {postpartum.mother.highest_education}
-                        </p>
-                    </div>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-center">
-                    <div className="flex w-full justify-start">
-                        <div className="space-y-3">
-                            <div className="space-y-2">
-                                <p className="font-medium">Kualitas Tidur</p>
-                                <Badge>
-                                    {postpartum.sleep_quality.label_id}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Apakah tinggal bersama pasangan
-                                </p>
-                                <Badge>
-                                    {postpartum.live_with_partner
-                                        ? 'Ya'
-                                        : 'Tidak'}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">Dukungan Suami</p>
-                                <Badge>
-                                    {postpartum.partner_support.label_id}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Pendapatan keluarga perbulan
-                                </p>
-                                <Badge>
-                                    {postpartum.family_salary_permonth.label_id}
-                                </Badge>
-                            </div>
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Jumlah Keluarga yang ditanggung
-                                </p>
-                                <Badge>
-                                    {postpartum.dependent_family_count.label_id}{' '}
-                                    Orang
-                                </Badge>
-                            </div>
+            {/* CARD 5 - Riwayat Risiko Medis */}
+            <Card className=" shadow-sm">
+                <CardHeader className="pb-3 px-6 pt-6 border-b ">
+                    <CardTitle className="text-base font-semibold ">
+                        Riwayat Risiko Medis
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 py-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4">
+                        <DangerBadgeBlock label="Riwayat Mental Health" hasRisk={!!postpartum.psych_history} />
+                        <DangerBadgeBlock label="Pernah Trauma" hasRisk={!!postpartum.psych_trauma} />
+                        <DangerBadgeBlock label="Terapi Psikologi Lalu" hasRisk={!!postpartum.psych_treatment} />
+                        <DangerBadgeBlock label="Riwayat Komplikasi" hasRisk={!!postpartum.preg_comp_history} />
+                        <DangerBadgeBlock 
+                            label="Komplikasi Persalinan Terakhir" 
+                            hasRisk={!!postpartum.last_comp} 
+                            note={postpartum.last_comp_note} 
+                        />
+                        <div className="flex items-center">
+                            <InfoBlock label="Jumlah Persalinan" value={`${postpartum.parity_count}x`} />
                         </div>
                     </div>
+                </CardContent>
+            </Card>
 
-                    <div>
-                        <Separator orientation="vertical" className="mx-4" />
-                    </div>
-
-                    <div className="flex w-full justify-start">
-                        <div className="space-y-3">
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Apakah pendapatan cukup
-                                </p>
-                                <Badge>
-                                    {postpartum.is_salary_sufficient.label_id}
-                                </Badge>
-                            </div>
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Mental Health History
-                                </p>
-                                <Badge>
-                                    {postpartum.psych_history ? 'Ya' : 'Tidak'}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">Terapi Psikologi dimasa lalu</p>
-                                <Badge>
-                                    {postpartum.psych_treatment
-                                        ? 'Ya'
-                                        : 'Tidak'}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">Pernah ada trauma</p>
-                                <Badge>
-                                    {postpartum.psych_trauma ? 'Ya' : 'Tidak'}
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-center">
-                    <div className="flex w-full justify-start">
-                        <div className="space-y-3">
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Berapa kali melahirkan
-                                </p>
-                                <Badge>{postpartum.parity_count}</Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Riwayat Komplikasi Kehamilan
-                                </p>
-                                <Badge>
-                                    {postpartum.preg_comp_history
-                                        ? 'Ya'
-                                        : 'Tidak'}
-                                </Badge>
-                            </div>
-
-                            <p className="font-medium">
-                                Komplikasi Persalinan Terakhir
-                            </p>
-                            <Badge>
-                                {postpartum.last_comp ? 'Ya' : 'Tidak'}
-                            </Badge>
-                            <div>
-                                {postpartum.last_comp == 1 && (
-                                    <p className="text-md mt-1 text-muted-foreground">
-                                        Catatan:                                        {postpartum.last_comp_note ??
-                                            'Tidak Ada'}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <Separator orientation="vertical" className="mx-4" />
-                    </div>
-
-                    <div className="flex w-full justify-start">
-                        <div className="space-y-3">
-                            <div className="space-y-2">
-                                <p className="font-medium">Kesehatan bayi</p>
-                                <Badge>
-                                    {postpartum.baby_healthy.label_id}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">Pengasuh Bayi</p>
-                                <Badge>
-                                    {postpartum.baby_caregiver.label.join(', ')}
-                                </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="font-medium">
-                                    Tipe Pemberian Makan
-                                </p>
-                                <Badge>{postpartum.feed_type.label}</Badge>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+        </div>
     );
 }

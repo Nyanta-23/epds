@@ -17,8 +17,8 @@ export default function Postpartum({ postpartums, extra, page_prop }: Postpartum
     const title: string = 'Postpartum';
     const link: string = '/postpartum';
 
-    const subtitle = `Hasil Skrining`;
-    const desc = `Lihat Hasil Skrining Pasien`;
+    const subtitle = `Hasil Deteksi Dini`;
+    const desc = `Lihat Hasil Deteksi Dini Pasien`;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
