@@ -8,9 +8,11 @@ interface FollowUpCreateProps {
   result: PostpartumVisit | undefined;
   enums: Enums;
   onSuccess: () => void;
+  initialType?: number | null;
+  initialStatus?: number | null;
 }
 
-export default function FollowUpCreate({ enums, result, onSuccess }: FollowUpCreateProps) {
+export default function FollowUpCreate({ enums, result, onSuccess, initialType, initialStatus }: FollowUpCreateProps) {
   const { ziggy } = usePage().props;
 
     const id = route().params.postpartum;
@@ -21,7 +23,7 @@ export default function FollowUpCreate({ enums, result, onSuccess }: FollowUpCre
     handleInputChange,
     storeFollowUp,
     processing
-  } = useFollowUpAction(result, onSuccess);
+  } = useFollowUpAction(result, onSuccess, initialType, initialStatus);
 
   return (
     <section className="px-2">

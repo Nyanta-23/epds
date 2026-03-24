@@ -15,7 +15,7 @@ export default function FollowUpActionForm({ action }: FollowUpActionFormProps) 
         className="inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium cursor-pointer"
         onClick={action}
       >
-        <Save className="mr-2 h-4 w-4" /> Save & Publish
+        <Save className="mr-2 h-4 w-4" /> Simpan
       </Button>
     </DialogFooter>
   );

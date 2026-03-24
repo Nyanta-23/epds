@@ -4,28 +4,28 @@ namespace App\Enums;
 
 enum FollowUpStatusEnum: int
 {
-  case BELUM_ADA_TINDAKAN = 0;
-  case TPMB = 1;
-  case REFER_PSYCHOLOGIST = 2;
-  case REFER_PSYCHOATIRST = 3;
+  case RUJUKAN_PUSKESMAS = 0;
+  case RUJUKAN_PSIKOLOGI = 1;
+  case RUJUKAN_PSIKIATER = 2;
+  case RUJUKAN_RUMAH_SAKIT = 3;
 
   public function label(): string
   {
     return match ($this) {
-      self::BELUM_ADA_TINDAKAN => 'No Action Yet',
-      self::TPMB => 'TPMB (Tempat Praktik Mandiri Bidan)',
-      self::REFER_PSYCHOLOGIST => 'Referred to Psychologist',
-      self::REFER_PSYCHOATIRST => 'Referred to Psychiatrist',
+      self::RUJUKAN_PUSKESMAS   => 'Rujukan ke Puskesmas',
+      self::RUJUKAN_PSIKOLOGI   => 'Rujukan ke Psikologi',
+      self::RUJUKAN_PSIKIATER   => 'Rujukan ke Psikiater',
+      self::RUJUKAN_RUMAH_SAKIT => 'Rujukan ke Rumah Sakit',
     };
   }
 
   public function label_id(): string
   {
     return match ($this) {
-      self::BELUM_ADA_TINDAKAN => 'Belum Ada Tindakan',
-      self::TPMB => 'TPMB (Tempat Praktik Mandiri Bidan)',
-      self::REFER_PSYCHOLOGIST => 'Rujuk Psikologi',
-      self::REFER_PSYCHOATIRST => 'Rujuk Psikiater',
+      self::RUJUKAN_PUSKESMAS   => 'Rujukan ke Puskesmas',
+      self::RUJUKAN_PSIKOLOGI   => 'Rujukan ke Psikologi',
+      self::RUJUKAN_PSIKIATER   => 'Rujukan ke Psikiater',
+      self::RUJUKAN_RUMAH_SAKIT => 'Rujukan ke Rumah Sakit',
     };
   }
 

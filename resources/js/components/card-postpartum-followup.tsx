@@ -1,12 +1,13 @@
 import FollowUpCreate from '@/pages/followup/action/followup-create';
 import FollowUpEdit from '@/pages/followup/action/followup-edit';
 import { Enums } from '@/types';
-import { PostpartumVisit, Result } from '@/types/resource';
+import { PostpartumVisit } from '@/types/resource';
 import { useState } from 'react';
 import FormDialog from './form-dialog-version-two';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Separator } from './ui/separator';
+import { ClipboardList, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 interface CardPostpartumFollowUpProps {
     postpartum: PostpartumVisit;
@@ -19,46 +20,108 @@ export default function CardPostpartumFollowUp({
 }: CardPostpartumFollowUpProps) {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [result, setResult] = useState<PostpartumVisit>();
+    const [initialType, setInitialType] = useState<number | null>(null);
+    const [initialStatus, setInitialStatus] = useState<number | null>(null);
+
+    const rujukOptions = enums.followup_status || [];
+    const rujukanTypeOption = enums.followup_types?.find(e => e.label.toLowerCase().includes('rujuk'));
+    const defaultTypeOption = enums.followup_types?.find(e => !e.label.toLowerCase().includes('rujuk'));
 
     return (
-        <Card className="p-4">
-            <CardHeader>
-                <CardTitle className="text-lg">Tindak Lanjut</CardTitle>
+        <Card className="border-l-4 border-l-primary shadow-sm  flex flex-col min-h-[19rem]">
+            <CardHeader className="pb-3 px-4 pt-4 md:px-6 md:pt-6">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                    <ClipboardList className="w-4 h-4 text-primary" />
+                    Tindak Lanjut
+                </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-                <div className="space-y-2">
-                    <p className="font-medium">Tipe</p>
-                    <p className="text-muted-foreground">
-                        {postpartum.followup?.type.label_id ?? '-'}
-                    </p>
+            <CardContent className="px-4 md:px-6 pb-4 md:pb-6 flex-1 flex flex-col">
+                
+                <div className="flex-1 flex flex-col justify-center mb-6">
+                    {!postpartum.followup ? (
+                        <div className="bg-slate-50 rounded-md p-4 text-center border ">
+                            <p className="text-sm text-muted-foreground">Belum ada tindak lanjut</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <p className="text-xs font-semibold uppercase tracking-wider">Tipe</p>
+                                <p className="text-sm font-medium">
+                                    {postpartum.followup.type.label_id ?? '-'}
+                                </p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-xs font-semibold uppercase tracking-wider">Catatan</p>
+                                <p className="text-sm leading-relaxed">
+                                    {postpartum.followup.notes ?? '-'}
+                                </p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-xs font-semibold uppercase tracking-wider">Tanggal diisi</p>
+                                <p className="text-sm">
+                                    {postpartum.followup.date_filled ?? '-'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                <div className="space-y-2">
-                    <p className="font-medium">Catatan</p>
-                    <p className="text-muted-foreground">
-                        {postpartum.followup?.notes ?? '-'}
-                    </p>
+                <div className="mt-auto">
+                    {!postpartum.followup && rujukOptions.length > 0 ? (
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full sm:w-1/2 justify-between border-primary text-primary hover:bg-primary/5 shadow-sm">
+                                        Rujuk Pasien
+                                        <ChevronDown className="w-4 h-4 ml-2 opacity-50" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56" align="start">
+                                    {rujukOptions.map(option => (
+                                        <DropdownMenuItem 
+                                            key={option.value} 
+                                            onSelect={() => {
+                                                setInitialType(rujukanTypeOption ? Number(rujukanTypeOption.value) : 1);
+                                                setInitialStatus(Number(option.value));
+                                                setResult(postpartum);
+                                                setOpenDialog(true);
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            {option.label}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <Button 
+                                className="w-full sm:w-1/2 bg-primary hover:bg-teal-700 text-white shadow-sm"
+                                onClick={() => {
+                                    setInitialType(defaultTypeOption ? Number(defaultTypeOption.value) : null);
+                                    setInitialStatus(null);
+                                    setResult(postpartum);
+                                    setOpenDialog(true);
+                                }}
+                            >
+                                Simpan Rekam Data
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            onClick={() => {
+                                setInitialType(null);
+                                setInitialStatus(null);
+                                setResult(postpartum);
+                                setOpenDialog(true);
+                            }}
+                            className="w-full bg-primary hover:bg-teal-700 text-white shadow-sm"
+                        >
+                            {postpartum.followup ? 'Edit Tindak Lanjut' : 'Tambah Tindak Lanjut +'}
+                        </Button>
+                    )}
                 </div>
-
-                <div className="space-y-2">
-                    <p className="font-medium">Tanggal diisi</p>
-                    <p className="text-muted-foreground">
-                        {postpartum.followup?.date_filled ?? '-'}
-                    </p>
-                </div>
-
-                <Separator />
-
-                <Button
-                    onClick={() => {
-                        setResult(postpartum);
-                        setOpenDialog(true);
-                    }}
-                    className="w-full"
-                >
-                    Add Follow Up
-                </Button>
             </CardContent>
+
             <FormDialog
                 open={openDialog}
                 onOpenChange={setOpenDialog}
@@ -74,6 +137,8 @@ export default function CardPostpartumFollowUp({
                         enums={enums}
                         result={result}
                         onSuccess={() => setOpenDialog(false)}
+                        initialType={initialType}
+                        initialStatus={initialStatus}
                     />
                 ) : (
                     <FollowUpEdit
