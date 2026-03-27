@@ -43,7 +43,18 @@ class PostpartumVisitResource extends JsonResource
             'psych_treatment' => $this->psych_treatment,
             'psych_trauma' => $this->psych_trauma,
 
+            'feel_unsafe' => [
+                'value' => $this->feel_unsafe,
+                'label' => $this->feel_unsafe?->label(),
+                'label_id' => $this->feel_unsafe?->label_id(),
+            ],
+
             'parity_count' => $this->parity_count,
+            'pregnancy_planned' => [
+                'value' => $this->pregnancy_planned,
+                'label' => $this->pregnancy_planned?->label(),
+                'label_id' => $this->pregnancy_planned?->label_id(),
+            ],
 
             'last_comp' => $this->last_comp,
             'last_comp_note' => $this->last_comp_note,

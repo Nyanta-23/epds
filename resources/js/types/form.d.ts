@@ -82,6 +82,9 @@ export interface FormPostpartumVisit {
 
     feed_type: string;
 
+    feel_unsafe: string;
+    pregnancy_planned: string;
+
     [key: string]: any;
 }
 

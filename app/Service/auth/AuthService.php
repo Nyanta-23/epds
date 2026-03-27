@@ -57,10 +57,9 @@ class AuthService
         'name' => $request->name,
         'password' => $request->password,
         'role_id' => Role::where('slug', 'patient')->first()->id,
-        'number_patient' => $this->generatePatientNumber()
+        'number_patient' => $this->generatePatientNumber(),
+        'email_verified_at' => now(),
       ]);
-
-      event(new Registered($user));
 
       $response = new RegisterResponse();
       $response->id = $user->id;
@@ -88,7 +87,7 @@ class AuthService
         if (!$lastUser) {
             $number = 1;
         } else {
-            $lastNumber = (int) substr($lastUser->patient_number, -4);
+            $lastNumber = (int) substr($lastUser->number_patient, -4);
             $number = $lastNumber + 1;
         }
         return $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);

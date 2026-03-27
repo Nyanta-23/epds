@@ -36,12 +36,12 @@ function InfoBadgeBlock({ label, value, isGood, isNeutral, isDanger }: { label: 
     );
 }
 
-function DangerBadgeBlock({ label, hasRisk, note }: { label: string, hasRisk: boolean, note?: string | null }) {
+function DangerBadgeBlock({ label, hasRisk, valueOverride, note }: { label: string, hasRisk: boolean, valueOverride?: string, note?: string | null }) {
     const variantClass = hasRisk 
         ? "bg-destructive/10 text-destructive border-none shadow-sm font-semibold" 
         : "bg-muted text-muted-foreground border-none font-medium";
 
-    const value = hasRisk ? 'Ya' : 'Tidak';
+    const value = valueOverride || (hasRisk ? 'Ya' : 'Tidak');
 
     return (
          <div className="space-y-1.5 flex flex-col items-start w-full">
@@ -138,7 +138,9 @@ export default function CardPostpartumDetail({
                         <DangerBadgeBlock label="Riwayat Mental Health" hasRisk={!!postpartum.psych_history} />
                         <DangerBadgeBlock label="Pernah Trauma" hasRisk={!!postpartum.psych_trauma} />
                         <DangerBadgeBlock label="Terapi Psikologi Lalu" hasRisk={!!postpartum.psych_treatment} />
+                        <DangerBadgeBlock label="Merasa Tidak Aman di Rumah" hasRisk={postpartum.feel_unsafe?.value !== 0} valueOverride={postpartum.feel_unsafe?.label_id} />
                         <DangerBadgeBlock label="Riwayat Komplikasi" hasRisk={!!postpartum.preg_comp_history} />
+                        <DangerBadgeBlock label="Kehamilan Direncanakan" hasRisk={postpartum.pregnancy_planned?.value !== 1} valueOverride={postpartum.pregnancy_planned?.label_id} />
                         <DangerBadgeBlock 
                             label="Komplikasi Persalinan Terakhir" 
                             hasRisk={!!postpartum.last_comp} 

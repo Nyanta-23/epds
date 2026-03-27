@@ -51,10 +51,12 @@ class PostpartumVisitExportService
         'Riwayat Psikologis' => $item->psych_history ? 'Ya' : 'Tidak',
         'Pengobatan Psikologis' => $item->psych_treatment ? 'Ya' : 'Tidak',
         'Trauma Psikologis' => $item->psych_trauma ? 'Ya' : 'Tidak',
+        'Merasa Tidak Aman' => $item->feel_unsafe?->label_id() ?? '-',
 
         'Komplikasi Persalinan' => $item->last_comp ? 'Ya' : 'Tidak',
         'Catatan Komplikasi Persalinan' => $item->last_comp ? $item->last_comp_note : '-',
         'Komplikasi Saat Menggandung' => $item->preg_comp_history ? 'Ya' : 'Tidak',
+        'Kehamilan Direncanakan' => $item->pregnancy_planned?->label_id() ?? '-',
         'Jumlah Mengandung' => $item->parity_count,
 
         'Bayi Sehat' => $item->baby_healthy ? 'Ya' : 'Tidak',

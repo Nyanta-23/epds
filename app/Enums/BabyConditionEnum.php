@@ -4,17 +4,17 @@ namespace App\Enums;
 
 enum BabyConditionEnum: int
 {
-  case HEALTHY = 0;
-  case PREMATURE = 1;
-  case LOW_BW = 2;
+  case LIVE = 0;
+  case LIVE_ASPHYXIA = 1;
+  case STILLBIRTH = 2;
   case NICU = 3;
 
   public function label(): string
   {
     return match ($this) {
-      self::HEALTHY => "Healthy",
-      self::PREMATURE => "Premature",
-      self::LOW_BW => "Low Body Weight",
+      self::LIVE => "Live Birth",
+      self::LIVE_ASPHYXIA => "Live Birth with Asphyxia",
+      self::STILLBIRTH => "Stillbirth",
       self::NICU => "NICU"
     };
   }
@@ -22,19 +22,19 @@ enum BabyConditionEnum: int
   public function label_id(): string
   {
     return match ($this) {
-      self::HEALTHY => "Sehat",
-      self::PREMATURE => "Prematur",
-      self::LOW_BW => "Berat Badan Rendah",
-      self::NICU => "NICU"
+      self::LIVE => "Bayi lahir hidup",
+      self::LIVE_ASPHYXIA => "Bayi lahir hidup dengan asfiksia",
+      self::STILLBIRTH => "Bayi lahir mati",
+      self::NICU => "NICU (Data Lama)"
     };
   }
 
   public function value_id(): int
   {
     return match ($this) {
-      self::HEALTHY => 0,
-      self::PREMATURE => 1,
-      self::LOW_BW => 2,
+      self::LIVE => 0,
+      self::LIVE_ASPHYXIA => 1,
+      self::STILLBIRTH => 2,
       self::NICU => 3
     };
   }
@@ -42,7 +42,8 @@ enum BabyConditionEnum: int
 
   public static function options(): array
   {
-    return collect(self::cases())->map(fn($case) => [
+    // Hanya menampilkan 3 opsi terbaru untuk form dropdown
+    return collect([self::LIVE, self::LIVE_ASPHYXIA, self::STILLBIRTH])->map(fn($case) => [
       'value' => $case->value_id(),
       'label' => $case->label_id(),
     ])->toArray();

@@ -37,6 +37,9 @@ class PostpartumVisitAnswerStoreRequest extends FormRequest
       'psych_history' => ['required', 'boolean'],
       'psych_treatment' => ['required', 'boolean'],
       'psych_trauma' => ['required', 'boolean'],
+      'feel_unsafe' => ['required', 'integer'],
+      
+      'pregnancy_planned' => ['required', 'integer'],
       'preg_comp_history' => ['required', 'boolean'],
       'last_comp' => ['required', 'boolean'],
       'last_comp_note' => ['nullable', 'string'],
@@ -76,6 +79,12 @@ class PostpartumVisitAnswerStoreRequest extends FormRequest
 
       'psych_trauma.required' => 'Riwayat trauma psikologis wajib dipilih.',
       'psych_trauma.boolean' => 'Format riwayat trauma tidak valid.',
+
+      'feel_unsafe.required' => 'Perasaan tidak aman wajib dipilih.',
+      'feel_unsafe.integer' => 'Format perasaan tidak aman tidak valid.',
+
+      'pregnancy_planned.required' => 'Apakah kehamilan direncanakan wajib dipilih.',
+      'pregnancy_planned.integer' => 'Format perencanaan kehamilan tidak valid.',
 
       'parity_count.required' => 'Jumlah paritas wajib diisi.',
       'preg_comp_history.required' => 'Riwayat komplikasi kehamilan wajib diisi.',

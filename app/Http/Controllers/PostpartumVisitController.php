@@ -127,7 +127,9 @@ class PostpartumVisitController extends Controller
           'partner_supports' => PartnerSupportEnum::options(),
           'familiy_economies' => FamilyEconomyEnum::options(),
           'baby_caregivers' => BabyCaregiverEnum::options(),
-          'feed_types' => FeedTyperEnum::options()
+          'feed_types' => FeedTyperEnum::options(),
+          'feel_unsafes' => \App\Enums\FeelUnsafeEnum::options(),
+          'pregnancy_planneds' => \App\Enums\PregnancyPlannedEnum::options(),
         ]
       ]
     ]);
@@ -153,11 +155,14 @@ class PostpartumVisitController extends Controller
       $postpartumVisitReq->psych_history = filter_var($request->post('psych_history'), FILTER_VALIDATE_BOOL);
       $postpartumVisitReq->psych_treatment = filter_var($request->post('psych_treatment'), FILTER_VALIDATE_BOOL);
       $postpartumVisitReq->psych_trauma = filter_var($request->post('psych_trauma'), FILTER_VALIDATE_BOOL);
+      $postpartumVisitReq->feel_unsafe = (string) $request->post('feel_unsafe');
+      
       $postpartumVisitReq->preg_comp_history = filter_var($request->post('preg_comp_history'), FILTER_VALIDATE_BOOL);
       $postpartumVisitReq->last_comp = filter_var($request->post('last_comp'), FILTER_VALIDATE_BOOL);
       $postpartumVisitReq->baby_healthy = filter_var($request->post('baby_healthy'), FILTER_VALIDATE_BOOL);
 
       $postpartumVisitReq->parity_count = (string) $request->post('parity_count');
+      $postpartumVisitReq->pregnancy_planned = (string) $request->post('pregnancy_planned');
 
       $postpartumVisitReq->last_comp_note = $request->post('last_comp_note') !== null
         ? (string) $request->post('last_comp_note')

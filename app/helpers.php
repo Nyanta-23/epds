@@ -82,45 +82,32 @@ if (!function_exists('category_baby_condition')) {
 }
 
 if (! function_exists('generate_dummy_recommendation')) {
-    function generate_dummy_recommendation(int $score): string
+    function generate_dummy_recommendation(int $score): array
     {
         if ($score >= 0 && $score <= 9) {
-
-
-            return 'Surah Ibrahim 7
-“Jika kamu bersyukur, niscaya Aku akan menambah (nikmat).”
-
-Mama, apa yang sudah mama lalui sekarang adalah hal yang hebat, Syukur atas langkah kecil hari ini akan membuka ruang bagi kebaikan yang lebih besar esok hari, terima kasih sudah bertahan sejauh ini. ';
-            
+            return [
+                'recommendation' => "Kondisi emosional Mama hari ini dalam keadaan baik. Jangan khawatir apabila dalam beberapa hari ke depan Mama merasa mudah menangis, lelah, atau suasana hati mudah berubah. Hal ini merupakan kondisi yang wajar dialami oleh sebagian ibu setelah melahirkan dan dikenal sebagai postpartum blues.\n\nTIPS: Tetap jaga kesehatan dengan :\n• Istirahat cukup,\n• Konsumsi makanan bergizi\n• Berbagi perasaan dengan suami, keluarga terdekat atau bidan.\n• Lakukan aktivitas ringan seperti berjalan santai atau olahraga ringan agar tubuh tetap bugar.",
+                'pesan' => "\"Jika kamu bersyukur, niscaya Aku akan menambah (nikmat) kepadamu.\" (QS. Ibrahim: 7)\n\nMama telah melalui perjalanan yang luar biasa. Mensyukuri langkah kecil hari ini dapat membuka ruang bagi kebaikan yang lebih besar di hari esok"
+            ];
         } 
         
         if ($score >= 10 && $score <= 12) {
- 
-           return 'QS. Al-Insyirah (94): 5–6 
-
-"Sesungguhnya bersama kesulitan ada kemudahan. Sungguh, bersama kesulitan ada kemudahan."
-
-Mama, jangan khawatir. Setiap menemukan kesulitan, Tuhan akan mengirimkan sepaket dengan kemudahan. Tarik nafas panjang, mari kita tetap syukuri kondisi Mama dan bayi saat ini. Mama tidak sendirian. Perasaan khawatir ini bukan tanda kelemahan, tetapi bukti bahwa hati Mama sangat peka dan penuh kasih. Istirahatkan pundak Mama sejenak. Tak apa meminta bantuan, tak apa bercerita, tak apa menangis sebentar, itu semua bagian dari cara Tuhan menguatkan hatimu.';
+           return [
+               'recommendation' => "Mama mungkin sedang mengalami perubahan suasana hati yang cukup terasa setelah melahirkan. Kondisi ini sering disebut postpartum blues dan cukup umum terjadi pada ibu setelah persalinan.\n\nTIPS:\n• Cobalah untuk beristirahat yang cukup dan konsumsi makanan bergizi\n• Meminta bantuan keluarga dalam merawat bayi\n• Berbagi perasaan dengan orang terdekat\n• Mama juga dapat melakukan aktivitas ringan seperti berjalan santai, peregangan, atau olahraga ringan untuk membantu tubuh menjadi lebih rileks dan melepaskan ketegangan emosi.\n\nApabila perasaan tidak membaik dalam dua minggu, atau terasa semakin berat, disarankan untuk berkonsultasi dengan bidan atau tenaga kesehatan.",
+               'pesan' => "QS. Al-Insyirah (94): 5–6\n\n\"Sesungguhnya bersama kesulitan ada kemudahan. Sungguh, bersama kesulitan ada kemudahan.\"\n\nMama, jangan khawatir. Setiap menemukan kesulitan, Tuhan akan mengirimkan sepaket dengan kemudahan. Tarik nafas panjang, mari kita tetap syukuri kondisi Mama dan bayi saat ini. Mama tidak sendirian. Perasaan khawatir ini bukan tanda kelemahan, tetapi bukti bahwa hati Mama sangat peka dan penuh kasih. Istirahatkan pundak Mama sejenak. Tak apa meminta bantuan, tak apa bercerita, tak apa menangis sebentar, itu semua bagian dari cara Tuhan menguatkan hatimu."
+           ];
         } 
         
-        if ($score >= 13 && $score <= 19) {
-
-            return "QS. Az-Zumar (39): 53 
-
-“Katakanlah: Wahai hamba-hamba-Ku yang melampaui batas terhadap diri mereka, janganlah berputus asa dari rahmat Allah…”
-
-Mama adalah wanita hebat,  meski hasilnya menunjukkan hati Mama sedang lelah, ini bukan salah Mama. Perasaan yang naik turun bukan tanda kurangnya iman, hanya pertanda Mama sudah terlalu lama berjuang. Pelan-pelan saja ya..,  ada jalan keluar, ada bantuan, dan Mama tidak sendiri.";
-        } 
-        
-        if ($score >= 20) {
-
-            return "QS. Az-Zumar (39): 53 
-
-“Katakanlah: Wahai hamba-hamba-Ku yang melampaui batas terhadap diri mereka, janganlah berputus asa dari rahmat Allah…”
-
-Mama adalah wanita hebat,  meski hasilnya menunjukkan hati Mama sedang lelah, ini bukan salah Mama. Perasaan yang naik turun bukan tanda kurangnya iman, hanya pertanda Mama sudah terlalu lama berjuang. Pelan-pelan saja ya..,  ada jalan keluar, ada bantuan, dan Mama tidak sendiri.";
+        if ($score >= 13) {
+            return [
+                'recommendation' => "Hasil skrining menunjukkan bahwa Mama mungkin sedang mengalami tekanan emosional yang cukup berat setelah melahirkan. Sangat disarankan untuk berkonsultasi dengan bidan, dokter, atau tenaga kesehatan agar Mama dapat memperoleh dukungan dan bantuan yang tepat. Dukungan dari suami dan keluarga juga sangat penting untuk membantu Mama melewati masa ini",
+                'pesan' => "\"Katakanlah: Wahai hamba-hamba-Ku yang melampaui batas terhadap diri mereka, janganlah berputus asa dari rahmat Allah.\" (QS. Az-Zumar: 53)\n\nMama adalah wanita yang kuat. Jika saat ini hati Mama terasa lelah, itu bukan kesalahan Mama. Perasaan yang naik turun bukanlah tanda kelemahan, melainkan tanda bahwa Mama telah berjuang begitu banyak."
+            ];
         }
 
-        return "Skor tidak valid. Silakan lakukan skrining ulang.";
+        return [
+            'recommendation' => "Skor tidak valid. Silakan lakukan skrining ulang.",
+            'pesan' => ""
+        ];
     }
 }

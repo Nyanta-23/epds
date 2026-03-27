@@ -78,8 +78,10 @@ class PostpartumVisitAnswerController extends Controller
         $postpartumVisitReq->psych_history = $validated['psych_history'];
         $postpartumVisitReq->psych_treatment = $validated['psych_treatment'];
         $postpartumVisitReq->psych_trauma = $validated['psych_trauma'];
+        $postpartumVisitReq->feel_unsafe = $validated['feel_unsafe'];
 
         $postpartumVisitReq->preg_comp_history = $validated['preg_comp_history'];
+        $postpartumVisitReq->pregnancy_planned = $validated['pregnancy_planned'];
         $postpartumVisitReq->last_comp = $validated['last_comp'];
         $postpartumVisitReq->last_comp_note = $validated['last_comp_note'] ?? null;
 
@@ -122,7 +124,7 @@ class PostpartumVisitAnswerController extends Controller
 
         $result = $this->resultService->store($resultDTO);
 
-        $recommendationText = generate_dummy_recommendation($totalScore);
+        $recommendationData = generate_dummy_recommendation($totalScore);
 
         $midwives = User::whereHas('role', function ($query) {
           $query->where('name', 'Midwife');
@@ -149,8 +151,8 @@ class PostpartumVisitAnswerController extends Controller
             'visit_number' => $scheduleInfo->visitNumber,
             'visit_label' => $scheduleInfo->label,
             'total_score' => $totalScore,
-            'interpretation' => interpreted_score($totalScore),
-            'recommendation' => $recommendationText,
+            'recommendation' => $recommendationData['recommendation'],
+            'pesan_penguatan' => $recommendationData['pesan'],
           ]
         ], 201);
 
