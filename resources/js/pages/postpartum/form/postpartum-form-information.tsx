@@ -18,7 +18,7 @@ interface PostpartumFormInformationProps {
 
   errors: Errors;
   process: boolean;
-  handleInputChange: (field: keyof FormPostpartumVisit, value: string | number | null) => void;
+  handleInputChange: (field: keyof FormPostpartumVisit, value: string | number | boolean | null) => void;
   action: () => void;
 
 }
@@ -30,7 +30,7 @@ export default function PostpartumFormInformation({ data, enums, errors, process
   }
 
 
-  const { baby_caregivers, familiy_economies, feed_types, partner_supports, sleep_qualities } = enums;
+  const { baby_caregivers, familiy_economies, feed_types, partner_supports, sleep_qualities, feel_unsafes, pregnancy_planneds } = enums;
 
   const parities = ['1x', '2x', '3x', '>3x'];
 
@@ -240,6 +240,36 @@ export default function PostpartumFormInformation({ data, enums, errors, process
 
       <div>
         <Label className="mb-2 block text-sm font-medium">
+          Merasa Tidak Aman di Rumah <span className="text-red-500">*</span>
+        </Label>
+        <span className="mb-2 block text-xs text-muted-foreground">Apakah selama kehamilan atau setelah melahirkan Mama pernah merasa tidak aman di rumah?</span>
+        <div className="relative">
+          <Select
+            value={data.feel_unsafe !== null ? String(data.feel_unsafe) : undefined}
+            onValueChange={(value) => handleInputChange("feel_unsafe", Number(value))}
+            required
+          >
+            <SelectTrigger
+              className={`w-full cursor-pointer ${identityErrorClassName("feel_unsafe")}`}
+            >
+              <SelectValue placeholder="Pilih Jawaban" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {feel_unsafes?.map((item) => (
+                <SelectItem className="cursor-pointer" key={item.value} value={String(item.value)}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform" />
+        </div>
+        {errors.feel_unsafe && <p className="mt-1 text-sm text-red-500">{errors.feel_unsafe}</p>}
+      </div>
+
+      <div>
+        <Label className="mb-2 block text-sm font-medium">
           Parity <span className="text-red-500">*</span>
         </Label>
         <div className="relative">
@@ -267,7 +297,37 @@ export default function PostpartumFormInformation({ data, enums, errors, process
 
           <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform" />
         </div>
-        {errors.feed_type && <p className="mt-1 text-sm text-red-500">{errors.feed_type}</p>}
+        {errors.parity_count && <p className="mt-1 text-sm text-red-500">{errors.parity_count}</p>}
+      </div>
+
+      <div>
+        <Label className="mb-2 block text-sm font-medium">
+          Kehamilan Direncanakan <span className="text-red-500">*</span>
+        </Label>
+        <span className="mb-2 block text-xs text-muted-foreground">Apakah kehamilan ini merupakan kehamilan yang Mama harapkan atau rencanakan?</span>
+        <div className="relative">
+          <Select
+            value={data.pregnancy_planned !== null ? String(data.pregnancy_planned) : undefined}
+            onValueChange={(value) => handleInputChange("pregnancy_planned", Number(value))}
+            required
+          >
+            <SelectTrigger
+              className={`w-full cursor-pointer ${identityErrorClassName("pregnancy_planned")}`}
+            >
+              <SelectValue placeholder="Pilih Jawaban" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {pregnancy_planneds?.map((item) => (
+                <SelectItem className="cursor-pointer" key={item.value} value={String(item.value)}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform" />
+        </div>
+        {errors.pregnancy_planned && <p className="mt-1 text-sm text-red-500">{errors.pregnancy_planned}</p>}
       </div>
 
       <div>

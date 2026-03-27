@@ -12,18 +12,18 @@ enum BabyTypeOfDeliveryEnum: int
   public function label(): string
   {
     return match ($this) {
-      self::NORMAL => "Normal",
-      self::C_SECTION => "C-Section",
-      self::FORSEP => "Forsep",
+      self::NORMAL => "Persalinan spontan (normal)",
+      self::C_SECTION => "Persalinan Sectio Caesarea (Operasi Caesar)",
+      self::FORSEP => "Persalinan dengan Tindakan (Forsep/Vakum)",
     };
   }
 
   public function label_id(): string
   {
     return match ($this) {
-      self::NORMAL => "Normal",
-      self::C_SECTION => "Caesar",
-      self::FORSEP => "Forsep",
+      self::NORMAL => "Persalinan spontan (normal)",
+      self::C_SECTION => "Persalinan Sectio Caesarea (Operasi Caesar)",
+      self::FORSEP => "Persalinan dengan Tindakan (Forsep/Vakum)",
     };
   }
 

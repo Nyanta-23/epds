@@ -33,6 +33,8 @@ class PostpartumVisit extends Model
         'dependent_family_count' => DependentFamilyCountEnum::class,
         'is_salary_sufficient' => FamilySalarySufficientEnum::class,
         'baby_healthy' => BabyConditionEnum::class,
+        'feel_unsafe' => \App\Enums\FeelUnsafeEnum::class,
+        'pregnancy_planned' => \App\Enums\PregnancyPlannedEnum::class,
     ];
 
     protected $fillable = [
@@ -60,7 +62,10 @@ class PostpartumVisit extends Model
         'baby_caregiver',
         'baby_id',
         'feed_type',
-        'mother_id'
+        'mother_id',
+        
+        'feel_unsafe',
+        'pregnancy_planned'
     ];
 
     protected function babyCaregiverLabel(): Attribute

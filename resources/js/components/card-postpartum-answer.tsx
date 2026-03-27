@@ -24,6 +24,7 @@ function getRowStyle(
     index: number,
 ): {
     rowClass: string;
+    textClass: string;
     badgeVariant: 'default' | 'secondary' | 'destructive' | 'outline';
     badgeClass: string;
 } {
@@ -32,24 +33,25 @@ function getRowStyle(
     if (isQ10 && score !== null && score > 0) {
         return { 
             rowClass: 'bg-destructive/10', 
+            textClass: 'text-destructive font-semibold',
             badgeVariant: 'destructive',
-            badgeClass: 'bg-destructive text-destructive-foreground border-none'
+            badgeClass: 'bg-destructive text-white border-none'
         };
     }
 
     const alternateBg = index % 2 === 0 ? 'bg-transparent' : 'bg-muted/50';
 
     if (score === null || score === 0) {
-        return { rowClass: alternateBg, badgeVariant: 'outline', badgeClass: 'text-muted-foreground border-border' };
+        return { rowClass: alternateBg, textClass: 'text-foreground', badgeVariant: 'outline', badgeClass: 'text-muted-foreground border-border' };
     }
     if (score === 1) {
-        return { rowClass: alternateBg, badgeVariant: 'secondary', badgeClass: 'bg-muted text-foreground hover:bg-muted border-none' };
+        return { rowClass: alternateBg, textClass: 'text-foreground font-medium', badgeVariant: 'secondary', badgeClass: 'bg-muted text-foreground hover:bg-muted border-none' };
     }
     if (score === 2) {
-        return { rowClass: alternateBg, badgeVariant: 'secondary', badgeClass: 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border-none' };
+        return { rowClass: alternateBg, textClass: 'text-amber-600 dark:text-amber-500 font-semibold', badgeVariant: 'secondary', badgeClass: 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 border-none' };
     }
     // score >= 3
-    return { rowClass: alternateBg, badgeVariant: 'destructive', badgeClass: 'bg-destructive text-destructive-foreground border-none' };
+    return { rowClass: alternateBg, textClass: 'text-destructive font-semibold', badgeVariant: 'destructive', badgeClass: 'bg-destructive text-white border-none' };
 }
 
 export default function CardPostpartumAnswer({
@@ -98,29 +100,28 @@ export default function CardPostpartumAnswer({
                             {answers.map((answer, index) => {
                                 const score = getScore(answer);
                                 const qNum = answer.question.number_question;
-                                const { rowClass, badgeVariant, badgeClass } = getRowStyle(qNum, score, index);
-                                const isQ10 = qNum === '10' && score !== null && score > 0;
+                                const { rowClass, badgeVariant, badgeClass, textClass } = getRowStyle(qNum, score, index);
 
                                 return (
                                     <tr
                                         key={answer.id}
                                         className={`transition-colors ${rowClass}`}
                                     >
-                                        <td className="px-4 py-3 text-center text-sm font-semibold tabular-nums ">
+                                        <td className={`px-4 py-3 text-center text-sm tabular-nums ${textClass || 'font-semibold'}`}>
                                             {qNum}
                                         </td>
                                         <td className="px-3 py-2.5 leading-snug">
-                                            <span className={isQ10 ? 'text-destructive font-semibold' : ''}>
+                                            <span className={textClass}>
                                                 {answer.question.question}
                                             </span>
                                             {/* On mobile: show answer inline below question */}
-                                            <p className={`mt-0.5 text-xs sm:hidden ${isQ10 ? 'text-destructive/80 font-medium' : 'text-muted-foreground'}`}>
+                                            <p className={`mt-0.5 text-xs sm:hidden ${textClass ? textClass : 'text-muted-foreground'}`}>
                                                 {answer.question.options.find(
                                                     (opt) => opt.option === answer.answer,
                                                 )?.option_text ?? answer.answer}
                                             </p>
                                         </td>
-                                        <td className={`hidden px-3 py-2.5 sm:table-cell ${isQ10 ? 'text-destructive/80 font-medium' : 'text-muted-foreground'}`}><p>
+                                        <td className={`hidden px-3 py-2.5 sm:table-cell ${textClass ? textClass : 'text-muted-foreground'}`}><p>
                                             {answer.question.options.find(
                                                 (opt) => opt.option === answer.answer,
                                             )?.option_text ?? answer.answer}

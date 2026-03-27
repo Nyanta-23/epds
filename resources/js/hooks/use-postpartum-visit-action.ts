@@ -22,8 +22,10 @@ export function usePostpartumVisitAction(postpartum?: PostpartumVisit) {
     psych_history: postpartum?.psych_history ?? false,
     psych_treatment: postpartum?.psych_treatment ?? false,
     psych_trauma: postpartum?.psych_trauma ?? false,
+    feel_unsafe: postpartum?.feel_unsafe?.value.toString() || "",
     parity_count: postpartum?.parity_count || "",
     preg_comp_history: postpartum?.preg_comp_history ?? false,
+    pregnancy_planned: postpartum?.pregnancy_planned?.value.toString() || "",
     last_comp: postpartum?.last_comp ?? false,
     last_comp_note: postpartum?.last_comp_note || "",
     baby_healthy: postpartum?.baby_healthy ?? false,
@@ -48,9 +50,11 @@ export function usePostpartumVisitAction(postpartum?: PostpartumVisit) {
         "psych_history",
         "psych_treatment",
         "psych_trauma",
+        "feel_unsafe",
 
         "parity_count",
         "preg_comp_history",
+        "pregnancy_planned",
 
         "last_comp",
         "last_comp_note",

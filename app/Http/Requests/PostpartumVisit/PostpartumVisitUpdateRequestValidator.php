@@ -25,9 +25,11 @@ class PostpartumVisitUpdateRequestValidator extends FormRequest
             'psych_history'      => ['required', 'boolean'],
             'psych_treatment'    => ['required', 'boolean'],
             'psych_trauma'       => ['required', 'boolean'],
+            'feel_unsafe'        => ['required', 'string'],
 
             'parity_count'       => ['required', 'string'],
             'preg_comp_history'  => ['required', 'boolean'],
+            'pregnancy_planned'  => ['required', 'string'],
 
             'last_comp'          => ['required', 'boolean'],
             'last_comp_note'     => ['nullable', 'string'],

@@ -15,9 +15,11 @@ class PostpartumVisitUpdateAttributeRequest
   public bool $psych_history;
   public bool $psych_treatment;
   public bool $psych_trauma;
+  public string $feel_unsafe;
 
   public string $parity_count;
   public bool $preg_comp_history;
+  public string $pregnancy_planned;
 
   public bool $last_comp;
   public ?string $last_comp_note;

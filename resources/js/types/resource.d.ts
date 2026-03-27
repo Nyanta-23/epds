@@ -118,7 +118,23 @@ export interface PostpartumVisit {
     baby_healthy: Enum;
     baby_caregiver: Enum;
 
-    feed_type: Enum;
+    feed_type: {
+        value: number;
+        label: string;
+        label_id: string;
+    };
+
+    feel_unsafe?: {
+        value: number;
+        label: string;
+        label_id: string;
+    };
+
+    pregnancy_planned?: {
+        value: number;
+        label: string;
+        label_id: string;
+    };
 
     mother: Patient | null;
     result: Result | null;
