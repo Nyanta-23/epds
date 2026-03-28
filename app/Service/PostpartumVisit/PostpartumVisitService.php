@@ -96,8 +96,10 @@ class PostpartumVisitService
           'psych_history' => $request->psych_history,
           'psych_treatment' => $request->psych_treatment,
           'psych_trauma' => $request->psych_trauma,
+          'feel_unsafe' => $request->feel_unsafe,
 
           'parity_count' => $request->parity_count,
+          'pregnancy_planned' => $request->pregnancy_planned,
           'preg_comp_history' => $request->preg_comp_history,
 
           'last_comp' => $request->last_comp,
@@ -130,8 +132,10 @@ class PostpartumVisitService
         'psych_history' => $request->psych_history,
         'psych_treatment' => $request->psych_treatment,
         'psych_trauma' => $request->psych_trauma,
+        'feel_unsafe' => $request->feel_unsafe,
 
         'parity_count' => $request->parity_count,
+        'pregnancy_planned' => $request->pregnancy_planned,
         'preg_comp_history' => $request->preg_comp_history,
 
         'last_comp' => $request->last_comp,
