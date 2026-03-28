@@ -11,6 +11,7 @@ class OptionQuestion extends Model
     use HasUuids;
 
     protected $fillable = [
+        'option',
         'option_text',
         'value'
     ];

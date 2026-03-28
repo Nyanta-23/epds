@@ -43,6 +43,7 @@ class AuthController extends Controller
           'email' => $response->email,
           'name' => $response->name,
           'token' => $response->token,
+          'role' => $response->role,
           'has_profile' => $hasProfile,
           'has_baby' => $hasBaby
         ]
