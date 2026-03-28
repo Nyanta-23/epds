@@ -8,4 +8,5 @@ class LoginResponse
   public ?string $email;
   public ?string $name;
   public ?string $token;
+  public ?string $role;
 }

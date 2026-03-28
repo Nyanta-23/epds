@@ -109,6 +109,42 @@ class PostpartumVisit extends Model
         return $this->belongsTo(Baby::class, 'baby_id', 'id');
     }
 
+    protected function riskStatus(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $totalScore = $this->result?->total_score ?? 0;
+                
+                // Check Question 10 (Self Harm)
+                // We use relation if already loaded, otherwise it might trigger N+1 if not careful,
+                // but for detail view it's always loaded.
+                $hasSelfHarm = false;
+                if ($this->relationLoaded('answers')) {
+                    $hasSelfHarm = $this->answers->contains(function ($ans) {
+                        $isSelfHarmQ = str_contains(strtolower($ans->question?->question ?? ''), 'menyakiti diri');
+                        if (!$isSelfHarmQ) return false;
+                        
+                        $options = $ans->question?->optionQuestions;
+                        if ($options) {
+                            $matchedOption = $options->firstWhere('option', strtolower($ans->answer));
+                            return ($matchedOption?->value ?? 0) > 0;
+                        }
+                        
+                        return false;
+                    });
+                }
+
+                if ($hasSelfHarm || $totalScore >= 13) {
+                    return 'Tinggi';
+                } else if ($totalScore >= 10) {
+                    return 'Ringan';
+                } else {
+                    return 'Normal';
+                }
+            }
+        );
+    }
+
     /**
      * Aktifkan Global Scope
      */

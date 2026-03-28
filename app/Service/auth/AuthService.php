@@ -36,6 +36,7 @@ class AuthService
       $response->email = $user->email;
       $response->name = $user->name;
       $response->token = $token;
+      $response->role = $user->role->name ?? 'User';
 
       return $response;
     } catch (Exception $error) {
