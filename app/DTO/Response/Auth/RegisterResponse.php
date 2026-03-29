@@ -4,8 +4,8 @@ namespace App\DTO\Response\Auth;
 
 class RegisterResponse
 {
-  public ?string $id;
-  public ?string $email;
-  public ?string $name;
-  public ?string $token;
+  public ?string $id = null;
+  public ?string $email = null;
+  public ?string $name = null;
+  public ?string $token = null;
 }
