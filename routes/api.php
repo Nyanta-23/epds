@@ -16,6 +16,13 @@ Route::prefix('v1')->group(function () {
         Route::put('/user/{id}/change-email', [\App\Http\Controllers\Api\UserController::class, 'changeEmail']);
         Route::put('/user/{id}/change-password', [\App\Http\Controllers\Api\UserController::class, 'changePassword']);
 
+        // User Management Routes
+        Route::get('/user-management', [\App\Http\Controllers\Api\UserController::class, 'index']);
+        Route::post('/user-management', [\App\Http\Controllers\Api\UserController::class, 'store']);
+        Route::put('/user-management/{id}', [\App\Http\Controllers\Api\UserController::class, 'update']);
+        Route::delete('/user-management/{id}', [\App\Http\Controllers\Api\UserController::class, 'destroy']);
+        Route::get('/roles', [\App\Http\Controllers\Api\RoleController::class, 'index']);
+
         // Patient / Profile Routes
         Route::get('/patient/{id?}', [\App\Http\Controllers\Api\PatientController::class, 'show']);
         Route::put('/patient/{id}', [\App\Http\Controllers\Api\PatientController::class, 'update']);

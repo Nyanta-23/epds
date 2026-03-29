@@ -45,6 +45,18 @@ class UserUpdateRequestValidator extends FormRequest
         'string',
         'max:255'
       ],
+      'email' => [
+        'required',
+        'string',
+        'email',
+        'max:255',
+        Rule::unique('users', 'email')->ignore($this->route('id')),
+      ],
+      'password' => [
+        'nullable',
+        'string',
+        'min:8'
+      ],
       'role_id' => [
         'required',
         Rule::exists('roles', 'id')->where(function ($query) {
@@ -56,10 +68,10 @@ class UserUpdateRequestValidator extends FormRequest
       'regency_id' => [$isMidwife ? 'required' : 'nullable'],
       'district_id' => [$isMidwife ? 'required' : 'nullable'],
       'village_id' => [$isMidwife ? 'required' : 'nullable'],
-      'village' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'province' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'city_or_district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'subdistrict' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'village' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'instansi' => [
         $isMidwife ? 'required' : 'nullable',
         Rule::in(['TPMB', 'Puskesmas', 'Klinik', 'RS']),

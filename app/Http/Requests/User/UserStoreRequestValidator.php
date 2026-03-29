@@ -54,7 +54,6 @@ class UserStoreRequestValidator extends FormRequest
       'password' => [
         'required',
         'min:8',
-        'confirmed'
       ],
       'role_id' => [
         'required',
@@ -68,8 +67,8 @@ class UserStoreRequestValidator extends FormRequest
       'district_id' => [$isMidwife ? 'required' : 'nullable'],
       'village_id' => [$isMidwife ? 'required' : 'nullable'],
       'province' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
-      'regency' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
-      'district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'city_or_district' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
+      'subdistrict' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'village' => [$isMidwife ? 'required' : 'nullable', 'string', 'max:100'],
       'instansi' => [
         $isMidwife ? 'required' : 'nullable',
