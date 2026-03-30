@@ -23,7 +23,9 @@ export default function CardPostpartumFollowUp({
     const [initialType, setInitialType] = useState<number | null>(null);
     const [initialStatus, setInitialStatus] = useState<number | null>(null);
 
-    const rujukOptions = enums.followup_status || [];
+    const rujukOptions = (enums.followup_status || []).filter(
+        (option) => Number(option.value) !== 0 && Number(option.value) !== 5,
+    );
     const rujukanTypeOption = enums.followup_types?.find(e => e.label.toLowerCase().includes('rujuk'));
     const defaultTypeOption = enums.followup_types?.find(e => !e.label.toLowerCase().includes('rujuk'));
 
@@ -68,37 +70,64 @@ export default function CardPostpartumFollowUp({
 
                 <div className="mt-auto">
                     {!postpartum.followup && rujukOptions.length > 0 ? (
-                        <div className="flex flex-col sm:flex-row gap-2">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full sm:flex-1 h-auto min-h-10 py-2 whitespace-normal justify-between border-primary text-primary hover:bg-primary/5 shadow-sm text-xs sm:text-sm lg:text-xs xl:text-sm px-2 sm:px-3">
-                                        <span className="text-left">Rujuk Pasien</span>
-                                        <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 opacity-50 shrink-0" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="start">
-                                    {rujukOptions.map(option => (
-                                        <DropdownMenuItem 
-                                            key={option.value} 
-                                            onSelect={() => {
-                                                setInitialType(rujukanTypeOption ? Number(rujukanTypeOption.value) : 1);
-                                                setInitialStatus(Number(option.value));
-                                                setResult(postpartum);
-                                                setOpenDialog(true);
-                                            }}
-                                            className="cursor-pointer"
+                        <div className="flex flex-col gap-2">
+                            {postpartum.result && postpartum.result.total_score > 12 && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full h-auto min-h-10 px-4 py-2 text-sm font-medium border-primary text-primary hover:bg-primary/5"
                                         >
-                                            {option.label}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                            <span className="text-left font-semibold">
+                                                Rujuk Pasien
+                                            </span>
+                                            <ChevronDown className="ml-2 h-4 w-4 opacity-50 shrink-0" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        className="w-56"
+                                        align="start"
+                                    >
+                                        {rujukOptions.map((option) => (
+                                            <DropdownMenuItem
+                                                key={option.value}
+                                                onSelect={() => {
+                                                    setInitialType(
+                                                        rujukanTypeOption
+                                                            ? Number(
+                                                                  rujukanTypeOption.value,
+                                                              )
+                                                            : 1,
+                                                    );
+                                                    setInitialStatus(
+                                                        Number(option.value),
+                                                    );
+                                                    setResult(postpartum);
+                                                    setOpenDialog(true);
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                {option.label}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            )}
 
-                            <Button 
-                                className="w-full sm:flex-1 h-auto min-h-10 py-2 whitespace-normal bg-primary hover:bg-teal-700 text-white shadow-sm text-xs sm:text-sm lg:text-xs xl:text-sm px-2 sm:px-3 leading-tight"
+                            <Button
+                                className="w-full h-auto min-h-10 px-4 py-2 text-sm font-semibold bg-primary hover:bg-teal-700 text-white shadow-sm leading-tight"
                                 onClick={() => {
-                                    setInitialType(defaultTypeOption ? Number(defaultTypeOption.value) : null);
-                                    setInitialStatus(null);
+                                    setInitialType(
+                                        defaultTypeOption
+                                            ? Number(defaultTypeOption.value)
+                                            : null,
+                                    );
+                                    setInitialStatus(
+                                        postpartum.result &&
+                                            postpartum.result.total_score <= 12
+                                            ? 5
+                                            : null,
+                                    );
                                     setResult(postpartum);
                                     setOpenDialog(true);
                                 }}
