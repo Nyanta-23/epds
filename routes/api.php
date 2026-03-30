@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('midwife')->group(function () {
             Route::get('/dashboard', [\App\Http\Controllers\Api\Midwife\DashboardController::class, 'index']);
             Route::get('/postpartum', [\App\Http\Controllers\Api\Midwife\PostpartumController::class, 'index']);
+            Route::get('/postpartum/export', [\App\Http\Controllers\Api\Midwife\PostpartumController::class, 'export']);
             Route::get('/postpartum/{id}', [\App\Http\Controllers\Api\Midwife\PostpartumController::class, 'show']);
             Route::post('/postpartum/{id}/followup', [\App\Http\Controllers\Api\Midwife\PostpartumController::class, 'storeFollowup']);
         });

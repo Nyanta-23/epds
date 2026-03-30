@@ -17,13 +17,13 @@ class FollowUpResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => [
-                'value' => $this->type,
+                'value' => $this->type->value,
                 'label' => $this->type->label(),
                 'label_id' => $this->type->label_id(),
             ],
             'notes' => $this->notes,
             'date_filled' => $this->date_filled,
-            'midiwfe' => new PatientResource($this->whenLoaded('mother')),
+            'midwife' => new PatientResource($this->whenLoaded('midwife')),
             'result' => new ResultResource($this->whenLoaded('result')),
         ];
     }

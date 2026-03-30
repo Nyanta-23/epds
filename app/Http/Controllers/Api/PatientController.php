@@ -10,17 +10,20 @@ use App\Models\User;
 use App\Service\Patient\PatientService;
 use Exception;
 use Log;
-use Request;
+use Illuminate\Http\Request;
 use Str;
 
 class PatientController extends Controller
 {
-  public function __construct(private PatientService $patientService) {}
+  public function __construct(private PatientService $patientService)
+  {
+  }
 
   public function show(Request $request, ?string $id = null)
   {
     try {
-      $response = $this->patientService->getPatients($id);
+      $search = $request->get('search');
+      $response = $this->patientService->getPatients($id, $search);
 
       $resource = PatientResource::collection($response);
 
@@ -28,7 +31,8 @@ class PatientController extends Controller
         'message' => 'data found',
         'data' => $id ? $resource[0] : $resource
       ]);
-    } catch (Exception $error) {
+    }
+    catch (Exception $error) {
       return response()->json([
         'message' => $error->getMessage()
       ], $error->getCode());
@@ -83,7 +87,8 @@ class PatientController extends Controller
         'message' => 'update successfully',
         'data' => $response
       ], 200);
-    } catch (Exception $error) {
+    }
+    catch (Exception $error) {
       Log::error('update_patient_error', ['error' => $error->getMessage()]);
       return response()->json([
         'message' => $error->getMessage()
@@ -100,8 +105,9 @@ class PatientController extends Controller
         'message' => 'data found',
         'data' => $response
       ]);
-    } catch (Exception $error) {
-      Log::error('error',['error' => $error->getMessage()]);
+    }
+    catch (Exception $error) {
+      Log::error('error', ['error' => $error->getMessage()]);
       return response()->json([
         'message' => $error->getMessage(),
         'data' => null
