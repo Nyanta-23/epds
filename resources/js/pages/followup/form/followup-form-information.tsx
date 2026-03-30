@@ -16,15 +16,17 @@ interface FollowUpFormInformationProps {
   enums: Enums;
   action: () => void;
   processing: boolean;
+  totalScore?: number;
 }
 
-export default function FollowupFormInformation({ data, errors, handleInputChange, enums, action, processing }: FollowUpFormInformationProps) {
+export default function FollowupFormInformation({ data, errors, handleInputChange, enums, action, processing, totalScore }: FollowUpFormInformationProps) {
 
   const identityErrorClassName = (field: keyof Errors) => {
     return errors[field] ? 'border-red-500 focus:ring-red-500' : '';
   }
 
   const { followup_types, followup_status } = enums;
+  const isReferralDisabled = totalScore !== undefined && totalScore <= 12;
 
 
   return (
@@ -39,6 +41,7 @@ export default function FollowupFormInformation({ data, errors, handleInputChang
             value={data.type !== null ? String(data.type) : undefined}
             onValueChange={(value) => handleInputChange("type", Number(value))}
             required
+            disabled={isReferralDisabled}
           >
             <SelectTrigger
               className={`w-full cursor-pointer ${identityErrorClassName("type")}`}
@@ -71,6 +74,7 @@ export default function FollowupFormInformation({ data, errors, handleInputChang
             value={data.followup_status !== null ? String(data.followup_status) : undefined}
             onValueChange={(value) => handleInputChange("followup_status", Number(value))}
             required
+            disabled={isReferralDisabled}
           >
             <SelectTrigger
               className={`w-full cursor-pointer ${identityErrorClassName("followup_status")}`}
@@ -79,12 +83,19 @@ export default function FollowupFormInformation({ data, errors, handleInputChang
             </SelectTrigger>
 
             <SelectContent>
-              {followup_status?.map((item) => (
-                <SelectItem className="cursor-pointer" key={item.value} value={String(item.value)}>
-                  {item.label}
-                </SelectItem>
-              ))}
-
+              {followup_status
+                ?.filter(
+                  (item) => Number(item.value) !== 0 && Number(item.value) !== 5,
+                )
+                .map((item) => (
+                  <SelectItem
+                    className="cursor-pointer"
+                    key={item.value}
+                    value={String(item.value)}
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
 

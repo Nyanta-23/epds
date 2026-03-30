@@ -27,7 +27,15 @@ export default function FollowUpCreate({ enums, result, onSuccess, initialType, 
 
   return (
     <section className="px-2">
-      <FollowupFormInformation processing={processing} action={() => storeFollowUp(id)} data={data} errors={errors} handleInputChange={handleInputChange} enums={enums} />
+      <FollowupFormInformation
+        processing={processing}
+        action={() => storeFollowUp(id)}
+        data={data}
+        errors={errors}
+        handleInputChange={handleInputChange}
+        enums={enums}
+        totalScore={result?.result?.total_score}
+      />
     </section>
   )
 }

@@ -22,7 +22,15 @@ export default function FollowUpEdit({result, enums, onSuccess }: FollowUpEditPr
 
   return (
     <section className="mx-5">
-      <FollowupFormInformation processing={processing} action={() => updateFollowUp(result?.followup.id)} data={data} errors={errors} handleInputChange={handleInputChange} enums={enums} />
+      <FollowupFormInformation
+        processing={processing}
+        action={() => updateFollowUp(result?.followup.id)}
+        data={data}
+        errors={errors}
+        handleInputChange={handleInputChange}
+        enums={enums}
+        totalScore={result?.result?.total_score}
+      />
     </section>
   );
 }
