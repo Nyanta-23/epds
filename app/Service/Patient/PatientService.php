@@ -38,7 +38,7 @@ class PatientService
       ->withQueryString();
   }
 
-  public function getPatients(?string $id = null)
+  public function getPatients(?string $id = null, ?string $search = null)
   {
     try {
       $results = User::with('babies')->latest();
@@ -46,6 +46,14 @@ class PatientService
       if ($id) {
         $results->where('id', '=', $id);
       }
+      
+      if ($search) {
+        $results->where(function ($q) use ($search) {
+          $q->where('name', 'like', "%$search%")
+            ->orWhere('number_patient', 'like', "%$search%");
+        });
+      }
+
       $results = $results->get();
 
       if ($id && sizeof($results) == 0)

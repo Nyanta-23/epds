@@ -7,14 +7,18 @@ use App\DTO\Request\FollowUp\FollowUpStoreAttributeRequest;
 use App\Http\Resources\PostpartumVisitResource;
 use App\Models\PostpartumVisit;
 use App\Service\FollowUp\FollowUpService;
+use App\Service\PostpartumVisit\PostpartumVisitExportService;
+use App\Exports\PostpartumVisitExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Log;
 
 class PostpartumController extends Controller
 {
   public function __construct(
-    private FollowUpService $followUpService
+    private FollowUpService $followUpService,
+    private PostpartumVisitExportService $exportService,
   ) {
   }
 
@@ -120,25 +124,41 @@ class PostpartumController extends Controller
     return DB::transaction(function () use ($request, $id) {
       try {
         $user = auth()->user();
-        $visit = PostpartumVisit::with('result')->findOrFail($id);
+        $visit = PostpartumVisit::with(['result', 'followup'])->findOrFail($id);
         $result = $visit->result;
+        $followup = $visit->followup;
 
         if (!$result) {
           return response()->json(['message' => 'Result not found'], 404);
         }
 
-        $followUpReq = new FollowUpStoreAttributeRequest();
-        $followUpReq->postpartum_visit_id = $visit->id;
-        $followUpReq->followup_status = $request->input('followup_status');
-        $followUpReq->notes = $request->input('notes');
-        $followUpReq->type = $request->input('type');
-        $followUpReq->result_id = $result->id;
-        $followUpReq->midwife_id = $user->id;
+        $message = '';
 
-        $this->followUpService->store($followUpReq);
+        if ($followup) {
+           $followUpReq = new \App\DTO\Request\FollowUp\FollowUpUpdateAttributeRequest();
+           $followUpReq->followup_status = (int)$request->input('followup_status');
+           $followUpReq->notes = (string)$request->input('notes');
+           $followUpReq->type = (int)$request->input('type');
+           $followUpReq->result_id = (string)$result->id;
+           $followUpReq->midwife_id = (string)$user->id;
+
+           $this->followUpService->update($followUpReq, $followup->id);
+           $message = 'Successfully updated follow up';
+        } else {
+           $followUpReq = new \App\DTO\Request\FollowUp\FollowUpStoreAttributeRequest();
+           $followUpReq->postpartum_visit_id = (string)$visit->id;
+           $followUpReq->followup_status = (int)$request->input('followup_status');
+           $followUpReq->notes = (string)$request->input('notes');
+           $followUpReq->type = (int)$request->input('type');
+           $followUpReq->result_id = (string)$result->id;
+           $followUpReq->midwife_id = (string)$user->id;
+
+           $this->followUpService->store($followUpReq);
+           $message = 'Successfully added follow up';
+        }
 
         return response()->json([
-          'message' => 'Successfully added follow up',
+          'message' => $message,
           'data' => new PostpartumVisitResource($visit->fresh(['followup', 'result', 'mother']))
         ], 201);
       } catch (\Exception $e) {
@@ -146,5 +166,21 @@ class PostpartumController extends Controller
         return response()->json(['message' => $e->getMessage()], 500);
       }
     });
+  }
+
+  public function export(Request $request)
+  {
+    try {
+      $start = $request->input('start_date');
+      $end   = $request->input('end_date');
+
+      $data = $this->exportService->exportByDateRange($start, $end);
+      $fileName = $this->exportService->fileName($start, $end);
+
+      return Excel::download(new PostpartumVisitExport($data), $fileName);
+    } catch (\Exception $e) {
+      Log::error('Export error: ' . $e->getMessage());
+      return response()->json(['message' => $e->getMessage()], 500);
+    }
   }
 }

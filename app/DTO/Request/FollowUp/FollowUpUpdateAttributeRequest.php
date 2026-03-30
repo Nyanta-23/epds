@@ -5,9 +5,9 @@ namespace App\DTO\Request\FollowUp;
 
 class FollowUpUpdateAttributeRequest
 {
-  public string $type;
+  public int $type;
   public string $notes;
-  public string $followup_status;
+  public int $followup_status;
   public string $result_id;
-  public string $midiwfe_id;
+  public string $midwife_id;
 }

@@ -7,7 +7,7 @@ class FollowUpStoreAttributeRequest
   public string $postpartum_visit_id;
   public string $midwife_id;
   public string $result_id;
-  public string $type;
+  public int $type;
   public string $notes;
-  public string $followup_status;
+  public int $followup_status;
 }
