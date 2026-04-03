@@ -40,12 +40,7 @@ class CheckEpdsSchedule extends Command
     if (!$mother)
       return;
 
-    $midwives = User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))
-      ->where(function ($q) use ($mother) {
-        $q->where('village_id', $mother->village_id)
-          ->orWhere('subdistrict_id', $mother->subdistrict_id);
-      })
-      ->get();
+    $midwives = User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))->get();
 
     $ageString = $daysAge < 1 ? "Baru Lahir" : "$daysAge Hari";
 
