@@ -34,6 +34,8 @@ class UpcomingScheduleNotification extends Notification
       'action_url' => route('postpartum'),
       'type' => 'info',
       'icon' => 'calendar',
+      'mother_id' => $this->motherId,
+      'visit_label' => $this->visitLabel,
     ];
 
     // FCM dikirim synchronous — tidak butuh queue worker (shared hosting safe)

@@ -40,6 +40,26 @@ class CheckEpdsSchedule extends Command
     if (!$mother)
       return;
 
+    // Cegah spam: cek apakah notifikasi (untuk ibu dan jenis kunjungan ini) sudah pernah dikirim.
+    $alreadySent = \Illuminate\Support\Facades\DB::table('notifications')
+      ->where('type', UpcomingScheduleNotification::class)
+      ->where(function($q) use ($mother, $label) {
+          $q->where(function($sub) use ($mother, $label) {
+             $sub->where('data', 'like', '%"mother_id":' . $mother->id . '%')
+                 ->orWhere('data', 'like', '%"mother_id":"' . $mother->id . '"%');
+          })->where('data', 'like', '%"visit_label":"' . $label . '"%')
+          ->orWhere(function($sub) use ($mother, $label) {
+             // Cek kompatibilitas mundur untuk notif lama yang datanya masih sebatas judul & pesan
+             $sub->where('data', 'like', '%Jadwal Skrining: ' . $label . '%')
+                 ->where('data', 'like', '%Ibu ' . $mother->name . ' memasuki%');
+          });
+      })
+      ->exists();
+
+    if ($alreadySent) {
+      return; // Langsung kembali jika notif sudah pernah dikirim
+    }
+
     $midwives = User::whereHas('role', fn($q) => $q->where('slug', 'midwife'))->get();
 
     $ageString = $daysAge < 1 ? "Baru Lahir" : "$daysAge Hari";
