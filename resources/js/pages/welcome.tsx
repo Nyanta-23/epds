@@ -176,7 +176,7 @@ export default function Welcome() {
                             </span>
                         </div>
                         <span>
-                            Sistem Informasi Monitoring Pasca Persalinan &copy;{' '}
+                            Sistem Monitoring Psikologis Ibu Nifas &copy;{' '}
                             {new Date().getFullYear()}
                         </span>
                     </div>
