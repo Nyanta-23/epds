@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "azishapidin/indoregion": "^3.0",
         "google-gemini-php/client": "^2.7",
         "inertiajs/inertia-laravel": "^2.0",
         "kreait/laravel-firebase": "^7.0",
@@ -23,14 +24,16 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
-        "lanin/laravel-api-debugger": "^4.0",
         "fakerphp/faker": "^1.23",
+        "lanin/laravel-api-debugger": "^4.0",
+        "laravel/boost": "^1.8",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.3"
+        "phpunit/phpunit": "^11.5.3",
+        "revolution/laravel-boost-copilot-cli": "^1.1"
     },
     "autoload": {
         "files": [
