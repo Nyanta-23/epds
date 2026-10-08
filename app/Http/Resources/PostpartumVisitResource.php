@@ -18,6 +18,7 @@ class PostpartumVisitResource extends JsonResource
             'id' => $this->id,
             'visit_number' => $this->visit_number,
             'date_filled' => $this->date_filled,
+            'facility_id' => $this->facility_id,
 
             'sleep_quality' => [
                 'value' => $this->sleep_quality,
@@ -91,7 +92,7 @@ class PostpartumVisitResource extends JsonResource
             'mother' => new PatientResource($this->whenLoaded('mother')),
             'result' => new ResultResource($this->whenLoaded('result')),
             'answers' => AnswerResource::collection($this->whenLoaded('answers')),
-            'followup' => new FollowUpResource($this->whenLoaded('followup'))
+            'followup' => new FollowUpResource($this->whenLoaded('followup')),
         ];
     }
 }

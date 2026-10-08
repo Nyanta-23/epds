@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FollowUpTypeEnum;
+use App\Models\Scopes\FacilityAccessScope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Followup extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $casts = [
         'type' => FollowUpTypeEnum::class,
@@ -23,7 +24,7 @@ class Followup extends Model
         'midwife_id',
         'result_id',
         'date_filled',
-        'postpartum_visit_id'
+        'postpartum_visit_id',
     ];
 
     public function midwife(): BelongsTo
@@ -36,8 +37,13 @@ class Followup extends Model
         return $this->hasOne(Result::class);
     }
 
-    public function PostpartumVisit(): BelongsTo
+    public function postpartumVisit(): BelongsTo
     {
         return $this->belongsTo(PostpartumVisit::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new FacilityAccessScope);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\FacilityAccessScope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Answer extends Model
 {
-
     use HasFactory, HasUuids;
 
     protected $fillable = [
@@ -26,5 +26,10 @@ class Answer extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new FacilityAccessScope);
     }
 }

@@ -36,7 +36,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('/baby/{id}', [\App\Http\Controllers\Api\BabyController::class, 'destroy']);
 
         // Midwife Routes
-        Route::prefix('midwife')->group(function () {
+        Route::middleware('role:super_admin,admin,midwife')->prefix('midwife')->group(function () {
             Route::get('/dashboard', [\App\Http\Controllers\Api\Midwife\DashboardController::class, 'index']);
             Route::get('/postpartum', [\App\Http\Controllers\Api\Midwife\PostpartumController::class, 'index']);
             Route::get('/postpartum/export', [\App\Http\Controllers\Api\Midwife\PostpartumController::class, 'export']);

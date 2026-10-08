@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FollowUpStatusEnum;
+use App\Models\Scopes\FacilityAccessScope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,17 +12,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Result extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $casts = [
-        'followup_status' => FollowUpStatusEnum::class
+        'followup_status' => FollowUpStatusEnum::class,
     ];
 
     protected $fillable = [
         'total_score',
         'postpartum_visit_id',
         'followup_status',
-        'followup_id'
+        'followup_id',
     ];
 
     public function postpartumVisit(): BelongsTo
@@ -37,5 +38,10 @@ class Result extends Model
     public function autoRecomendation(): HasOne
     {
         return $this->hasOne(AutoRecomendation::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new FacilityAccessScope);
     }
 }

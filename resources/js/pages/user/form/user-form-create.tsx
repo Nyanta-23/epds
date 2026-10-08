@@ -1,6 +1,4 @@
-import { useRegion } from '@/hooks/use-region';
 import { useUserAction } from '@/hooks/use-user-action';
-import { FormUser } from '@/types/form';
 import { UserManagementExtra } from '@/types/resource';
 import UserFormInformation from './user-form-information';
 
@@ -13,45 +11,6 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
 
     const { data, errors, handleInputChange, createUser, processing } =
         useUserAction();
-
-    const {
-        regions: { provinces, cities, districts, villages },
-        handlers: { onProvinceChange, onCityChange, onDistrictChange },
-        loading,
-    } = useRegion();
-
-    const onFieldChange = (
-        field: keyof FormUser,
-        value: string | number | null,
-    ) => {
-        handleInputChange(field, value);
-
-        const strValue = value?.toString() ?? '';
-
-        if (field === 'province_id') {
-            const province = provinces.find((r) => r.id == strValue);
-            onProvinceChange(strValue);
-            handleInputChange('province', province?.name ?? '');
-            handleInputChange('regency_id', null);
-            handleInputChange('district_id', null);
-            handleInputChange('village_id', null);
-        } else if (field === 'regency_id') {
-            const regencies = cities.find((r) => r.id == strValue);
-            onCityChange(strValue);
-            handleInputChange('city_or_district', regencies?.name ?? '');
-            handleInputChange('district_id', null);
-            handleInputChange('village_id', null);
-        } else if (field === 'district_id') {
-            const district = districts.find((r) => r.id == strValue);
-            onDistrictChange(strValue);
-            handleInputChange('subdistrict', district?.name ?? '');
-            handleInputChange('village_id', null);
-        } else {
-            const village = villages.find((v) => v.id === strValue);
-            handleInputChange('village_id', strValue);
-            handleInputChange('village', village?.name ?? '');
-        }
-    };
 
     return (
         <section className="px-6 py-6">
@@ -70,17 +29,12 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
 
                             <div className="space-y-4 p-6">
                                 <UserFormInformation
-                                    provinces={provinces}
-                                    cities={cities}
-                                    districts={districts}
-                                    villages={villages}
                                     roles={roles.data}
                                     facilities={facilities}
                                     data={data}
                                     errors={errors}
-                                    process={processing || loading}
-                                    loadingRegion={loading}
-                                    handleInputChange={onFieldChange}
+                                    process={processing}
+                                    handleInputChange={handleInputChange}
                                     action={() => createUser()}
                                 />
                             </div>

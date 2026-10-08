@@ -99,6 +99,7 @@ export interface PostpartumVisit {
     id: string;
     visit_number: number;
     date_filled: string;
+    facility_id: string | null;
 
     sleep_quality: Enum;
     partner_support: Enum;

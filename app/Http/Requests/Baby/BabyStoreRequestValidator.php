@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Baby;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BabyStoreRequestValidator extends FormRequest
 {
@@ -27,9 +28,25 @@ class BabyStoreRequestValidator extends FormRequest
             'baby_condition' => ['required', 'integer', 'between:0,3'],
             'typeof_delivery' => ['required', 'integer', 'between:0,2'],
             'gender' => ['required', 'in:male,female'],
-            'mother_id' => ['required', 'uuid', 'exists:users,id'],
-            'baby_feeding_method' => ['required', 'integer']
+            'mother_id' => ['required', 'uuid', $this->motherExistsRule()],
+            'baby_feeding_method' => ['required', 'integer'],
         ];
+    }
+
+    private function motherExistsRule(): \Illuminate\Validation\Rules\Exists
+    {
+        $rule = Rule::exists('users', 'id')->whereNull('deleted_at');
+        $user = $this->user();
+
+        if ($user?->role?->slug === 'midwife') {
+            return $rule->where('facility_id', $user->facility_id ?? '');
+        }
+
+        if ($user?->role?->slug === 'patient') {
+            return $rule->where('id', $user->id);
+        }
+
+        return $rule;
     }
 
     /**

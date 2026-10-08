@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\FacilityAccessScope;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,109 +11,110 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-  /** @use HasFactory<\Database\Factories\UserFactory> */
-  use HasFactory, Notifiable, HasUuids, SoftDeletes, HasApiTokens;
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasApiTokens, HasFactory, HasUuids, Notifiable, SoftDeletes;
 
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var list<string>
-   */
-  protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'email_verified_at',
-    'role_id',
-    'phone_number',
-    'birthplace',
-    'date_of_birth',
-    'job',
-    'married_status',
-    'highest_education',
-    'province',
-    'city_or_district',
-    'subdistrict',
-    'village',
-    'province_id',
-    'city_or_district_id',
-    'subdistrict_id',
-    'village_id',
-    'address',
-    'is_verified',
-    'is_can_visit',
-    'number_patient',
-    'fcm_token',
-    'facility_id',
-    'instansi',
-    'nama_instansi',
-    'province_migrate_id',
-    'regency_migrate_id',
-    'district_migrate_id',
-    'village_migrate_id',
-  ];
-
-  /**
-   * The attributes that should be hidden for serialization.
-   *
-   * @var list<string>
-   */
-  protected $hidden = [
-    'password',
-    'two_factor_secret',
-    'two_factor_recovery_codes',
-    'remember_token',
-  ];
-
-  /**
-   * Get the attributes that should be cast.
-   *
-   * @return array<string, string>
-   */
-  protected function casts(): array
-  {
-    return [
-      'email_verified_at' => 'datetime',
-      'password' => 'hashed',
-      'two_factor_confirmed_at' => 'datetime',
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'email_verified_at',
+        'role_id',
+        'phone_number',
+        'birthplace',
+        'date_of_birth',
+        'job',
+        'married_status',
+        'highest_education',
+        'province',
+        'city_or_district',
+        'subdistrict',
+        'village',
+        'province_id',
+        'city_or_district_id',
+        'subdistrict_id',
+        'village_id',
+        'address',
+        'is_verified',
+        'is_can_visit',
+        'number_patient',
+        'fcm_token',
+        'facility_id',
+        'instansi',
+        'nama_instansi',
+        'province_migrate_id',
+        'regency_migrate_id',
+        'district_migrate_id',
+        'village_migrate_id',
     ];
-  }
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'remember_token',
+    ];
 
-  public function role(): BelongsTo
-  {
-    return $this->belongsTo(Role::class);
-  }
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'two_factor_confirmed_at' => 'datetime',
+        ];
+    }
 
-  public function facility(): BelongsTo
-  {
-    return $this->belongsTo(Facility::class);
-  }
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
 
-  public function permissions()
-  {
-    return $this->role->permissions;
-  }
+    public function facility(): BelongsTo
+    {
+        return $this->belongsTo(Facility::class);
+    }
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new FacilityAccessScope);
+    }
 
-  public function babies(): HasMany
-  {
-    return $this->hasMany(Baby::class, 'mother_id');
-  }
+    public function permissions()
+    {
+        return $this->role->permissions;
+    }
 
-  public function postpartumVisits(): HasMany
-  {
-    return $this->hasMany(PostpartumVisit::class);
-  }
+    public function babies(): HasMany
+    {
+        return $this->hasMany(Baby::class, 'mother_id');
+    }
 
-  public function followups(): HasMany
-  {
-    return $this->hasMany(Followup::class);
-  }
+    public function postpartumVisits(): HasMany
+    {
+        return $this->hasMany(PostpartumVisit::class);
+    }
 
+    public function followups(): HasMany
+    {
+        return $this->hasMany(Followup::class);
+    }
 }

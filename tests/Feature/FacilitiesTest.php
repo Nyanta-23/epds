@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Facility;
 use App\Models\FacilityType;
+use App\Models\PostpartumVisit;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -84,6 +85,78 @@ class FacilitiesTest extends TestCase
         $this->get(route('facility.index'))->assertForbidden();
     }
 
+    public function test_midwife_can_only_query_patients_and_screenings_in_their_facility(): void
+    {
+        $this->seedRegion();
+        $facilityType = FacilityType::query()->create(['name' => 'Puskesmas']);
+        $facilityA = $this->createFacility($facilityType, 'Fasilitas A');
+        $facilityB = $this->createFacility($facilityType, 'Fasilitas B');
+        $midwife = $this->userWithRole('midwife');
+        $midwife->update(['facility_id' => $facilityA->id]);
+        $patientA = $this->userWithRole('patient');
+        $patientA->update(['facility_id' => $facilityA->id]);
+        $patientB = $this->userWithRole('patient');
+        $patientB->update(['facility_id' => $facilityB->id]);
+
+        $visitA = PostpartumVisit::factory()->create([
+            'visit_number' => 1,
+            'mother_id' => $patientA->id,
+            'facility_id' => $facilityA->id,
+            'parity_count' => '1x',
+            'baby_caregiver' => 0,
+        ]);
+        $visitB = PostpartumVisit::factory()->create([
+            'visit_number' => 1,
+            'mother_id' => $patientB->id,
+            'facility_id' => $facilityB->id,
+            'parity_count' => '1x',
+            'baby_caregiver' => 0,
+        ]);
+        $legacyVisit = PostpartumVisit::factory()->create([
+            'visit_number' => 2,
+            'mother_id' => $patientA->id,
+            'facility_id' => null,
+            'parity_count' => '1x',
+            'baby_caregiver' => 0,
+        ]);
+
+        $this->actingAs($midwife);
+
+        $this->assertSame(
+            [$patientA->id],
+            User::query()->whereHas('role', fn ($query) => $query->where('slug', 'patient'))->pluck('id')->all(),
+        );
+        $this->assertSame([$visitA->id], PostpartumVisit::query()->pluck('id')->all());
+        $this->assertNull(PostpartumVisit::query()->find($legacyVisit->id));
+        $this->get(route('postpartum.show', $visitB->id))->assertNotFound();
+        $this->get(route('postpartum.show', $legacyVisit->id))->assertNotFound();
+
+        $this->actingAs($this->userWithRole('admin'));
+        $this->assertSame(3, PostpartumVisit::query()->count());
+    }
+
+    public function test_midwife_without_a_facility_cannot_query_patients_or_screenings(): void
+    {
+        $this->seedRegion();
+        $facilityType = FacilityType::query()->create(['name' => 'Puskesmas']);
+        $facility = $this->createFacility($facilityType, 'Fasilitas A');
+        $midwife = $this->userWithRole('midwife');
+        $patient = $this->userWithRole('patient');
+        $patient->update(['facility_id' => $facility->id]);
+        PostpartumVisit::factory()->create([
+            'visit_number' => 1,
+            'mother_id' => $patient->id,
+            'facility_id' => $facility->id,
+            'parity_count' => '1x',
+            'baby_caregiver' => 0,
+        ]);
+
+        $this->actingAs($midwife);
+
+        $this->assertSame(0, User::query()->whereHas('role', fn ($query) => $query->where('slug', 'patient'))->count());
+        $this->assertSame(0, PostpartumVisit::query()->count());
+    }
+
     public function test_facility_type_in_use_cannot_be_deleted(): void
     {
         $this->seedRegion();
@@ -132,6 +205,18 @@ class FacilitiesTest extends TestCase
         $role = Role::query()->create(['name' => $slug, 'slug' => $slug]);
 
         return User::factory()->create(['role_id' => $role->id]);
+    }
+
+    private function createFacility(FacilityType $facilityType, string $name): Facility
+    {
+        return Facility::query()->create([
+            'name' => $name,
+            'facility_type_id' => $facilityType->id,
+            'province_id' => '11',
+            'regency_id' => '1101',
+            'district_id' => '1101010',
+            'village_id' => '1101010001',
+        ]);
     }
 
     private function seedRegion(): void

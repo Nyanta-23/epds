@@ -39,6 +39,50 @@ class UserUpdateValidationTest extends TestCase
         ]);
     }
 
+    public function test_midwife_can_be_created_without_legacy_work_region_fields(): void
+    {
+        $actor = $this->userWithRole('super_admin');
+        $role = Role::query()->create(['name' => 'Bidan', 'slug' => 'midwife']);
+        $facility = $this->facility();
+
+        $this->actingAs($actor)
+            ->post(route('user.store'), [
+                'name' => 'Bidan Fasilitas',
+                'email' => 'bidan.fasilitas@example.test',
+                'password' => 'Password123!',
+                'role_id' => $role->id,
+                'facility_id' => $facility->id,
+            ])
+            ->assertRedirect(route('user'))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'bidan.fasilitas@example.test',
+            'facility_id' => $facility->id,
+            'province_id' => null,
+            'city_or_district_id' => null,
+            'subdistrict_id' => null,
+            'village_id' => null,
+        ]);
+    }
+
+    public function test_midwife_creation_requires_a_facility_assignment(): void
+    {
+        $actor = $this->userWithRole('super_admin');
+        $role = Role::query()->create(['name' => 'Bidan', 'slug' => 'midwife']);
+
+        $this->actingAs($actor)
+            ->from(route('user.create'))
+            ->post(route('user.store'), [
+                'name' => 'Bidan Tanpa Fasilitas',
+                'email' => 'bidan.tanpa.fasilitas@example.test',
+                'password' => 'Password123!',
+                'role_id' => $role->id,
+            ])
+            ->assertRedirect(route('user.create'))
+            ->assertSessionHasErrors('facility_id');
+    }
+
     public function test_user_can_be_assigned_a_facility_without_changing_their_email(): void
     {
         $actor = $this->userWithRole('super_admin');

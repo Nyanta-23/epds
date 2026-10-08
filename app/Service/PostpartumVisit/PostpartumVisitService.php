@@ -10,171 +10,169 @@ use App\Models\PostpartumVisit;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class PostpartumVisitService
 {
-  public function index($filters)
-  {
-    $search = $filters['search'] ?? null;
+    public function index($filters)
+    {
+        $search = $filters['search'] ?? null;
 
-    $verified = filter_var($filters['filter_list']['select_filter']['is_verified'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-    $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-    $isFollowed = filter_var($filters['is_followed'] ?? null, FILTER_VALIDATE_BOOLEAN);
-    $riskType = $filters['risk'] ?? 'all';  // all|normal|low|high
+        $verified = filter_var($filters['filter_list']['select_filter']['is_verified'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'] ?? null, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $isFollowed = filter_var($filters['is_followed'] ?? null, FILTER_VALIDATE_BOOLEAN);
+        $riskType = $filters['risk'] ?? 'all';  // all|normal|low|high
 
-    $startDate = $filters['filter_list']['date_filter']['start_date'] ?? null;
-    $endDate = $filters['filter_list']['date_filter']['end_date'] ?? null;
+        $startDate = $filters['filter_list']['date_filter']['start_date'] ?? null;
+        $endDate = $filters['filter_list']['date_filter']['end_date'] ?? null;
 
-
-    $query = PostpartumVisit::with([
-      'mother',
-      'result.followup',
-      'answers.question.optionQuestions'
-    ]);
-
-    $query->when($search, function ($q, $search) {
-      $q->whereHas('mother', fn($subQ) => $subQ->where('name', 'like', "%{$search}%"));
-    });
-
-    $query->when($startDate || $endDate, function ($q) use ($startDate, $endDate) {
-      if ($startDate && $endDate) {
-        $q->whereBetween('date_filled', [
-          Carbon::parse($startDate)->startOfDay(),
-          Carbon::parse($endDate)->endOfDay(),
+        $query = PostpartumVisit::with([
+            'mother',
+            'result.followup',
+            'answers.question.optionQuestions',
         ]);
-      } elseif ($startDate) {
-        $q->where('date_filled', '>=', Carbon::parse($startDate)->startOfDay());
-      } elseif ($endDate) {
-        $q->where('date_filled', '<=', Carbon::parse($endDate)->endOfDay());
-      }
-    });
 
-    // ── Risk filter via EPDS score thresholds ─────────────────────────
-    // Normal: total_score 0-9  |  Low Risk: 10-12  |  High Risk: ≥13
-    if ($riskType !== 'all') {
-      $query->whereHas('result', function ($q) use ($riskType) {
-        match ($riskType) {
-          'normal' => $q->whereBetween('total_score', [0, 9]),
-          'low' => $q->whereBetween('total_score', [10, 12]),
-          'high' => $q->where('total_score', '>=', 13),
-          default => null,
-        };
-      });
+        $query->when($search, function ($q, $search) {
+            $q->whereHas('mother', fn ($subQ) => $subQ->where('name', 'like', "%{$search}%"));
+        });
+
+        $query->when($startDate || $endDate, function ($q) use ($startDate, $endDate) {
+            if ($startDate && $endDate) {
+                $q->whereBetween('date_filled', [
+                    Carbon::parse($startDate)->startOfDay(),
+                    Carbon::parse($endDate)->endOfDay(),
+                ]);
+            } elseif ($startDate) {
+                $q->where('date_filled', '>=', Carbon::parse($startDate)->startOfDay());
+            } elseif ($endDate) {
+                $q->where('date_filled', '<=', Carbon::parse($endDate)->endOfDay());
+            }
+        });
+
+        // ── Risk filter via EPDS score thresholds ─────────────────────────
+        // Normal: total_score 0-9  |  Low Risk: 10-12  |  High Risk: ≥13
+        if ($riskType !== 'all') {
+            $query->whereHas('result', function ($q) use ($riskType) {
+                match ($riskType) {
+                    'normal' => $q->whereBetween('total_score', [0, 9]),
+                    'low' => $q->whereBetween('total_score', [10, 12]),
+                    'high' => $q->where('total_score', '>=', 13),
+                    default => null,
+                };
+            });
+        }
+
+        if ($isFollowed) {
+            $query->whereHas('result.followup');
+            $query->orderByDesc(
+                Followup::select('updated_at')
+                    ->whereColumn('postpartum_visit_id', 'postpartum_visits.id')
+                    ->latest()
+                    ->limit(1)
+            );
+        } else {
+            $query->whereDoesntHave('result.followup');
+            $query->latest('created_at');
+        }
+
+        return $query->paginate(10)->withQueryString();
     }
 
-    if ($isFollowed) {
-      $query->whereHas('result.followup');
-      $query->orderByDesc(
-        Followup::select('updated_at')
-          ->whereColumn('postpartum_visit_id', 'postpartum_visits.id')
-          ->latest()
-          ->limit(1)
-      );
-    } else {
-      $query->whereDoesntHave('result.followup');
-      $query->latest('created_at');
+    public function update(PostpartumVisitUpdateAttributeRequest $request, string $id)
+    {
+        return DB::transaction(function () use ($request, $id) {
+            PostpartumVisit::findOrFail($id)
+                ->update([
+                    'visit_number' => $request->visit_number,
+                    'date_filled' => $request->date_filled,
+
+                    'sleep_quality' => $request->sleep_quality,
+                    'partner_support' => $request->partner_support,
+                    'live_with_partner' => $request->live_with_partner,
+                    'family_economy' => $request->family_economy,
+
+                    'psych_history' => $request->psych_history,
+                    'psych_treatment' => $request->psych_treatment,
+                    'psych_trauma' => $request->psych_trauma,
+                    'feel_unsafe' => $request->feel_unsafe,
+
+                    'parity_count' => $request->parity_count,
+                    'pregnancy_planned' => $request->pregnancy_planned,
+                    'preg_comp_history' => $request->preg_comp_history,
+
+                    'last_comp' => $request->last_comp,
+                    'last_comp_note' => $request->last_comp_note,
+
+                    'baby_healthy' => $request->baby_healthy,
+                    'baby_caregiver' => $request->baby_caregiver,
+
+                    'feed_type' => $request->feed_type,
+                ]);
+        });
     }
 
-    return $query->paginate(10)->withQueryString();
-  }
+    // Api
 
+    public function store(PostpartumVisitStoreAttributeRequest $request)
+    {
+        return DB::transaction(function () use ($request) {
+            return PostpartumVisit::create([
+                'visit_number' => $request->visit_number,
+                'date_filled' => $request->date_filled,
 
-  public function update(PostpartumVisitUpdateAttributeRequest $request, string $id)
-  {
-    return DB::transaction(function () use ($request, $id) {
-      PostpartumVisit::findOrFail($id)
-        ->update([
-          'visit_number' => $request->visit_number,
-          'date_filled' => $request->date_filled,
+                'sleep_quality' => $request->sleep_quality,
+                'partner_support' => $request->partner_support,
+                'live_with_partner' => $request->live_with_partner,
+                'family_salary_permonth' => $request->family_salary_permonth,
+                'dependent_family_count' => $request->dependent_family_count,
+                'is_salary_sufficient' => $request->is_salary_sufficient,
 
-          'sleep_quality' => $request->sleep_quality,
-          'partner_support' => $request->partner_support,
-          'live_with_partner' => $request->live_with_partner,
-          'family_economy' => $request->family_economy,
+                'psych_history' => $request->psych_history,
+                'psych_treatment' => $request->psych_treatment,
+                'psych_trauma' => $request->psych_trauma,
+                'feel_unsafe' => $request->feel_unsafe,
 
-          'psych_history' => $request->psych_history,
-          'psych_treatment' => $request->psych_treatment,
-          'psych_trauma' => $request->psych_trauma,
-          'feel_unsafe' => $request->feel_unsafe,
+                'parity_count' => $request->parity_count,
+                'pregnancy_planned' => $request->pregnancy_planned,
+                'preg_comp_history' => $request->preg_comp_history,
 
-          'parity_count' => $request->parity_count,
-          'pregnancy_planned' => $request->pregnancy_planned,
-          'preg_comp_history' => $request->preg_comp_history,
+                'last_comp' => $request->last_comp,
+                'last_comp_note' => $request->last_comp_note,
 
-          'last_comp' => $request->last_comp,
-          'last_comp_note' => $request->last_comp_note,
+                'baby_healthy' => $request->baby_healthy,
+                'baby_caregiver' => json_encode($request->baby_caregiver),
+                'baby_id' => $request->baby_id,
+                'feed_type' => $request->feed_type,
+                'mother_id' => $request->mother_id,
+                'facility_id' => User::query()->whereKey($request->mother_id)->value('facility_id'),
+            ]);
+        });
+    }
 
-          'baby_healthy' => $request->baby_healthy,
-          'baby_caregiver' => $request->baby_caregiver,
+    public function previousDataFromUser(User $user)
+    {
+        return PostpartumVisit::with(['answers', 'result'])
+            ->where('mother_id', $user->id)
+            ->latest('date_filled')
+            ->first();
+    }
 
-          'feed_type' => $request->feed_type,
-        ]);
-    });
-  }
+    public function hasPrevious(User $user): bool
+    {
+        $latestBaby = Baby::where('mother_id', $user->id)
+            ->orderBy('date_of_birth', 'desc')
+            ->first();
 
-  // Api
+        return PostpartumVisit::where('mother_id', $user->id)->where('baby_id', $latestBaby->baby_id)->exists();
+    }
 
-  public function store(PostpartumVisitStoreAttributeRequest $request)
-  {
-    return DB::transaction(function () use ($request) {
-      return PostpartumVisit::create([
-        'visit_number' => $request->visit_number,
-        'date_filled' => $request->date_filled,
-
-        'sleep_quality' => $request->sleep_quality,
-        'partner_support' => $request->partner_support,
-        'live_with_partner' => $request->live_with_partner,
-        'family_salary_permonth' => $request->family_salary_permonth,
-        'dependent_family_count' => $request->dependent_family_count,
-        'is_salary_sufficient' => $request->is_salary_sufficient,
-
-        'psych_history' => $request->psych_history,
-        'psych_treatment' => $request->psych_treatment,
-        'psych_trauma' => $request->psych_trauma,
-        'feel_unsafe' => $request->feel_unsafe,
-
-        'parity_count' => $request->parity_count,
-        'pregnancy_planned' => $request->pregnancy_planned,
-        'preg_comp_history' => $request->preg_comp_history,
-
-        'last_comp' => $request->last_comp,
-        'last_comp_note' => $request->last_comp_note,
-
-        'baby_healthy' => $request->baby_healthy,
-        'baby_caregiver' => json_encode($request->baby_caregiver),
-        'baby_id' => $request->baby_id,
-        'feed_type' => $request->feed_type,
-        'mother_id' => $request->mother_id
-      ]);
-    });
-  }
-
-  public function previousDataFromUser(User $user)
-  {
-    return PostpartumVisit::with(['answers', 'result'])
-      ->where('mother_id', $user->id)
-      ->latest('date_filled')
-      ->first();
-  }
-
-  public function hasPrevious(User $user): bool
-  {
-    $latestBaby = Baby::where('mother_id', $user->id)
-      ->orderBy('date_of_birth', 'desc')
-      ->first();
-    return PostpartumVisit::where('mother_id', $user->id)->where('baby_id', $latestBaby->baby_id)->exists();
-  }
-
-
-  public function getPostpartumVisitById(string $id)
-  {
-    return PostpartumVisit::with([
-      'answers',
-      'answers.question',
-      'answers.question.optionQuestions',
-      'result',
-      'result.followup'
-    ])->findOrFail($id);
-  }
+    public function getPostpartumVisitById(string $id)
+    {
+        return PostpartumVisit::with([
+            'answers',
+            'answers.question',
+            'answers.question.optionQuestions',
+            'result',
+            'result.followup',
+        ])->findOrFail($id);
+    }
 }

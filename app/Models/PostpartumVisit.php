@@ -10,7 +10,7 @@ use App\Enums\FamilySalarySufficientEnum;
 use App\Enums\FeedTyperEnum;
 use App\Enums\PartnerSupportEnum;
 use App\Enums\SleepQualityEnum;
-use App\Models\Scopes\RegionAccessScope;
+use App\Models\Scopes\FacilityAccessScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,8 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PostpartumVisit extends Model
 {
-    use HasUuids, HasFactory;
-
+    use HasFactory, HasUuids;
 
     protected $casts = [
         'sleep_quality' => SleepQualityEnum::class,
@@ -63,25 +62,26 @@ class PostpartumVisit extends Model
         'baby_id',
         'feed_type',
         'mother_id',
-        
+        'facility_id',
+
         'feel_unsafe',
-        'pregnancy_planned'
+        'pregnancy_planned',
     ];
 
     protected function babyCaregiverLabel(): Attribute
     {
         return Attribute::make(
-        get: function () {
-            $data = $this->baby_caregiver;
+            get: function () {
+                $data = $this->baby_caregiver;
 
-            if (is_string($data)) {
-                $data = json_decode($data, true);
+                if (is_string($data)) {
+                    $data = json_decode($data, true);
+                }
+                $safeIds = is_array($data) ? $data : [];
+
+                return BabyCaregiverEnum::getLabelsFromIds($safeIds);
             }
-            $safeIds = is_array($data) ? $data : [];
-
-            return BabyCaregiverEnum::getLabelsFromIds($safeIds);
-        }
-    );
+        );
     }
 
     public function result(): HasOne
@@ -104,6 +104,11 @@ class PostpartumVisit extends Model
         return $this->belongsTo(User::class, 'mother_id', 'id');
     }
 
+    public function facility(): BelongsTo
+    {
+        return $this->belongsTo(Facility::class);
+    }
+
     public function baby(): BelongsTo
     {
         return $this->belongsTo(Baby::class, 'baby_id', 'id');
@@ -114,7 +119,7 @@ class PostpartumVisit extends Model
         return Attribute::make(
             get: function () {
                 $totalScore = $this->result?->total_score ?? 0;
-                
+
                 // Check Question 10 (Self Harm)
                 // We use relation if already loaded, otherwise it might trigger N+1 if not careful,
                 // but for detail view it's always loaded.
@@ -122,21 +127,24 @@ class PostpartumVisit extends Model
                 if ($this->relationLoaded('answers')) {
                     $hasSelfHarm = $this->answers->contains(function ($ans) {
                         $isSelfHarmQ = str_contains(strtolower($ans->question?->question ?? ''), 'menyakiti diri');
-                        if (!$isSelfHarmQ) return false;
-                        
+                        if (! $isSelfHarmQ) {
+                            return false;
+                        }
+
                         $options = $ans->question?->optionQuestions;
                         if ($options) {
                             $matchedOption = $options->firstWhere('option', strtolower($ans->answer));
+
                             return ($matchedOption?->value ?? 0) > 0;
                         }
-                        
+
                         return false;
                     });
                 }
 
                 if ($hasSelfHarm || $totalScore >= 13) {
                     return 'Tinggi';
-                } else if ($totalScore >= 10) {
+                } elseif ($totalScore >= 10) {
                     return 'Ringan';
                 } else {
                     return 'Normal';
@@ -150,6 +158,6 @@ class PostpartumVisit extends Model
      */
     protected static function booted()
     {
-        static::addGlobalScope(new RegionAccessScope);
+        static::addGlobalScope(new FacilityAccessScope);
     }
 }
