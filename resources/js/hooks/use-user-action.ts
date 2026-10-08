@@ -18,6 +18,7 @@ export function useUserAction(user?: User) {
         name: user?.name ?? '',
         email: user?.email ?? '',
         role_id: user?.role.id ?? '',
+        facility_id: user?.facility_id ?? '',
         password: '',
         password_confirmation: '',
         province_id: user?.province_id ?? '',

@@ -63,6 +63,11 @@ class UserUpdateRequestValidator extends FormRequest
           $query->where('deleted_at', null);
         }),
       ],
+      'facility_id' => [
+        'nullable',
+        'uuid',
+        Rule::exists('facilities', 'id')->whereNull('deleted_at'),
+      ],
       // Wilayah hanya wajib diisi untuk Bidan
       'province_id' => [$isMidwife ? 'required' : 'nullable'],
       'regency_id' => [$isMidwife ? 'required' : 'nullable'],

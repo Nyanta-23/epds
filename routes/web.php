@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BabyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PostpartumVisitController;
@@ -111,6 +112,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
   });
 
+  Route::middleware(['role:super_admin,midwife'])->prefix('facility')->name('facility.')->group(function () {
+    Route::get('/', [FacilityController::class, 'index'])->name('index');
+    Route::post('/type', [FacilityController::class, 'storeType'])->name('type.store');
+    Route::put('/type/{facilityType}', [FacilityController::class, 'updateType'])->name('type.update');
+    Route::delete('/type/{facilityType}', [FacilityController::class, 'destroyType'])->name('type.destroy');
+    Route::post('/', [FacilityController::class, 'store'])->name('store');
+    Route::put('/{facility}', [FacilityController::class, 'update'])->name('update');
+    Route::delete('/{facility}', [FacilityController::class, 'destroy'])->name('destroy');
+  });
 
   // 4. USER MANAGEMENT (Akses: Super Admin & Admin)
   // ---------------------------------------------------

@@ -1,14 +1,15 @@
 import MainFormHeader from "@/components/main/main-form-header";
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Extra } from "@/types";
+import { BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
 import UserFormEdit from "../form/user-form-edit";
 import { UserSingleData } from "@/types/data";
+import { UserManagementExtra } from "@/types/resource";
 
 
 interface UserEditProps {
   user: UserSingleData;
-  extra: Extra;
+  extra: UserManagementExtra;
 }
 
 export default function UserEdit({ extra, user }: UserEditProps) {

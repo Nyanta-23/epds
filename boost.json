@@ -1,11 +1,9 @@
 {
     "agents": [
-        "copilot",
-        "gemini"
+        "copilot-cli"
     ],
     "editors": [
-        "copilot-cli",
-        "gemini"
+        "copilot-cli"
     ],
     "guidelines": [
         "revolution/laravel-boost-copilot-cli"

@@ -1,12 +1,13 @@
 import MainFormHeader from "@/components/main/main-form-header";
 import AppLayout from "@/layouts/app-layout";
-import { BreadcrumbItem, Extra } from "@/types";
+import { BreadcrumbItem } from "@/types";
+import { UserManagementExtra } from "@/types/resource";
 import { Head } from "@inertiajs/react";
 import UserFormCreate from "../form/user-form-create";
 
 
 interface UserCreateProps {
-  extra: Extra;
+  extra: UserManagementExtra;
 }
 
 export default function UserCreate({ extra }: UserCreateProps) {

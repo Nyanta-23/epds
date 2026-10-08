@@ -8,6 +8,7 @@ class UserStoreAttributeRequest
   public string $email;
   public string $password;
   public string $role_id;
+  public ?string $facility_id = null;
   public ?string $province_id;
   public ?string $regency_id;
   public ?string $district_id;

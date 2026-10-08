@@ -48,8 +48,13 @@ class User extends Authenticatable implements MustVerifyEmail
     'is_can_visit',
     'number_patient',
     'fcm_token',
+    'facility_id',
     'instansi',
     'nama_instansi',
+    'province_migrate_id',
+    'regency_migrate_id',
+    'district_migrate_id',
+    'village_migrate_id',
   ];
 
   /**
@@ -84,6 +89,11 @@ class User extends Authenticatable implements MustVerifyEmail
     return $this->belongsTo(Role::class);
   }
 
+  public function facility(): BelongsTo
+  {
+    return $this->belongsTo(Facility::class);
+  }
+
   public function permissions()
   {
     return $this->role->permissions;
@@ -106,4 +116,3 @@ class User extends Authenticatable implements MustVerifyEmail
   }
 
 }
-

@@ -15,6 +15,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     Baby,
     FileQuestion,
+    Hospital,
     LayoutGrid,
     ScanHeart,
     UserRoundCog,
@@ -43,6 +44,12 @@ const mainNavItems: NavItem[] = [
         canAccess: ['super_admin'],
     },
     {
+        title: 'Fasilitas',
+        href: '/facility',
+        icon: Hospital,
+        canAccess: ['super_admin', 'midwife'],
+    },
+    {
         title: 'Pasien',
         href: '/patient',
         icon: UserRoundPlus,
@@ -69,11 +76,13 @@ const mainNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage().props as {
+        auth?: { user?: { role?: { slug?: string } } };
+    };
 
     const userRole = auth?.user?.role?.slug || 'guest';
 
-    let filteredNavItems = mainNavItems.filter((value) =>
+    const filteredNavItems = mainNavItems.filter((value) =>
         value.canAccess.includes(userRole),
     );
 

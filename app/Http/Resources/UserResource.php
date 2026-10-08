@@ -29,6 +29,7 @@ class UserResource extends JsonResource
       'village' => $this->village ?? '',
       'instansi' => $this->instansi ?? '',
       'nama_instansi' => $this->nama_instansi ?? '',
+      'facility_id' => $this->facility_id ?? '',
     ];
   }
 }
