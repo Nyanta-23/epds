@@ -128,7 +128,7 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
         } else if (field === 'regency_id') {
             const regencies = cities.find((r) => r.id == strValue);
             if (regencies) {
-                handleInputChange('regency', regencies.name);
+                handleInputChange('city_or_district', regencies.name);
             }
             onCityChange(strValue);
             handleInputChange('district_id', null);
@@ -136,7 +136,7 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
         } else if (field === 'district_id') {
             const district = districts.find((r) => r.id == strValue);
             if (district) {
-                handleInputChange('district', district.name);
+                handleInputChange('subdistrict', district.name);
             }
             onDistrictChange(strValue);
             handleInputChange('village_id', null);

@@ -7,180 +7,176 @@ use App\DTO\Request\User\UserUpdateAttributeRequest;
 use App\Http\Requests\User\UserStoreRequestValidator;
 use App\Http\Requests\User\UserUpdateRequestValidator;
 use App\Http\Resources\RoleResource;
-use Inertia\Inertia;
 use App\Http\Resources\UserResource;
-use App\Models\User;
 use App\Models\Facility;
+use App\Models\User;
 use App\Service\Role\RoleService;
 use App\Service\User\UserService;
 use Illuminate\Http\Request;
-use Log;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private UserService $userService,
+        private RoleService $roleService
+    ) {}
 
+    public function index(Request $request)
+    {
+        $whoAmI = auth()->user();
 
-  public function __construct(
-    private UserService $userService,
-    private RoleService $roleService
-  ) {
-  }
+        $filters = [
+            'search' => $request->input('search'),
+            'only_trash' => $request->boolean('only_trash', false),
+            'filter_list' => [
+                'select_filter' => [
+                    'role' => $request->input('role'),
+                ],
+                // 'checkbox_filter' => []
+            ],
 
-  public function index(Request $request)
-  {
-    $whoAmI = auth()->user();
+        ];
 
-    $filters = [
-      'search' => $request->input('search'),
-      'only_trash' => $request->boolean('only_trash', false),
-      'filter_list' => [
-        'select_filter' => [
-          'role' => $request->input('role')
-        ],
-        // 'checkbox_filter' => []
-      ]
+        $users = $this->userService->index($whoAmI, $filters);
+        $roles = $this->roleService->getAllRoles($whoAmI);
 
-    ];
-
-    $users = $this->userService->index($whoAmI, $filters);
-    $roles = $this->roleService->getAllRoles($whoAmI);
-
-    return Inertia::render('user', [
-      'users' => UserResource::collection($users),
-      'extra' => [
-        'roles' => RoleResource::collection($roles)
-      ],
-      'page_prop' => [
-        'main_link' => '',
-        'filter' => $filters
-      ]
-    ]);
-  }
-
-
-  public function create()
-  {
-
-    $whoAmI = auth()->user();
-
-
-    $roles = $this->roleService->getAllRoles($whoAmI);
-
-    return Inertia::render('user/action/user-create', [
-      'extra' => [
-        'roles' => RoleResource::collection($roles),
-        'facilities' => Facility::query()
-          ->with('facilityType:id,name')
-          ->orderBy('name')
-          ->get(['id', 'name', 'facility_type_id'])
-          ->map(fn (Facility $facility) => [
-            'id' => $facility->id,
-            'name' => $facility->name,
-            'facility_type' => $facility->facilityType?->name,
-          ]),
-      ]
-    ]);
-  }
-
-  public function store(UserStoreRequestValidator $request)
-  {
-
-    try {
-      $validated = $request->validated();
-
-      $userReq = new UserStoreAttributeRequest();
-      $userReq->name = $validated['name'];
-      $userReq->email = $validated['email'];
-      $userReq->password = $validated['password'];
-      $userReq->role_id = $validated['role_id'];
-      $userReq->facility_id = $validated['facility_id'] ?? null;
-      $userReq->province_id = $validated['province_id'] ?? null;
-      $userReq->district_id = $validated['district_id'] ?? null;
-      $userReq->regency_id = $validated['regency_id'] ?? null;
-      $userReq->village_id = $validated['village_id'] ?? null;
-      $userReq->province = $validated['province'] ?? null;
-      $userReq->regency = $validated['regency'] ?? null;
-      $userReq->district = $validated['district'] ?? null;
-      $userReq->village = $validated['village'] ?? null;
-      $userReq->instansi = $validated['instansi'] ?? null;
-      $userReq->nama_instansi = $validated['nama_instansi'] ?? null;
-
-      $this->userService->store($userReq);
-
-      return redirect()->route('user')->with('success', 'User with email ' . $userReq->email . ', has been added');
-    } catch (\Throwable $th) {
-      dump($th->getMessage());
-      return redirect()->back()->with('error', 'An internal server error.');
+        return Inertia::render('user', [
+            'users' => UserResource::collection($users),
+            'extra' => [
+                'roles' => RoleResource::collection($roles),
+            ],
+            'page_prop' => [
+                'main_link' => '',
+                'filter' => $filters,
+            ],
+        ]);
     }
-  }
 
-  public function edit(User $user)
-  {
+    public function create()
+    {
 
-    $whoAmI = auth()->user();
+        $whoAmI = auth()->user();
 
-    $roles = $this->roleService->getAllRoles($whoAmI);
+        $roles = $this->roleService->getAllRoles($whoAmI);
 
-    // Nanti ubah agar tidak dengan super admin
-    $user->load('role', 'facility');
-
-    return Inertia::render('user/action/user-edit', [
-      'user' => new UserResource($user),
-      'extra' => [
-        'roles' => RoleResource::collection($roles),
-        'facilities' => Facility::query()
-          ->with('facilityType:id,name')
-          ->orderBy('name')
-          ->get(['id', 'name', 'facility_type_id'])
-          ->map(fn (Facility $facility) => [
-            'id' => $facility->id,
-            'name' => $facility->name,
-            'facility_type' => $facility->facilityType?->name,
-          ]),
-      ]
-    ]);
-  }
-
-  public function update(UserUpdateRequestValidator $request, User $user)
-  {
-    try {
-
-      $validated = $request->validated();
-      $userReq = new UserUpdateAttributeRequest();
-
-      $userReq->name = $validated['name'];
-      $userReq->role_id = $validated['role_id'];
-      $userReq->facility_id = $validated['facility_id'] ?? null;
-      $userReq->province_id = $validated['province_id'] ?? null;
-      $userReq->district_id = $validated['district_id'] ?? null;
-      $userReq->regency_id = $validated['regency_id'] ?? null;
-      $userReq->village_id = $validated['village_id'] ?? null;
-      $userReq->province = $validated['province'] ?? null;
-      $userReq->city_or_district = $validated['city_or_district'] ?? null;
-      $userReq->subdistrict = $validated['subdistrict'] ?? null;
-      $userReq->regency = $validated['regency'] ?? null;
-      $userReq->village = $validated['village'] ?? null;
-      $userReq->instansi = $validated['instansi'] ?? null;
-      $userReq->nama_instansi = $validated['nama_instansi'] ?? null;
-
-      $this->userService->update($userReq, $user->id);
-
-      return redirect()->route('user')->with('success', 'User with email ' . $user->email . ', has been updated.');
-    } catch (\Throwable $th) {
-      dump($th->getMessage());
-      return redirect()->back()->with('error', 'An internal server error.');
+        return Inertia::render('user/action/user-create', [
+            'extra' => [
+                'roles' => RoleResource::collection($roles),
+                'facilities' => Facility::query()
+                    ->with('facilityType:id,name')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'facility_type_id'])
+                    ->map(fn (Facility $facility) => [
+                        'id' => $facility->id,
+                        'name' => $facility->name,
+                        'facility_type' => $facility->facilityType?->name,
+                    ]),
+            ],
+        ]);
     }
-  }
 
-  public function destroy(User $user)
-  {
-    try {
-      $this->userService->softDelete($user->id);
+    public function store(UserStoreRequestValidator $request)
+    {
 
-      return redirect()->back()->with('success', 'Successfully deleting user.');
-    } catch (\Throwable $th) {
-      dump($th->getMessage());
-      return redirect()->back()->with('error', 'An internal server error.');
+        try {
+            $validated = $request->validated();
+
+            $userReq = new UserStoreAttributeRequest;
+            $userReq->name = $validated['name'];
+            $userReq->email = $validated['email'];
+            $userReq->password = $validated['password'];
+            $userReq->role_id = $validated['role_id'];
+            $userReq->facility_id = $validated['facility_id'] ?? null;
+            $userReq->province_id = $validated['province_id'] ?? null;
+            $userReq->district_id = $validated['district_id'] ?? null;
+            $userReq->regency_id = $validated['regency_id'] ?? null;
+            $userReq->village_id = $validated['village_id'] ?? null;
+            $userReq->province = $validated['province'] ?? null;
+            $userReq->city_or_district = $validated['city_or_district'] ?? null;
+            $userReq->subdistrict = $validated['subdistrict'] ?? null;
+            $userReq->village = $validated['village'] ?? null;
+            $userReq->instansi = $validated['instansi'] ?? null;
+            $userReq->nama_instansi = $validated['nama_instansi'] ?? null;
+
+            $this->userService->store($userReq);
+
+            return redirect()->route('user')->with('success', 'User with email '.$userReq->email.', has been added');
+        } catch (\Throwable $th) {
+            dump($th->getMessage());
+
+            return redirect()->back()->with('error', 'An internal server error.');
+        }
     }
-  }
+
+    public function edit(User $user)
+    {
+
+        $whoAmI = auth()->user();
+
+        $roles = $this->roleService->getAllRoles($whoAmI);
+
+        // Nanti ubah agar tidak dengan super admin
+        $user->load('role', 'facility');
+
+        return Inertia::render('user/action/user-edit', [
+            'user' => new UserResource($user),
+            'extra' => [
+                'roles' => RoleResource::collection($roles),
+                'facilities' => Facility::query()
+                    ->with('facilityType:id,name')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'facility_type_id'])
+                    ->map(fn (Facility $facility) => [
+                        'id' => $facility->id,
+                        'name' => $facility->name,
+                        'facility_type' => $facility->facilityType?->name,
+                    ]),
+            ],
+        ]);
+    }
+
+    public function update(UserUpdateRequestValidator $request, User $user)
+    {
+        try {
+
+            $validated = $request->validated();
+            $userReq = new UserUpdateAttributeRequest;
+
+            $userReq->name = $validated['name'];
+            $userReq->role_id = $validated['role_id'];
+            $userReq->facility_id = $validated['facility_id'] ?? null;
+            $userReq->province_id = $validated['province_id'] ?? null;
+            $userReq->district_id = $validated['district_id'] ?? null;
+            $userReq->regency_id = $validated['regency_id'] ?? null;
+            $userReq->village_id = $validated['village_id'] ?? null;
+            $userReq->province = $validated['province'] ?? null;
+            $userReq->city_or_district = $validated['city_or_district'] ?? null;
+            $userReq->subdistrict = $validated['subdistrict'] ?? null;
+            $userReq->village = $validated['village'] ?? null;
+            $userReq->instansi = $validated['instansi'] ?? null;
+            $userReq->nama_instansi = $validated['nama_instansi'] ?? null;
+
+            $this->userService->update($userReq, $user->id);
+
+            return redirect()->route('user')->with('success', 'User with email '.$user->email.', has been updated.');
+        } catch (\Throwable $th) {
+            dump($th->getMessage());
+
+            return redirect()->back()->with('error', 'An internal server error.');
+        }
+    }
+
+    public function destroy(User $user)
+    {
+        try {
+            $this->userService->softDelete($user->id);
+
+            return redirect()->back()->with('success', 'Successfully deleting user.');
+        } catch (\Throwable $th) {
+            dump($th->getMessage());
+
+            return redirect()->back()->with('error', 'An internal server error.');
+        }
+    }
 }

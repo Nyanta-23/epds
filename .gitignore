@@ -32,3 +32,4 @@ tests/*
 !tests/Feature/
 tests/Feature/*
 !tests/Feature/FacilitiesTest.php
+!tests/Feature/UserUpdateValidationTest.php

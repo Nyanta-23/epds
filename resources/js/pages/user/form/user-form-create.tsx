@@ -38,13 +38,13 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
         } else if (field === 'regency_id') {
             const regencies = cities.find((r) => r.id == strValue);
             onCityChange(strValue);
-            handleInputChange('regency', regencies?.name ?? '');
+            handleInputChange('city_or_district', regencies?.name ?? '');
             handleInputChange('district_id', null);
             handleInputChange('village_id', null);
         } else if (field === 'district_id') {
             const district = districts.find((r) => r.id == strValue);
             onDistrictChange(strValue);
-            handleInputChange('district', district?.name ?? '');
+            handleInputChange('subdistrict', district?.name ?? '');
             handleInputChange('village_id', null);
         } else {
             const village = villages.find((v) => v.id === strValue);
