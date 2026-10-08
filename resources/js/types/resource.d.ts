@@ -9,6 +9,7 @@ export interface User {
     name: string;
     email: string;
     role: Role;
+    facility_id?: string;
     province_id: string;
     regency_id: string;
     district_id: string;
@@ -186,4 +187,37 @@ export interface RecomendationVariation {
 export interface Region {
     id: string;
     name: string | null;
+}
+
+export interface FacilityType {
+    id: string;
+    name: string;
+}
+
+export interface Facility {
+    id: string;
+    name: string;
+    facility_type_id: string;
+    facility_type: FacilityType | null;
+    parent_id: string | null;
+    parent_name: string | null;
+    province_id: string;
+    province: string | null;
+    regency_id: string;
+    regency: string | null;
+    district_id: string;
+    district: string | null;
+    village_id: string;
+    village: string | null;
+}
+
+export interface FacilityOption {
+    id: string;
+    name: string;
+    facility_type: string | null;
+}
+
+export interface UserManagementExtra {
+    roles: { data: Role[] };
+    facilities: FacilityOption[];
 }

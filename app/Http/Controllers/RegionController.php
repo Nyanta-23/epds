@@ -2,38 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District;
+use App\Models\Province;
+use App\Models\Regency;
+use App\Models\Village;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Http;
 
 class RegionController extends Controller
 {
-  private const BASE_URL = 'https://wilayah.id/api';
+    public function provinces(): JsonResponse
+    {
+        return response()->json([
+            'data' => Province::query()
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (Province $province): array => [
+                    'code' => $province->id,
+                    'name' => $province->name,
+                ]),
+        ]);
+    }
 
-  public function provinces(): JsonResponse
-  {
-    $response = Http::get(self::BASE_URL . '/provinces.json');
+    public function regencies(string $provinceCode): JsonResponse
+    {
+        return response()->json([
+            'data' => Regency::query()
+                ->where('province_id', $provinceCode)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (Regency $regency): array => [
+                    'code' => $regency->id,
+                    'name' => $regency->name,
+                ]),
+        ]);
+    }
 
-    return response()->json($response->json());
-  }
+    public function districts(string $regencyCode): JsonResponse
+    {
+        return response()->json([
+            'data' => District::query()
+                ->where('regency_id', $regencyCode)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (District $district): array => [
+                    'code' => $district->id,
+                    'name' => $district->name,
+                ]),
+        ]);
+    }
 
-  public function regencies(string $provinceCode): JsonResponse
-  {
-    $response = Http::get(self::BASE_URL . "/regencies/{$provinceCode}.json");
-
-    return response()->json($response->json());
-  }
-
-  public function districts(string $regencyCode): JsonResponse
-  {
-    $response = Http::get(self::BASE_URL . "/districts/{$regencyCode}.json");
-
-    return response()->json($response->json());
-  }
-
-  public function villages(string $districtCode): JsonResponse
-  {
-    $response = Http::get(self::BASE_URL . "/villages/{$districtCode}.json");
-
-    return response()->json($response->json());
-  }
+    public function villages(string $districtCode): JsonResponse
+    {
+        return response()->json([
+            'data' => Village::query()
+                ->where('district_id', $districtCode)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (Village $village): array => [
+                    'code' => $village->id,
+                    'name' => $village->name,
+                ]),
+        ]);
+    }
 }

@@ -7,6 +7,7 @@ class UserUpdateAttributeRequest
   public string $name;
   // public ?string $email;
   public string $role_id;
+  public ?string $facility_id = null;
   public ?string $province_id;
   public ?string $regency_id;
   public ?string $district_id;

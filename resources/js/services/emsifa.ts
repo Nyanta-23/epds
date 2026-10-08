@@ -8,11 +8,11 @@ export interface Region {
 }
 
 interface WilayahResponse {
-    data: { code: string; name: string }[];
+    data: { code: string | number; name: string }[];
 }
 
-const mapRegion = (item: { code: string; name: string }): Region => ({
-    id: item.code,
+const mapRegion = (item: { code: string | number; name: string }): Region => ({
+    id: String(item.code),
     name: item.name,
 });
 

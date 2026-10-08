@@ -61,6 +61,7 @@ class UserController extends Controller
       $userReq->email = $validated['email'];
       $userReq->password = $validated['password'];
       $userReq->role_id = $validated['role_id'];
+      $userReq->facility_id = $validated['facility_id'] ?? null;
       $userReq->province_id = $validated['province_id'] ?? null;
       $userReq->regency_id = $validated['regency_id'] ?? null;
       $userReq->district_id = $validated['district_id'] ?? null;
@@ -93,6 +94,9 @@ class UserController extends Controller
 
       $userReq->name = $validated['name'];
       $userReq->role_id = $validated['role_id'];
+      $userReq->facility_id = array_key_exists('facility_id', $validated)
+        ? $validated['facility_id']
+        : User::query()->findOrFail($id)->facility_id;
       $userReq->province_id = $validated['province_id'] ?? null;
       $userReq->regency_id = $validated['regency_id'] ?? null;
       $userReq->district_id = $validated['district_id'] ?? null;

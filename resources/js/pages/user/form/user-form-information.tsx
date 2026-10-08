@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import roleIdentifier from '@/components/utils/role-identifier';
 import { FormUser } from '@/types/form';
-import { Region, Role } from '@/types/resource';
+import { FacilityOption, Region, Role } from '@/types/resource';
 import { ChevronDown, Loader2, MapPin } from 'lucide-react';
 import UserActionForm from './user-action-form';
 
@@ -18,6 +18,7 @@ type Errors = Partial<Record<keyof FormUser, string>>;
 
 interface UserFormInformationProps {
     roles: Role[];
+    facilities: FacilityOption[];
     provinces: Region[];
     cities: Region[];
     districts: Region[];
@@ -36,6 +37,7 @@ interface UserFormInformationProps {
 
 export default function UserFormInformation({
     roles,
+    facilities,
     provinces,
     cities,
     districts,
@@ -186,6 +188,47 @@ export default function UserFormInformation({
                 )}
             </div>
 
+            <div>
+                <Label className="mb-2 block text-sm font-medium">
+                    Fasilitas Kesehatan
+                </Label>
+                <Select
+                    value={data.facility_id || 'none'}
+                    onValueChange={(value) =>
+                        handleInputChange(
+                            'facility_id',
+                            value === 'none' ? '' : value,
+                        )
+                    }
+                >
+                    <SelectTrigger
+                        className={`w-full cursor-pointer ${identityErrorClassName('facility_id')}`}
+                    >
+                        <SelectValue placeholder="Pilih fasilitas kesehatan (opsional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="none">Tidak ditentukan</SelectItem>
+                        {facilities.map((facility) => (
+                            <SelectItem
+                                className="cursor-pointer"
+                                key={facility.id}
+                                value={facility.id}
+                            >
+                                {facility.name}
+                                {facility.facility_type
+                                    ? ` — ${facility.facility_type}`
+                                    : ''}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {errors.facility_id && (
+                    <p className="mt-1 text-sm text-destructive">
+                        {errors.facility_id}
+                    </p>
+                )}
+            </div>
+
             {isMidwife && (
                 <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 p-4">
                     <div className="mb-4 flex items-center gap-2">
@@ -201,8 +244,7 @@ export default function UserFormInformation({
                     {/* Instansi */}
                     <div className="mb-4">
                         <Label className="mb-2 block text-xs font-medium text-muted-foreground">
-                            Instansi{' '}
-                            <span className="text-destructive">*</span>
+                            Instansi <span className="text-destructive">*</span>
                         </Label>
                         <Select
                             value={data.instansi ?? ''}

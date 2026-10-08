@@ -1,18 +1,17 @@
 import { useRegion } from '@/hooks/use-region';
 import { useUserAction } from '@/hooks/use-user-action';
-import { Extra } from '@/types';
 import { FormUser } from '@/types/form';
-import { User } from '@/types/resource';
+import { User, UserManagementExtra } from '@/types/resource';
 import { useEffect } from 'react';
 import UserFormInformation from './user-form-information';
 
 interface UserFormEditProps {
-    extra: Extra;
+    extra: UserManagementExtra;
     user: User;
 }
 
 export default function UserFormEdit({ extra, user }: UserFormEditProps) {
-    const { roles } = extra;
+    const { roles, facilities } = extra;
 
     const { data, errors, handleInputChange, updateUser, processing } =
         useUserAction(user);
@@ -169,6 +168,7 @@ export default function UserFormEdit({ extra, user }: UserFormEditProps) {
                                     districts={districts}
                                     villages={villages}
                                     roles={roles.data}
+                                    facilities={facilities}
                                     data={data}
                                     errors={errors}
                                     process={processing}

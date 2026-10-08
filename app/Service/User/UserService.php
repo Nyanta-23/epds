@@ -54,6 +54,7 @@ class UserService
         'name' => $request->name,
         'email' => $request->email,
         'role_id' => $request->role_id,
+        'facility_id' => $request->facility_id,
         'password' => Hash::make($request->password),
         'email_verified_at' => now(),
         'is_verified' => true,
@@ -82,6 +83,7 @@ class UserService
       $updateData = [
         'name' => $request->name,
         'role_id' => $request->role_id,
+        'facility_id' => $request->facility_id,
       ];
 
       // Only update location data if the new role is midwife

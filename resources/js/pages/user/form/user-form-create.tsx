@@ -1,15 +1,15 @@
 import { useRegion } from '@/hooks/use-region';
 import { useUserAction } from '@/hooks/use-user-action';
-import { Extra } from '@/types';
 import { FormUser } from '@/types/form';
+import { UserManagementExtra } from '@/types/resource';
 import UserFormInformation from './user-form-information';
 
 interface UserFormCreateProps {
-    extra: Extra;
+    extra: UserManagementExtra;
 }
 
 export default function UserFormCreate({ extra }: UserFormCreateProps) {
-    const { roles } = extra;
+    const { roles, facilities } = extra;
 
     const { data, errors, handleInputChange, createUser, processing } =
         useUserAction();
@@ -75,6 +75,7 @@ export default function UserFormCreate({ extra }: UserFormCreateProps) {
                                     districts={districts}
                                     villages={villages}
                                     roles={roles.data}
+                                    facilities={facilities}
                                     data={data}
                                     errors={errors}
                                     process={processing || loading}

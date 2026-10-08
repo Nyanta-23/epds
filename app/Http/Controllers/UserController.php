@@ -10,6 +10,7 @@ use App\Http\Resources\RoleResource;
 use Inertia\Inertia;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\Facility;
 use App\Service\Role\RoleService;
 use App\Service\User\UserService;
 use Illuminate\Http\Request;
@@ -67,7 +68,16 @@ class UserController extends Controller
 
     return Inertia::render('user/action/user-create', [
       'extra' => [
-        'roles' => RoleResource::collection($roles)
+        'roles' => RoleResource::collection($roles),
+        'facilities' => Facility::query()
+          ->with('facilityType:id,name')
+          ->orderBy('name')
+          ->get(['id', 'name', 'facility_type_id'])
+          ->map(fn (Facility $facility) => [
+            'id' => $facility->id,
+            'name' => $facility->name,
+            'facility_type' => $facility->facilityType?->name,
+          ]),
       ]
     ]);
   }
@@ -83,6 +93,7 @@ class UserController extends Controller
       $userReq->email = $validated['email'];
       $userReq->password = $validated['password'];
       $userReq->role_id = $validated['role_id'];
+      $userReq->facility_id = $validated['facility_id'] ?? null;
       $userReq->province_id = $validated['province_id'] ?? null;
       $userReq->district_id = $validated['district_id'] ?? null;
       $userReq->regency_id = $validated['regency_id'] ?? null;
@@ -111,12 +122,21 @@ class UserController extends Controller
     $roles = $this->roleService->getAllRoles($whoAmI);
 
     // Nanti ubah agar tidak dengan super admin
-    $user->load('role');
+    $user->load('role', 'facility');
 
     return Inertia::render('user/action/user-edit', [
       'user' => new UserResource($user),
       'extra' => [
-        'roles' => RoleResource::collection($roles)
+        'roles' => RoleResource::collection($roles),
+        'facilities' => Facility::query()
+          ->with('facilityType:id,name')
+          ->orderBy('name')
+          ->get(['id', 'name', 'facility_type_id'])
+          ->map(fn (Facility $facility) => [
+            'id' => $facility->id,
+            'name' => $facility->name,
+            'facility_type' => $facility->facilityType?->name,
+          ]),
       ]
     ]);
   }
@@ -130,6 +150,7 @@ class UserController extends Controller
 
       $userReq->name = $validated['name'];
       $userReq->role_id = $validated['role_id'];
+      $userReq->facility_id = $validated['facility_id'] ?? null;
       $userReq->province_id = $validated['province_id'] ?? null;
       $userReq->district_id = $validated['district_id'] ?? null;
       $userReq->regency_id = $validated['regency_id'] ?? null;
