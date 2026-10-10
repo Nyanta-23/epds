@@ -128,6 +128,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Baby::class, 'mother_id');
     }
 
+    public function webPushSubscriptions(): HasMany
+    {
+        return $this->hasMany(WebPushSubscription::class);
+    }
+
     public function postpartumVisits(): HasMany
     {
         return $this->hasMany(PostpartumVisit::class);

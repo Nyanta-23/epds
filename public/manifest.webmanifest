@@ -1,0 +1,21 @@
+{
+    "id": "/patient-app",
+    "name": "EPDS Sahabat Ibu",
+    "short_name": "EPDS Ibu",
+    "description": "Pantau kesehatan ibu nifas dan jadwal skrining EPDS.",
+    "lang": "id-ID",
+    "start_url": "/patient-app",
+    "scope": "/patient-app",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#FEF6F7",
+    "theme_color": "#FB93A4",
+    "icons": [
+        {
+            "src": "/pwa-icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

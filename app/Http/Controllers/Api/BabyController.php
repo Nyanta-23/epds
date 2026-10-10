@@ -7,6 +7,7 @@ use App\DTO\Request\Baby\BabyUpdateAttributeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Baby\BabyStoreRequestValidator;
 use App\Http\Requests\Baby\BabyUpdateRequestValidator;
+use App\Models\Baby;
 use App\Service\Baby\BabyService;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,99 +15,119 @@ use Log;
 
 class BabyController extends Controller
 {
-  public function __construct(private BabyService $babyService)
-  {
+    public function __construct(private BabyService $babyService) {}
 
-  }
+    public function store(BabyStoreRequestValidator $request)
+    {
+        try {
+            $request->validated();
 
-  public function store(BabyStoreRequestValidator $request)
-  {
-    try {
-      $request->validated();
+            $babyReq = new BabyStoreAttributeRequest;
 
-      $babyReq = new BabyStoreAttributeRequest();
+            $babyReq->which_child = (int) $request->post('which_child');
+            $babyReq->date_of_birth = $request->post('date_of_birth');
+            $babyReq->baby_condition = (int) $request->post('baby_condition');
+            $babyReq->typeof_delivery = (int) $request->post('typeof_delivery');
+            $babyReq->gender = $request->post('gender');
+            $babyReq->mother_id = $request->post('mother_id');
+            $babyReq->baby_feeding_method = (int) $request->post('baby_feeding_method');
 
-      $babyReq->which_child = (int) $request->post('which_child');
-      $babyReq->date_of_birth = $request->post('date_of_birth');
-      $babyReq->baby_condition = (int) $request->post('baby_condition');
-      $babyReq->typeof_delivery = (int) $request->post('typeof_delivery');
-      $babyReq->gender = $request->post('gender');
-      $babyReq->mother_id = $request->post('mother_id');
-      $babyReq->baby_feeding_method = (int) $request->post('baby_feeding_method');
+            $response = $this->babyService->store($babyReq);
 
-      $response = $this->babyService->store($babyReq);
-
-      return response()->json([
-        'message' => 'successfully add baby',
-        'data' => $response
-      ], 201);
-    } catch (Exception $error) {
-      return response()->json([
-        'message' => $error->getMessage(),
-      ], $error->getCode());
+            return response()->json([
+                'message' => 'successfully add baby',
+                'data' => $response,
+            ], 201);
+        } catch (Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage(),
+            ], $error->getCode());
+        }
     }
-  }
 
-  public function find(Request $request, ?string $id)
-  {
-    try {
-      $response = $this->babyService->find($id);
+    public function find(Request $request, ?string $id)
+    {
+        try {
+            if (! $this->canAccessPatientBaby($request, $id)) {
+                return response()->json(['message' => 'Data bayi tidak ditemukan.'], 404);
+            }
+            $response = $this->babyService->find($id);
 
-      return response()->json([
-        'message' => 'data bayi ditemukan',
-        'data' => $response
-      ], 200);
-    } catch (Exception $error) {
-      return response()->json([
-        'message' => $error->getMessage()
-      ], $error->getCode());
+            return response()->json([
+                'message' => 'data bayi ditemukan',
+                'data' => $response,
+            ], 200);
+        } catch (Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage(),
+            ], $error->getCode());
+        }
     }
-  }
 
-  public function update(BabyUpdateRequestValidator $request, ?string $id = null)
-  {
-    try {
-      $validated = $request->validated();
+    public function update(BabyUpdateRequestValidator $request, ?string $id = null)
+    {
+        try {
+            if (! $this->canAccessPatientBaby($request, $id)) {
+                return response()->json(['message' => 'Data bayi tidak ditemukan.'], 404);
+            }
+            $validated = $request->validated();
 
-      $request = new BabyUpdateAttributeRequest();
+            $request = new BabyUpdateAttributeRequest;
 
-      $request->which_child = (int) $validated['which_child'];
-      $request->date_of_birth = $validated['date_of_birth'];
-      $request->baby_condition = (int) $validated['baby_condition'];
-      $request->typeof_delivery = (int) $validated['typeof_delivery'];
-      $request->gender = $validated['gender'];
-      $request->mother_id = $validated['mother_id'];
-      $request->baby_feeding_method = (int) $validated['baby_feeding_method'];
+            $request->which_child = (int) $validated['which_child'];
+            $request->date_of_birth = $validated['date_of_birth'];
+            $request->baby_condition = (int) $validated['baby_condition'];
+            $request->typeof_delivery = (int) $validated['typeof_delivery'];
+            $request->gender = $validated['gender'];
+            $request->mother_id = $validated['mother_id'];
+            $request->baby_feeding_method = (int) $validated['baby_feeding_method'];
 
-      $response = $this->babyService->update($request, $id);
+            $response = $this->babyService->update($request, $id);
 
-      return response()->json([
-        'message' => 'data bayi berhasil diupdate',
-        'data' => $response
-      ], 200);
-    } catch (Exception $error) {
-      Log::error('update-baby-error', ['error' => $error->getMessage()]);
-      return response()->json([
-        'message' => $error->getMessage()
-      ], $error->getCode());
+            return response()->json([
+                'message' => 'data bayi berhasil diupdate',
+                'data' => $response,
+            ], 200);
+        } catch (Exception $error) {
+            Log::error('update-baby-error', ['error' => $error->getMessage()]);
+
+            return response()->json([
+                'message' => $error->getMessage(),
+            ], $error->getCode());
+        }
     }
-  }
 
-  public function destroy(Request $request, ?string $id = null)
-  {
-    try {
-      $this->babyService->softDelete($id);
+    public function destroy(Request $request, ?string $id = null)
+    {
+        try {
+            if (! $this->canAccessPatientBaby($request, $id)) {
+                return response()->json(['message' => 'Data bayi tidak ditemukan.'], 404);
+            }
+            $this->babyService->softDelete($id);
 
-      return response()->json([
-        'message' => 'Data Berhasil dihapus',
-      ], 200);
-    } catch (Exception $error) {
-      Log::error('delete-baby-error', ['error' => $error->getMessage(), 'code' => $error->getCode()]);
+            return response()->json([
+                'message' => 'Data Berhasil dihapus',
+            ], 200);
+        } catch (Exception $error) {
+            Log::error('delete-baby-error', ['error' => $error->getMessage(), 'code' => $error->getCode()]);
 
-      $statusCode = $error->getCode() > 0 ? $error->getCode() : 500;
-      return response()->json([
-        'message' => $error->getMessage()
-      ], $statusCode);
+            $statusCode = $error->getCode() > 0 ? $error->getCode() : 500;
+
+            return response()->json([
+                'message' => $error->getMessage(),
+            ], $statusCode);
+        }
     }
-  }
+
+    private function canAccessPatientBaby(Request $request, ?string $id): bool
+    {
+        if ($request->user()->role?->slug !== 'patient') {
+            return true;
+        }
+
+        return Baby::query()
+            ->whereKey($id)
+            ->where('mother_id', $request->user()->id)
+            ->exists();
+    }
 }

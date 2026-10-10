@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DTO\Request\Answer\AnswerPostAttributeRequest;
 use App\DTO\Request\PostpartumVisit\PostpartumVisitStoreAttributeRequest;
 use App\DTO\Request\Result\ResultPostAttributeRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\PostpartumVisitAnswerStoreRequest;
 use App\Models\Answer;
-use App\Models\AutoRecomendation;
 use App\Models\Baby;
-use App\Models\RecomendationRule;
-use App\Models\RecomendationVariation;
 use App\Models\User;
 use App\Notifications\NewScreeningResultNotification;
 use App\Service\AiPostpartumResultService;
 use App\Service\Answer\AnswerService;
 use App\Service\PostpartumVisit\PostpartumVisitService;
 use App\Service\Result\ResultService;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Notification;
 use Log;
@@ -25,141 +22,138 @@ use Str;
 
 class PostpartumVisitAnswerController extends Controller
 {
+    public function __construct(
+        private PostpartumVisitService $postpartumVisitService,
+        private AnswerService $answerService,
+        private ResultService $resultService,
+        private AiPostpartumResultService $aiService,
+        private \App\Service\PostpartumVisit\PostpartumScheduleService $scheduleService
+    ) {}
 
+    public function store(PostpartumVisitAnswerStoreRequest $request)
+    {
+        return DB::transaction(function () use ($request) {
+            try {
+                $user = auth()->user();
+                $validated = $request->validated();
 
-  public function __construct(
-    private PostpartumVisitService $postpartumVisitService,
-    private AnswerService $answerService,
-    private ResultService $resultService,
-    private AiPostpartumResultService $aiService,
-    private \App\Service\PostpartumVisit\PostpartumScheduleService $scheduleService
-  ) {
-  }
+                $latestBaby = Baby::where('mother_id', $user->id)
+                    ->orderBy('date_of_birth', 'desc')
+                    ->first();
 
-  public function store(PostpartumVisitAnswerStoreRequest $request)
-  {
-    return DB::transaction(function () use ($request) {
-      try {
-        $user = auth()->user();
-        $validated = $request->validated();
+                if (! $latestBaby) {
+                    throw new \Exception('Data bayi tidak ditemukan. Silakan lengkapi profil bayi terlebih dahulu.', 404);
+                }
 
-        $latestBaby = Baby::where('mother_id', $user->id)
-          ->orderBy('date_of_birth', 'desc')
-          ->first();
+                // Dapatkan informasi jadwal untuk menentukan visit_number otomatis
+                $scheduleInfo = $this->scheduleService->getScheduleForMother($user->id);
 
-        if (!$latestBaby) {
-          throw new \Exception("Data bayi tidak ditemukan. Silakan lengkapi profil bayi terlebih dahulu.", 404);
-        }
+                // Validasi apakah user bisa mengisi kunjungan saat ini
+                if (! $scheduleInfo->canFill) {
+                    throw new \Exception($scheduleInfo->message, 400);
+                }
 
-        // Dapatkan informasi jadwal untuk menentukan visit_number otomatis
-        $scheduleInfo = $this->scheduleService->getScheduleForMother($user->id);
+                $postpartumVisitReq = new PostpartumVisitStoreAttributeRequest;
 
-        // Validasi apakah user bisa mengisi kunjungan saat ini
-        if (!$scheduleInfo->canFill) {
-          throw new \Exception($scheduleInfo->message, 400);
-        }
+                $postpartumVisitReq->mother_id = $user->id;
+                $postpartumVisitReq->baby_id = $latestBaby->id;
+                $postpartumVisitReq->parity_count = $validated['parity_count'];
 
-        $postpartumVisitReq = new PostpartumVisitStoreAttributeRequest();
+                // Visit number dihitung otomatis dari schedule service
+                $postpartumVisitReq->visit_number = $scheduleInfo->visitNumber;
+                $postpartumVisitReq->date_filled = Carbon::parse($validated['date_filled'])->toDateString();
+                $postpartumVisitReq->sleep_quality = $validated['sleep_quality'];
+                $postpartumVisitReq->partner_support = $validated['partner_support'];
+                $postpartumVisitReq->family_salary_permonth = $validated['family_salary_permonth'];
+                $postpartumVisitReq->dependent_family_count = $validated['dependent_family_count'];
+                $postpartumVisitReq->is_salary_sufficient = $validated['is_salary_sufficient'];
+                $postpartumVisitReq->live_with_partner = $validated['live_with_partner'];
 
-        $postpartumVisitReq->mother_id = $user->id;
-        $postpartumVisitReq->baby_id = $latestBaby->id;
-        $postpartumVisitReq->parity_count = $validated['parity_count'];
+                $postpartumVisitReq->psych_history = $validated['psych_history'];
+                $postpartumVisitReq->psych_treatment = $validated['psych_treatment'];
+                $postpartumVisitReq->psych_trauma = $validated['psych_trauma'];
+                $postpartumVisitReq->feel_unsafe = $validated['feel_unsafe'];
 
-        // Visit number dihitung otomatis dari schedule service
-        $postpartumVisitReq->visit_number = $scheduleInfo->visitNumber;
-        $postpartumVisitReq->date_filled = $validated['date_filled'];
-        $postpartumVisitReq->sleep_quality = $validated['sleep_quality'];
-        $postpartumVisitReq->partner_support = $validated['partner_support'];
-        $postpartumVisitReq->family_salary_permonth = $validated['family_salary_permonth'];
-        $postpartumVisitReq->dependent_family_count = $validated['dependent_family_count'];
-        $postpartumVisitReq->is_salary_sufficient = $validated['is_salary_sufficient'];
-        $postpartumVisitReq->live_with_partner = $validated['live_with_partner'];
+                $postpartumVisitReq->preg_comp_history = $validated['preg_comp_history'];
+                $postpartumVisitReq->pregnancy_planned = $validated['pregnancy_planned'];
+                $postpartumVisitReq->last_comp = $validated['last_comp'];
+                $postpartumVisitReq->last_comp_note = $validated['last_comp_note'] ?? null;
 
-        $postpartumVisitReq->psych_history = $validated['psych_history'];
-        $postpartumVisitReq->psych_treatment = $validated['psych_treatment'];
-        $postpartumVisitReq->psych_trauma = $validated['psych_trauma'];
-        $postpartumVisitReq->feel_unsafe = $validated['feel_unsafe'];
+                $postpartumVisitReq->baby_healthy = $latestBaby->baby_condition;
+                $postpartumVisitReq->baby_caregiver = $validated['baby_caregiver'];
+                $postpartumVisitReq->feed_type = $latestBaby->feed_type;
 
-        $postpartumVisitReq->preg_comp_history = $validated['preg_comp_history'];
-        $postpartumVisitReq->pregnancy_planned = $validated['pregnancy_planned'];
-        $postpartumVisitReq->last_comp = $validated['last_comp'];
-        $postpartumVisitReq->last_comp_note = $validated['last_comp_note'] ?? null;
+                $postpartumVisit = $this->postpartumVisitService->store($postpartumVisitReq);
 
-        $postpartumVisitReq->baby_healthy = $latestBaby->baby_condition;
-        $postpartumVisitReq->baby_caregiver = $validated['baby_caregiver'];
-        $postpartumVisitReq->feed_type = $latestBaby->feed_type;
+                $answerReq = [];
+                foreach ($validated['answers'] as $ans) {
+                    $answerReq[] = [
+                        'id' => Str::uuid(),
+                        'answer' => $ans['answer'],
+                        'question_id' => $ans['question_id'],
+                        'postpartum_visit_id' => $postpartumVisit->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
 
-        $postpartumVisit = $this->postpartumVisitService->store($postpartumVisitReq);
+                Answer::insert($answerReq);
 
-        $answerReq = [];
-        foreach ($validated['answers'] as $ans) {
-          $answerReq[] = [
-            'id' => Str::uuid(),
-            'answer' => $ans['answer'],
-            'question_id' => $ans['question_id'],
-            'postpartum_visit_id' => $postpartumVisit->id,
-            'created_at' => now(),
-            'updated_at' => now(),
-          ];
-        }
+                $questionAnswereds = $this->answerService->getAnswersByPostpartumVisitId($postpartumVisit->id);
 
-        Answer::insert($answerReq);
+                $totalScore = 0;
+                foreach ($questionAnswereds as $answer) {
+                    $userAnswer = strtolower($answer->answer);
+                    $matchedOption = $answer->question->optionQuestions
+                        ->firstWhere('option', $userAnswer);
 
-        $questionAnswereds = $this->answerService->getAnswersByPostpartumVisitId($postpartumVisit->id);
+                    if ($matchedOption) {
+                        $totalScore += $matchedOption->value;
+                    }
+                }
+                $resultDTO = new ResultPostAttributeRequest;
+                $resultDTO->total_score = $totalScore;
+                $resultDTO->followup_status = 0;
+                $resultDTO->postpartum_visit_id = $postpartumVisit->id;
 
-        $totalScore = 0;
-        foreach ($questionAnswereds as $answer) {
-          $userAnswer = strtolower($answer->answer);
-          $matchedOption = $answer->question->optionQuestions
-            ->firstWhere('option', $userAnswer);
+                $result = $this->resultService->store($resultDTO);
 
-          if ($matchedOption) {
-            $totalScore += $matchedOption->value;
-          }
-        }
-        $resultDTO = new ResultPostAttributeRequest();
-        $resultDTO->total_score = $totalScore;
-        $resultDTO->followup_status = 0;
-        $resultDTO->postpartum_visit_id = $postpartumVisit->id;
+                $recommendationData = generate_dummy_recommendation($totalScore);
 
-        $result = $this->resultService->store($resultDTO);
+                $midwives = User::whereHas('role', function ($query) {
+                    $query->where('name', 'Midwife');
+                })
+                    ->where('city_or_district_id', $user->city_or_district_id)
+                    ->get();
 
-        $recommendationData = generate_dummy_recommendation($totalScore);
+                /* Fallback: if no midwife in the same city, notify all midwives */
+                if ($midwives->isEmpty()) {
+                    $midwives = User::whereHas('role', function ($query) {
+                        $query->where('name', 'Midwife');
+                    })->get();
+                }
 
-        $midwives = User::whereHas('role', function ($query) {
-          $query->where('name', 'Midwife');
-        })
-          ->where('city_or_district_id', $user->city_or_district_id)
-          ->get();
+                Log::info('midwife', ['midwife' => $midwives]);
 
-        /* Fallback: if no midwife in the same city, notify all midwives */
-        if ($midwives->isEmpty()) {
-          $midwives = User::whereHas('role', function ($query) {
-            $query->where('name', 'Midwife');
-          })->get();
-        }
+                Notification::send($midwives, new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id));
 
-        Log::info('midwife', ['midwife' => $midwives]);
+                return response()->json([
+                    'message' => 'Successfully store data',
+                    'data' => [
+                        'postpartum_visit_id' => $postpartumVisit->id,
+                        'baby_id' => $latestBaby->id,
+                        'visit_number' => $scheduleInfo->visitNumber,
+                        'visit_label' => $scheduleInfo->label,
+                        'total_score' => $totalScore,
+                        'recommendation' => $recommendationData['recommendation'],
+                        'pesan_penguatan' => $recommendationData['pesan'],
+                    ],
+                ], 201);
 
-        Notification::send($midwives, new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id));
-
-        return response()->json([
-          'message' => 'Successfully store data',
-          'data' => [
-            'postpartum_visit_id' => $postpartumVisit->id,
-            'baby_id' => $latestBaby->id,
-            'visit_number' => $scheduleInfo->visitNumber,
-            'visit_label' => $scheduleInfo->label,
-            'total_score' => $totalScore,
-            'recommendation' => $recommendationData['recommendation'],
-            'pesan_penguatan' => $recommendationData['pesan'],
-          ]
-        ], 201);
-
-      } catch (\Exception $e) {
-        Log::info('Error storing postpartum visit answer: ' . $e->getMessage());
-        throw $e;
-      }
-    });
-  }
+            } catch (\Exception $e) {
+                Log::info('Error storing postpartum visit answer: '.$e->getMessage());
+                throw $e;
+            }
+        });
+    }
 }

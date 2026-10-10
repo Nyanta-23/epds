@@ -12,16 +12,19 @@ class PostpartumController extends Controller
     public function __construct(
         private PostpartumScheduleService $postpartumScheduleService,
         private PostpartumVisitService $postpartumVisitService
-    ) {
-    }
+    ) {}
 
     public function getSchedule(Request $request, string $motherId)
     {
+        if ($request->user()->role?->slug === 'patient' && $motherId !== $request->user()->id) {
+            return response()->json(['message' => 'Anda tidak memiliki akses ke jadwal pasien ini.'], 403);
+        }
+
         $schedule = $this->postpartumScheduleService->getScheduleForMother($motherId);
 
         return response()->json([
             'message' => 'Postpartum schedule retrieved successfully',
-            'data' => $schedule
+            'data' => $schedule,
         ]);
     }
 
@@ -39,12 +42,12 @@ class PostpartumController extends Controller
 
             return response()->json([
                 'message' => 'Previous postpartum visit fetched successfully.',
-                'data' => $previousPostpartumVisit
+                'data' => $previousPostpartumVisit,
             ], 200);
         } catch (\Exception $err) {
             return response()->json([
                 'message' => 'An error occurred.',
-                'error' => $err->getMessage()
+                'error' => $err->getMessage(),
             ], 500);
         }
     }

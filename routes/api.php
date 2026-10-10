@@ -21,17 +21,18 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
         Route::get('/user', function (Request $request) {
-            return $request->user();
+            return $request->user()->load('role');
         });
         Route::put('/user/{id}/change-email', [\App\Http\Controllers\Api\UserController::class, 'changeEmail']);
         Route::put('/user/{id}/change-password', [\App\Http\Controllers\Api\UserController::class, 'changePassword']);
 
-        // User Management Routes
-        Route::get('/user-management', [\App\Http\Controllers\Api\UserController::class, 'index']);
-        Route::post('/user-management', [\App\Http\Controllers\Api\UserController::class, 'store']);
-        Route::put('/user-management/{id}', [\App\Http\Controllers\Api\UserController::class, 'update']);
-        Route::delete('/user-management/{id}', [\App\Http\Controllers\Api\UserController::class, 'destroy']);
-        Route::get('/roles', [\App\Http\Controllers\Api\RoleController::class, 'index']);
+        Route::middleware('role:super_admin,admin,midwife')->group(function () {
+            Route::get('/user-management', [\App\Http\Controllers\Api\UserController::class, 'index']);
+            Route::post('/user-management', [\App\Http\Controllers\Api\UserController::class, 'store']);
+            Route::put('/user-management/{id}', [\App\Http\Controllers\Api\UserController::class, 'update']);
+            Route::delete('/user-management/{id}', [\App\Http\Controllers\Api\UserController::class, 'destroy']);
+            Route::get('/roles', [\App\Http\Controllers\Api\RoleController::class, 'index']);
+        });
 
         // Patient / Profile Routes
         Route::get('/patient/{id?}', [\App\Http\Controllers\Api\PatientController::class, 'show']);
@@ -66,5 +67,7 @@ Route::prefix('v1')->group(function () {
         // FCM Token Routes
         Route::post('/fcm-token', [\App\Http\Controllers\Api\FcmTokenController::class, 'store']);
         Route::delete('/fcm-token', [\App\Http\Controllers\Api\FcmTokenController::class, 'destroy']);
+        Route::post('/web-push-subscriptions', [\App\Http\Controllers\Api\WebPushSubscriptionController::class, 'store']);
+        Route::delete('/web-push-subscriptions', [\App\Http\Controllers\Api\WebPushSubscriptionController::class, 'destroy']);
     });
 });

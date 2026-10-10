@@ -37,13 +37,16 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        if ($request->routeIs('patient.pwa')) {
+            return parent::share($request);
+        }
+
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         // dd(session('success'));
         // dd(session('error'));
         // dd(session('warning'));
         // dd(session('info'));
-
 
         return [
             ...parent::share($request),
@@ -61,7 +64,7 @@ class HandleInertiaRequests extends Middleware
                     : 0,
             ],
 
-            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             // 'ziggy' => fn(): array => [
             //     ...(new Ziggy)->toArray(),
             //     'location' => $request->url()
@@ -72,7 +75,7 @@ class HandleInertiaRequests extends Middleware
             // 'ziggy' => fn() => array_merge((new Ziggy)->toArray(), ['location' => $request->url()]),
             'ziggy' => function () use ($request) {
                 return array_merge((new Ziggy)->toArray(), [
-                    'location' => $request->url()
+                    'location' => $request->url(),
                 ]);
             },
             'flash' => [

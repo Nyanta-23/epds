@@ -17,6 +17,12 @@ const firebaseConfig = {
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string;
 const LS_TOKEN_KEY = 'epds_fcm_token';
+interface FcmRegistrationOptions {
+    endpoint?: string;
+    apiToken?: string;
+    userId?: string;
+    throwOnError?: boolean;
+}
 
 function getFirebaseMessaging() {
     const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
@@ -57,13 +63,27 @@ async function registerServiceWorker(): Promise<ServiceWorkerRegistration> {
     });
 }
 
-async function saveTokenToBackend(token: string): Promise<void> {
-    const cached = localStorage.getItem(LS_TOKEN_KEY);
+async function saveTokenToBackend(
+    token: string,
+    options: FcmRegistrationOptions = {},
+): Promise<void> {
+    const endpoint = options.endpoint ?? '/fcm-token';
+    const storageKey = options.userId
+        ? `${LS_TOKEN_KEY}:${endpoint}:${options.userId}`
+        : LS_TOKEN_KEY;
+    const cached = localStorage.getItem(storageKey);
     if (cached === token) return; // already saved, skip round-trip
 
-    /* Web route — session/cookie auth, XSRF handled by axios automatically */
-    await axios.post('/fcm-token', { fcm_token: token });
-    localStorage.setItem(LS_TOKEN_KEY, token);
+    if (options.apiToken) {
+        await axios.post(
+            endpoint,
+            { token },
+            { headers: { Authorization: `Bearer ${options.apiToken}` } },
+        );
+    } else {
+        await axios.post(endpoint, { fcm_token: token });
+    }
+    localStorage.setItem(storageKey, token);
     console.info('[useFcm] FCM token saved to backend.');
 }
 
@@ -76,7 +96,9 @@ async function saveTokenToBackend(token: string): Promise<void> {
  *
  * Returns true if permission was granted (or was already granted).
  * ──────────────────────────────────────────────────────────────────── */
-export async function requestFcmPermission(): Promise<boolean> {
+export async function requestFcmPermission(
+    options: FcmRegistrationOptions = {},
+): Promise<boolean> {
     console.log(
         '[FCM] requestFcmPermission called — current permission:',
         Notification.permission,
@@ -88,6 +110,11 @@ export async function requestFcmPermission(): Promise<boolean> {
         !VAPID_KEY
     ) {
         console.warn('[FCM] Notifications not supported or VAPID key missing.');
+        if (options.throwOnError) {
+            throw new Error(
+                'Notifikasi web belum tersedia. Periksa dukungan browser dan konfigurasi VAPID.',
+            );
+        }
         return false;
     }
 
@@ -99,9 +126,13 @@ export async function requestFcmPermission(): Promise<boolean> {
                 vapidKey: VAPID_KEY,
                 serviceWorkerRegistration: sw,
             });
-            if (token) await saveTokenToBackend(token);
+            if (token) await saveTokenToBackend(token, options);
+            else if (options.throwOnError) {
+                throw new Error('Token notifikasi tidak berhasil dibuat.');
+            }
         } catch (e) {
             console.error('[useFcm] Token refresh failed:', e);
+            if (options.throwOnError) throw e;
         }
         return true;
     }
@@ -109,6 +140,11 @@ export async function requestFcmPermission(): Promise<boolean> {
     /* Already denied — cannot ask again programmatically */
     if (Notification.permission === 'denied') {
         console.warn('[useFcm] Notification permission was denied by user.');
+        if (options.throwOnError) {
+            throw new Error(
+                'Izin notifikasi diblokir. Aktifkan notifikasi melalui pengaturan browser.',
+            );
+        }
         return false;
     }
 
@@ -128,12 +164,16 @@ export async function requestFcmPermission(): Promise<boolean> {
             vapidKey: VAPID_KEY,
             serviceWorkerRegistration: sw,
         });
-        if (token) await saveTokenToBackend(token);
+        if (token) await saveTokenToBackend(token, options);
+        else if (options.throwOnError) {
+            throw new Error('Token notifikasi tidak berhasil dibuat.');
+        }
     } catch (e) {
         console.error(
             '[useFcm] Error obtaining FCM token after permission grant:',
             e,
         );
+        if (options.throwOnError) throw e;
     }
 
     return true;

@@ -19,6 +19,14 @@ class PatientController extends Controller
     public function show(Request $request, ?string $id = null)
     {
         try {
+            if ($request->user()->role?->slug === 'patient') {
+                if ($id !== null && $id !== $request->user()->id) {
+                    return response()->json(['message' => 'Anda tidak memiliki akses ke data pasien ini.'], 403);
+                }
+
+                $id = $request->user()->id;
+            }
+
             $search = $request->get('search');
             $response = $this->patientService->getPatients($id, $search);
 
@@ -38,6 +46,10 @@ class PatientController extends Controller
     public function update(PatientUpdateRequestValidator $request, string $id)
     {
         try {
+            if ($request->user()->role?->slug === 'patient' && $id !== $request->user()->id) {
+                return response()->json(['message' => 'Anda tidak memiliki akses untuk mengubah data pasien ini.'], 403);
+            }
+
             $validated = $request->validated();
 
             $user = User::find($id);
@@ -87,6 +99,14 @@ class PatientController extends Controller
     public function getPostpartumChart(Request $request, ?string $id = null)
     {
         try {
+            if ($request->user()->role?->slug === 'patient') {
+                if ($id !== null && $id !== $request->user()->id) {
+                    return response()->json(['message' => 'Anda tidak memiliki akses ke data pasien ini.'], 403);
+                }
+
+                $id = $request->user()->id;
+            }
+
             $response = $this->patientService->getPostpartumChart($id);
 
             return response()->json([
