@@ -42,6 +42,10 @@ async function fetchOptions<T>(url: string): Promise<T[]> {
     return response.data.data;
 }
 
+function getSelectValue(value: string | undefined): string {
+    return value ? String(value) : '';
+}
+
 export default function SelectLocationApi({
     value,
     onChange,
@@ -187,7 +191,7 @@ export default function SelectLocationApi({
     }, [value.subdistrict_id]);
 
     function handleProvinceChange(id: string) {
-        const province = provinces.find((option) => option.code === id);
+        const province = provinces.find((option) => String(option.code) === id);
         setLoading((current) => ({ ...current, regencies: true }));
         onChange({
             province_id: id,
@@ -203,7 +207,7 @@ export default function SelectLocationApi({
     }
 
     function handleRegencyChange(id: string) {
-        const regency = regencies.find((option) => option.code === id);
+        const regency = regencies.find((option) => String(option.code) === id);
         setLoading((current) => ({
             ...current,
             districts: true,
@@ -222,7 +226,7 @@ export default function SelectLocationApi({
     }
 
     function handleDistrictChange(id: string) {
-        const district = districts.find((option) => option.code === id);
+        const district = districts.find((option) => String(option.code) === id);
         setLoading((current) => ({ ...current, villages: true }));
         onChange({
             ...value,
@@ -234,7 +238,7 @@ export default function SelectLocationApi({
     }
 
     function handleVillageChange(id: string) {
-        const village = villages.find((option) => option.code === id);
+        const village = villages.find((option) => String(option.code) === id);
         onChange({
             ...value,
             village_id: id,
@@ -250,15 +254,15 @@ export default function SelectLocationApi({
                 </Label>
                 <Select
                     onValueChange={handleProvinceChange}
-                    value={value.province_id || ''}
+                    value={getSelectValue(value.province_id)}
                     disabled={loading.provinces}
                 >
                     <SelectTrigger className={`${identityErrorClassName('province_id')} cursor-pointer`}>
-                        <SelectValue placeholder="Pilih provinsi" />
+                        <SelectValue placeholder="Pilih provinsi">{value.province || undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                         {provinces.map((province) => (
-                            <SelectItem key={province.code} value={province.code}>
+                            <SelectItem key={province.code} value={String(province.code)}>
                                 {province.name}
                             </SelectItem>
                         ))}
@@ -273,15 +277,15 @@ export default function SelectLocationApi({
                 </Label>
                 <Select
                     onValueChange={handleRegencyChange}
-                    value={value.city_or_district_id || ''}
+                    value={getSelectValue(value.city_or_district_id)}
                     disabled={!value.province_id || loading.regencies}
                 >
                     <SelectTrigger className={`${identityErrorClassName('city_or_district_id')} cursor-pointer`}>
-                        <SelectValue placeholder="Pilih kabupaten / kota" />
+                        <SelectValue placeholder="Pilih kabupaten / kota">{value.city_or_district || undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                         {regencies.map((regency) => (
-                            <SelectItem key={regency.code} value={regency.code}>
+                            <SelectItem key={regency.code} value={String(regency.code)}>
                                 {regency.name}
                             </SelectItem>
                         ))}
@@ -296,15 +300,15 @@ export default function SelectLocationApi({
                 </Label>
                 <Select
                     onValueChange={handleDistrictChange}
-                    value={value.subdistrict_id || ''}
+                    value={getSelectValue(value.subdistrict_id)}
                     disabled={!value.city_or_district_id || loading.districts}
                 >
                     <SelectTrigger className={`${identityErrorClassName('subdistrict_id')} cursor-pointer`}>
-                        <SelectValue placeholder="Pilih kecamatan" />
+                        <SelectValue placeholder="Pilih kecamatan">{value.subdistrict || undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                         {districts.map((district) => (
-                            <SelectItem key={district.code} value={district.code}>
+                            <SelectItem key={district.code} value={String(district.code)}>
                                 {district.name}
                             </SelectItem>
                         ))}
@@ -319,15 +323,15 @@ export default function SelectLocationApi({
                 </Label>
                 <Select
                     onValueChange={handleVillageChange}
-                    value={value.village_id || ''}
+                    value={getSelectValue(value.village_id)}
                     disabled={!value.subdistrict_id || loading.villages}
                 >
                     <SelectTrigger className={`${identityErrorClassName('village_id')} cursor-pointer`}>
-                        <SelectValue placeholder="Pilih desa / kelurahan" />
+                        <SelectValue placeholder="Pilih desa / kelurahan">{value.village || undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                         {villages.map((village) => (
-                            <SelectItem key={village.code} value={village.code}>
+                            <SelectItem key={village.code} value={String(village.code)}>
                                 {village.name}
                             </SelectItem>
                         ))}
