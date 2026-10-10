@@ -23,24 +23,44 @@ class PatientUpdateRequestValidator extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['string', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100'],
             'phone_number' => ['required', 'string', 'max:50'],
             'birthplace' => ['required', 'string', 'max:50'],
-            'date_of_birth' => ['date'],
+            'date_of_birth' => ['required', 'date'],
             'job' => ['required', 'string', 'max:255'],
-            'married_status' => [Rule::in(['married', 'not_married', 'divorced'])],
+            'married_status' => ['required', Rule::in(['married', 'not_married', 'divorced'])],
             'highest_education' => ['required', 'string', 'max:10'],
-            'province' => ['required', 'string', 'max:50'],
-            'city_or_district' => ['required', 'string', 'max:50'],
-            'subdistrict' => ['required', 'string', 'max:50'],
-            'village' => ['required', 'string', 'max:50'],
+            'province' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'city_or_district' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'subdistrict' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'village' => ['sometimes', 'nullable', 'string', 'max:50'],
 
-            'province_id' => ['required', 'string', 'max:50'],
-            'city_or_district_id' => ['required', 'string', 'max:50'],
-            'subdistrict_id' => ['required', 'string', 'max:50'],
-            'village_id' => ['required', 'string', 'max:50'],
+            'province_id' => ['required', 'string', Rule::exists('provinces', 'id')],
+            'city_or_district_id' => [
+                'required',
+                'string',
+                Rule::exists('regencies', 'id')->where('province_id', $this->input('province_id')),
+            ],
+            'subdistrict_id' => [
+                'required',
+                'string',
+                Rule::exists('districts', 'id')->where('regency_id', $this->input('city_or_district_id')),
+            ],
+            'village_id' => [
+                'required',
+                'string',
+                Rule::exists('villages', 'id')->where('district_id', $this->input('subdistrict_id')),
+            ],
 
-            'address' => ['nullable', 'string'],
+            'address' => ['required', 'string'],
+            'facility_id' => [
+                'required',
+                'string',
+                Rule::exists('facilities', 'id')
+                    ->where('regency_id', $this->input('city_or_district_id'))
+                    ->where('is_deleted', false)
+                    ->whereNull('deleted_at'),
+            ],
         ];
     }
 }

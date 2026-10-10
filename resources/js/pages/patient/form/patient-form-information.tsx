@@ -1,8 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormPatient } from "@/types/form";
-import { ChevronDown } from "lucide-react";
 import PatientActionForm from "./patient-action-form";
 import { DatePicker } from "@/components/utils/date-picker";
 import { SelectMarriedStatusInput } from "@/components/utils/select-married-status-input";
@@ -150,16 +148,18 @@ export default function PatientFormInformation({ data, errors, process, handleIn
             subdistrict_id: data.subdistrict_id,
             village: data.village,
             village_id: data.village_id,
+            facility_id: data.facility_id,
           }}
           onChange={(val) => {
             handleInputChange("province", val.province)
-            handleInputChange("province_id" as any, val.province_id || "")
+            handleInputChange("province_id", val.province_id || "")
             handleInputChange("city_or_district", val.city_or_district)
-            handleInputChange("city_or_district_id" as any, val.city_or_district_id || "")
+            handleInputChange("city_or_district_id", val.city_or_district_id || "")
             handleInputChange("subdistrict", val.subdistrict)
-            handleInputChange("subdistrict_id" as any, val.subdistrict_id || "")
+            handleInputChange("subdistrict_id", val.subdistrict_id || "")
             handleInputChange("village", val.village)
-            handleInputChange("village_id" as any, val.village_id || "")
+            handleInputChange("village_id", val.village_id || "")
+            handleInputChange("facility_id", val.facility_id || "")
           }}
           errors={errors}
           identityErrorClassName={identityErrorClassName}

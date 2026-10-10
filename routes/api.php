@@ -1,9 +1,19 @@
 <?php
 
+use App\Http\Controllers\Api\FacilityController;
+use App\Http\Controllers\RegionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::prefix('region')->name('api.v1.region.')->group(function () {
+        Route::get('/provinces', [RegionController::class, 'provinces'])->name('provinces');
+        Route::get('/regencies/{provinceCode}', [RegionController::class, 'regencies'])->name('regencies');
+        Route::get('/districts/{regencyCode}', [RegionController::class, 'districts'])->name('districts');
+        Route::get('/villages/{districtCode}', [RegionController::class, 'villages'])->name('villages');
+    });
+    Route::get('/facilities', [FacilityController::class, 'index'])->name('api.v1.facilities.index');
+
     // Auth Routes
     Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);

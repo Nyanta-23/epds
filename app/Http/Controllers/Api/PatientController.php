@@ -9,109 +9,97 @@ use App\Http\Resources\PatientResource;
 use App\Models\User;
 use App\Service\Patient\PatientService;
 use Exception;
-use Log;
 use Illuminate\Http\Request;
-use Str;
+use Log;
 
 class PatientController extends Controller
 {
-  public function __construct(private PatientService $patientService)
-  {
-  }
+    public function __construct(private PatientService $patientService) {}
 
-  public function show(Request $request, ?string $id = null)
-  {
-    try {
-      $search = $request->get('search');
-      $response = $this->patientService->getPatients($id, $search);
+    public function show(Request $request, ?string $id = null)
+    {
+        try {
+            $search = $request->get('search');
+            $response = $this->patientService->getPatients($id, $search);
 
-      $resource = PatientResource::collection($response);
+            $resource = PatientResource::collection($response);
 
-      return response()->json([
-        'message' => 'data found',
-        'data' => $id ? $resource[0] : $resource
-      ]);
+            return response()->json([
+                'message' => 'data found',
+                'data' => $id ? $resource[0] : $resource,
+            ]);
+        } catch (Exception $error) {
+            return response()->json([
+                'message' => $error->getMessage(),
+            ], $error->getCode());
+        }
     }
-    catch (Exception $error) {
-      return response()->json([
-        'message' => $error->getMessage()
-      ], $error->getCode());
+
+    public function update(PatientUpdateRequestValidator $request, string $id)
+    {
+        try {
+            $validated = $request->validated();
+
+            $user = User::find($id);
+
+            if (! $user) {
+                throw new Exception('pengguna tidak ditemukan', 404);
+            }
+
+            $request = new PatientUpdateAttributeRequest;
+            $request->name = $validated['name'];
+            $request->phone_number = $validated['phone_number'];
+            $request->birthplace = $validated['birthplace'];
+            $request->date_of_birth = $validated['date_of_birth'];
+            $request->job = $validated['job'];
+            $request->married_status = $validated['married_status'];
+            $request->highest_education = $validated['highest_education'];
+            $request->province = $validated['province'] ?? null;
+            $request->city_or_district = $validated['city_or_district'] ?? null;
+            $request->subdistrict = $validated['subdistrict'] ?? null;
+            $request->village = $validated['village'] ?? null;
+            $request->province_id = $validated['province_id'];
+            $request->city_or_district_id = $validated['city_or_district_id'];
+            $request->subdistrict_id = $validated['subdistrict_id'];
+            $request->village_id = $validated['village_id'];
+            $request->address = $validated['address'];
+            $request->facility_id = $validated['facility_id'];
+
+            $request->number_patient = $user->number_patient;
+
+            $response = $this->patientService->update($request, $id);
+
+            Log::info('data', ['data' => $response]);
+
+            return response()->json([
+                'message' => 'update successfully',
+                'data' => $response,
+            ], 200);
+        } catch (Exception $error) {
+            Log::error('update_patient_error', ['error' => $error->getMessage()]);
+
+            return response()->json([
+                'message' => $error->getMessage(),
+            ], $error->getCode());
+        }
     }
-  }
 
-  public function update(PatientUpdateRequestValidator $request, string $id)
-  {
-    try {
-      $validated = $request->validated();
+    public function getPostpartumChart(Request $request, ?string $id = null)
+    {
+        try {
+            $response = $this->patientService->getPostpartumChart($id);
 
+            return response()->json([
+                'message' => 'data found',
+                'data' => $response,
+            ]);
+        } catch (Exception $error) {
+            Log::error('error', ['error' => $error->getMessage()]);
 
-      $user = User::find($id);
-
-      if (!$user) {
-        throw new Exception("pengguna tidak ditemukan", 404);
-      }
-
-      $patientNumber = $user->patient_number;
-
-      if (!$patientNumber) {
-        $random = strtoupper(Str::random(6));
-        $increment = User::count() + 1;
-        $numberPatient = "P-$random-$increment";
-      }
-
-      $request = new PatientUpdateAttributeRequest();
-      $request->name = $validated['name'];
-      $request->phone_number = $validated['phone_number'];
-      $request->birthplace = $validated['birthplace'];
-      $request->date_of_birth = $validated['date_of_birth'];
-      $request->job = $validated['job'];
-      $request->married_status = $validated['married_status'];
-      $request->highest_education = $validated['highest_education'];
-      $request->province = $validated['province'];
-      $request->city_or_district = $validated['city_or_district'];
-      $request->subdistrict = $validated['subdistrict'];
-      $request->village = $validated['village'];
-      $request->province_id = $validated['province_id'];
-      $request->city_or_district_id = $validated['city_or_district_id'];
-      $request->subdistrict_id = $validated['subdistrict_id'];
-      $request->village_id = $validated['village_id'];
-      $request->address = $validated['address'];
-
-      $request->number_patient = $numberPatient;
-
-      $response = $this->patientService->update($request, $id);
-
-      Log::info('data', ['data' => $response]);
-
-      return response()->json([
-        'message' => 'update successfully',
-        'data' => $response
-      ], 200);
+            return response()->json([
+                'message' => $error->getMessage(),
+                'data' => null,
+            ], $error->getCode());
+        }
     }
-    catch (Exception $error) {
-      Log::error('update_patient_error', ['error' => $error->getMessage()]);
-      return response()->json([
-        'message' => $error->getMessage()
-      ], $error->getCode());
-    }
-  }
-
-  public function getPostpartumChart(Request $request, ?string $id = null)
-  {
-    try {
-      $response = $this->patientService->getPostpartumChart($id);
-
-      return response()->json([
-        'message' => 'data found',
-        'data' => $response
-      ]);
-    }
-    catch (Exception $error) {
-      Log::error('error', ['error' => $error->getMessage()]);
-      return response()->json([
-        'message' => $error->getMessage(),
-        'data' => null
-      ], $error->getCode());
-    }
-  }
 }

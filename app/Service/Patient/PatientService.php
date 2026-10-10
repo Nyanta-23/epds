@@ -4,217 +4,245 @@ namespace App\Service\Patient;
 
 use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
 use App\Models\Baby;
+use App\Models\District;
 use App\Models\PostpartumVisit;
+use App\Models\Province;
+use App\Models\Regency;
 use App\Models\User;
+use App\Models\Village;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Log;
 
 class PatientService
 {
+    public function index($filters)
+    {
 
-  public function index($filters)
-  {
+        $search = $filters['search'];
+        $verified = filter_var($filters['filter_list']['select_filter']['is_verified'], FILTER_VALIDATE_BOOLEAN);
+        $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'], FILTER_VALIDATE_BOOLEAN);
 
-    $search = $filters['search'];
-    $verified = filter_var($filters['filter_list']['select_filter']['is_verified'], FILTER_VALIDATE_BOOLEAN);
-    $canVisit = filter_var($filters['filter_list']['select_filter']['is_can_visit'], FILTER_VALIDATE_BOOLEAN);
+        $query = User::with('role')
+            ->with([
+                'provinceMigration',
+                'regencyMigration',
+                'districtMigration',
+                'villageMigration',
+            ])
+            ->whereHas('role', function ($query) {
+                $query->where('slug', 'patient');
+            })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $searchTerms = '%'.$search.'%';
+                    $q->where('name', 'like', $searchTerms);
+                });
+            })
+            ->when($verified, fn ($q) => $q->where('is_verified', $verified))
+            ->when($canVisit, fn ($q) => $q->where('is_can_visit', $canVisit))
+            ->latest();
 
-    $query = User::with('role')
-      ->whereHas('role', function ($query) {
-        $query->where('slug', 'patient');
-      })
-      ->when($search, function ($query, $search) {
-        $query->where(function ($q) use ($search) {
-          $searchTerms = '%' . $search . '%';
-          $q->where('name', 'like', $searchTerms);
-        });
-      })
-      ->when($verified, fn($q) => $q->where('is_verified', $verified))
-      ->when($canVisit, fn($q) => $q->where('is_can_visit', $canVisit))
-      ->latest();
-
-    return $query->paginate(10)
-      ->withQueryString();
-  }
-
-  public function getPatients(?string $id = null, ?string $search = null)
-  {
-    try {
-      $results = User::with('babies')->latest();
-
-      if ($id) {
-        $results->where('id', '=', $id);
-      }
-      
-      if ($search) {
-        $results->where(function ($q) use ($search) {
-          $q->where('name', 'like', "%$search%")
-            ->orWhere('number_patient', 'like', "%$search%");
-        });
-      }
-
-      $results = $results->get();
-
-      if ($id && sizeof($results) == 0)
-        throw new Exception('user not found', 404);
-
-      return $results;
-    } catch (Exception $error) {
-      throw new Exception($error->getMessage(), $error->getCode());
+        return $query->paginate(10)
+            ->withQueryString();
     }
-  }
 
+    public function getPatients(?string $id = null, ?string $search = null)
+    {
+        try {
+            $results = User::with([
+                'babies',
+                'provinceMigration',
+                'regencyMigration',
+                'districtMigration',
+                'villageMigration',
+            ])->latest();
 
-  public function update(PatientUpdateAttributeRequest $request, string $id)
-  {
-    try {
-      $user = User::find($id);
+            if ($id) {
+                $results->where('id', '=', $id);
+            }
 
-      if (!$user)
-        throw new Exception("pengguna tidak ditemukan", 404);
+            if ($search) {
+                $results->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('number_patient', 'like', "%$search%");
+                });
+            }
 
-      $user->fill([
-        'name' => $request->name,
-        'phone_number' => $request->phone_number,
-        'birthplace' => $request->birthplace,
-        'date_of_birth' => $request->date_of_birth,
-        'job' => $request->job,
-        'married_status' => $request->married_status,
-        'highest_education' => $request->highest_education,
-        'province' => $request->province,
-        'city_or_district' => $request->city_or_district,
-        'subdistrict' => $request->subdistrict,
-        'village' => $request->village,
+            $results = $results->get();
 
-        'province_id' => $request->province_id,
-        'city_or_district_id' => $request->city_or_district_id,
-        'subdistrict_id' => $request->subdistrict_id,
-        'village_id' => $request->village_id,
+            if ($id && count($results) == 0) {
+                throw new Exception('user not found', 404);
+            }
 
-        'address' => $request->address,
-        'number_patient' => $request->number_patient
-      ]);
-
-      $user->save();
-
-      return $user;
-
-    } catch (Exception $error) {
-      throw new Exception($error->getMessage(), $error->getCode());
+            return $results;
+        } catch (Exception $error) {
+            throw new Exception($error->getMessage(), $error->getCode());
+        }
     }
-  }
 
-  public function getPostpartumChart(?string $motherId = null)
-  {
-    try {
-      $latestBaby = Baby::where('mother_id', $motherId)
-        ->orderBy('date_of_birth', 'desc')
-        ->first();
+    public function update(PatientUpdateAttributeRequest $request, string $id)
+    {
+        try {
+            return DB::transaction(function () use ($request, $id): User {
+                $user = User::find($id);
 
-      if (!$latestBaby) {
-        return [];
-      }
-      $postpartums = PostpartumVisit::with(['result'])
-        ->where('mother_id', $motherId)
-        ->where('baby_id', $latestBaby->id)
-        ->orderBy('visit_number', 'asc')
-        ->get();
+                if (! $user) {
+                    throw new Exception('pengguna tidak ditemukan', 404);
+                }
 
-      $mappingData = [];
+                $province = Province::findOrFail($request->province_id);
+                $regency = Regency::findOrFail($request->city_or_district_id);
+                $district = District::findOrFail($request->subdistrict_id);
+                $village = Village::findOrFail($request->village_id);
 
-      foreach ($postpartums as $visit) {
-        if (!$visit->result)
-          continue;
+                $user->fill([
+                    'name' => $request->name,
+                    'phone_number' => $request->phone_number,
+                    'birthplace' => $request->birthplace,
+                    'date_of_birth' => $request->date_of_birth,
+                    'job' => $request->job,
+                    'married_status' => $request->married_status,
+                    'highest_education' => $request->highest_education,
+                    'province' => $province->name,
+                    'city_or_district' => $regency->name,
+                    'subdistrict' => $district->name,
+                    'village' => $village->name,
+                    'province_id' => $province->id,
+                    'city_or_district_id' => $regency->id,
+                    'subdistrict_id' => $district->id,
+                    'village_id' => $village->id,
+                    'province_migrate_id' => $province->id,
+                    'regency_migrate_id' => $regency->id,
+                    'district_migrate_id' => $district->id,
+                    'village_migrate_id' => $village->id,
+                    'address' => $request->address,
+                    'number_patient' => $request->number_patient ?? $user->number_patient,
+                    'facility_id' => $request->facility_id,
+                ]);
 
-        $totalScore = $visit->result->total_score;
+                $user->save();
 
-        $mappingData[] = [
-          "parameter" => "KF" . $visit->visit_number,
-          'value' => $this->classificationPostpartumScore($totalScore),
-          'risk_category' => category_score($totalScore),
-          'date_filled' => $visit->date_filled
+                return $user;
+            });
+
+        } catch (Exception $error) {
+            throw new Exception($error->getMessage(), $error->getCode());
+        }
+    }
+
+    public function getPostpartumChart(?string $motherId = null)
+    {
+        try {
+            $latestBaby = Baby::where('mother_id', $motherId)
+                ->orderBy('date_of_birth', 'desc')
+                ->first();
+
+            if (! $latestBaby) {
+                return [];
+            }
+            $postpartums = PostpartumVisit::with(['result'])
+                ->where('mother_id', $motherId)
+                ->where('baby_id', $latestBaby->id)
+                ->orderBy('visit_number', 'asc')
+                ->get();
+
+            $mappingData = [];
+
+            foreach ($postpartums as $visit) {
+                if (! $visit->result) {
+                    continue;
+                }
+
+                $totalScore = $visit->result->total_score;
+
+                $mappingData[] = [
+                    'parameter' => 'KF'.$visit->visit_number,
+                    'value' => $this->classificationPostpartumScore($totalScore),
+                    'risk_category' => category_score($totalScore),
+                    'date_filled' => $visit->date_filled,
+                ];
+            }
+
+            return $mappingData;
+
+        } catch (Exception $error) {
+            throw new Exception($error->getMessage(), 500);
+        }
+    }
+
+    private function classificationPostpartumScore(int $score)
+    {
+        if ($score >= 0 && $score <= 6) {
+            return 1;
+        } elseif ($score >= 7 && $score <= 13) {
+            return 2;
+        } elseif ($score >= 14 && $score <= 19) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
+
+    public function verification(string $id)
+    {
+        $user = DB::transaction(function () use ($id) {
+            $user = User::findOrFail($id);
+
+            $user->update([
+                'is_verified' => ! $user->is_verified,
+            ]);
+
+            return $user;
+        });
+
+        return $user;
+    }
+
+    public function visit(string $id)
+    {
+        $user = DB::transaction(function () use ($id) {
+
+            $user = User::findOrFail($id);
+
+            $user->update([
+                'is_can_visit' => ! $user->is_can_visit,
+            ]);
+
+            return $user;
+        });
+
+        return $user;
+    }
+
+    public function isProfileFilled(string $userId): bool
+    {
+        $user = User::find($userId);
+
+        if (! $user) {
+            return false;
+        }
+
+        $requiredFields = [
+            'phone_number',
+            'birthplace',
+            'date_of_birth',
+            'job',
+            'married_status',
+            'highest_education',
+            'province_id',
+            'city_or_district_id',
+            'subdistrict_id',
+            'village_id',
+            'address',
+            'facility_id',
         ];
-      }
 
-      return $mappingData;
+        foreach ($requiredFields as $field) {
+            if (! filled($user->{$field})) {
+                return false;
+            }
+        }
 
-    } catch (Exception $error) {
-      throw new Exception($error->getMessage(), 500);
+        return true;
     }
-  }
-
-  private function classificationPostpartumScore(int $score)
-  {
-    if ($score >= 0 && $score <= 6) {
-      return 1;
-    } else if ($score >= 7 && $score <= 13) {
-      return 2;
-    } else if ($score >= 14 && $score <= 19) {
-      return 3;
-    } else {
-      return 4;
-    }
-  }
-
-  public function verification(string $id)
-  {
-    $user = DB::transaction(function () use ($id) {
-      $user = User::findOrFail($id);
-
-      $user->update([
-        'is_verified' => !$user->is_verified
-      ]);
-
-      return $user;
-    });
-
-    return $user;
-  }
-
-  public function visit(string $id)
-  {
-    $user = DB::transaction(function () use ($id) {
-
-      $user = User::findOrFail($id);
-
-      $user->update([
-        'is_can_visit' => !$user->is_can_visit
-      ]);
-
-      return $user;
-    });
-
-    return $user;
-  }
-
-  public function isProfileFilled(string $userId): bool
-  {
-    $user = User::find($userId);
-
-    if (!$user) {
-      return false;
-    }
-
-    $requiredFields = [
-      'phone_number',
-      'birthplace',
-      'date_of_birth',
-      'job',
-      'married_status',
-      'highest_education',
-      'province_id',
-      'city_or_district_id',
-      'subdistrict_id',
-      'village_id',
-      'address',
-    ];
-
-    foreach ($requiredFields as $field) {
-      if (!filled($user->{$field})) {
-        return false;
-      }
-    }
-    return true;
-  }
 }

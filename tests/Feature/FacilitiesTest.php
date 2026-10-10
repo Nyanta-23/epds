@@ -200,6 +200,193 @@ class FacilitiesTest extends TestCase
             ->assertJsonCount(0, 'data');
     }
 
+    public function test_public_api_returns_local_region_options_in_hierarchical_order(): void
+    {
+        $this->seedRegion();
+
+        $this->getJson('/api/v1/region/provinces')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    ['code' => '11', 'name' => 'Aceh'],
+                ],
+            ]);
+
+        $this->getJson('/api/v1/region/regencies/11')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    ['code' => '1101', 'name' => 'Kabupaten Simeulue'],
+                ],
+            ]);
+
+        $this->getJson('/api/v1/region/districts/1101')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    ['code' => '1101010', 'name' => 'Teupah Selatan'],
+                ],
+            ]);
+
+        $this->getJson('/api/v1/region/villages/1101010')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    ['code' => '1101010001', 'name' => 'Lataling'],
+                ],
+            ]);
+
+        $this->getJson('/api/v1/region/regencies/12')
+            ->assertOk()
+            ->assertExactJson(['data' => []]);
+    }
+
+    public function test_public_api_returns_only_active_facilities_in_the_requested_regency(): void
+    {
+        $this->seedRegion();
+        DB::table('regencies')->insert([
+            'id' => '1102',
+            'province_id' => '11',
+            'name' => 'Kabupaten Pidie',
+        ]);
+        $facilityType = FacilityType::query()->create(['name' => 'Puskesmas']);
+        $active = $this->createFacility($facilityType, 'Puskesmas Aktif');
+        $deleted = $this->createFacility($facilityType, 'Puskesmas Terhapus');
+        $deleted->delete();
+        $flaggedDeleted = $this->createFacility($facilityType, 'Puskesmas Nonaktif');
+        $flaggedDeleted->update(['is_deleted' => true]);
+        $otherRegency = $this->createFacility($facilityType, 'Puskesmas Lain');
+        $otherRegency->update(['regency_id' => '1102']);
+
+        $this->getJson('/api/v1/facilities?regency_id=1101')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    [
+                        'id' => $active->id,
+                        'name' => 'Puskesmas Aktif',
+                        'facility_type' => 'Puskesmas',
+                    ],
+                ],
+            ]);
+
+        $this->getJson('/api/v1/facilities')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('regency_id');
+    }
+
+    public function test_patient_profile_update_persists_local_regions_and_selected_facility(): void
+    {
+        $this->seedRegion();
+        $facilityType = FacilityType::query()->create(['name' => 'Puskesmas']);
+        $facility = $this->createFacility($facilityType, 'Puskesmas Pilihan');
+        $patient = $this->userWithRole('patient');
+
+        $this->actingAs($patient, 'sanctum')
+            ->putJson("/api/v1/patient/{$patient->id}", [
+                'name' => $patient->name,
+                'phone_number' => '081234567890',
+                'birthplace' => 'Aceh',
+                'date_of_birth' => '1990-05-15',
+                'job' => 'Ibu Rumah Tangga',
+                'married_status' => 'married',
+                'highest_education' => 'SMA',
+                'province' => 'Nama provinsi buatan',
+                'city_or_district' => 'Nama kabupaten buatan',
+                'subdistrict' => 'Nama kecamatan buatan',
+                'village' => 'Nama desa buatan',
+                'province_id' => '11',
+                'city_or_district_id' => '1101',
+                'subdistrict_id' => '1101010',
+                'village_id' => '1101010001',
+                'address' => 'Jalan Sehat',
+                'facility_id' => $facility->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.facility_id', $facility->id)
+            ->assertJsonPath('data.province', 'Aceh')
+            ->assertJsonPath('data.city_or_district', 'Kabupaten Simeulue')
+            ->assertJsonPath('data.subdistrict', 'Teupah Selatan')
+            ->assertJsonPath('data.village', 'Lataling');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $patient->id,
+            'facility_id' => $facility->id,
+            'province_id' => '11',
+            'city_or_district_id' => '1101',
+            'subdistrict_id' => '1101010',
+            'village_id' => '1101010001',
+            'province_migrate_id' => '11',
+            'regency_migrate_id' => '1101',
+            'district_migrate_id' => '1101010',
+            'village_migrate_id' => '1101010001',
+        ]);
+    }
+
+    public function test_patient_profile_update_rejects_region_codes_outside_the_selected_hierarchy(): void
+    {
+        $this->seedRegion();
+        DB::table('provinces')->insert(['id' => '12', 'name' => 'Sumatera Utara']);
+        DB::table('regencies')->insert([
+            'id' => '1201',
+            'province_id' => '12',
+            'name' => 'Kabupaten Tapanuli Selatan',
+        ]);
+        $facilityType = FacilityType::query()->create(['name' => 'Puskesmas']);
+        $facility = $this->createFacility($facilityType, 'Puskesmas Pilihan');
+        $patient = $this->userWithRole('patient');
+
+        $this->actingAs($patient, 'sanctum')
+            ->putJson("/api/v1/patient/{$patient->id}", [
+                ...$this->validPatientProfileAttributes($facility->id),
+                'city_or_district_id' => '1201',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['city_or_district_id', 'facility_id']);
+    }
+
+    public function test_patient_profile_update_requires_facility_and_local_region_codes(): void
+    {
+        $this->seedRegion();
+        $patient = $this->userWithRole('patient');
+
+        $this->actingAs($patient, 'sanctum')
+            ->putJson("/api/v1/patient/{$patient->id}", [
+                'name' => $patient->name,
+                'phone_number' => '081234567890',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'province_id',
+                'city_or_district_id',
+                'subdistrict_id',
+                'village_id',
+                'facility_id',
+            ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function validPatientProfileAttributes(string $facilityId): array
+    {
+        return [
+            'name' => 'Pasien',
+            'phone_number' => '081234567890',
+            'birthplace' => 'Aceh',
+            'date_of_birth' => '1990-05-15',
+            'job' => 'Ibu Rumah Tangga',
+            'married_status' => 'married',
+            'highest_education' => 'SMA',
+            'province_id' => '11',
+            'city_or_district_id' => '1101',
+            'subdistrict_id' => '1101010',
+            'village_id' => '1101010001',
+            'address' => 'Jalan Sehat',
+            'facility_id' => $facilityId,
+        ];
+    }
+
     private function userWithRole(string $slug): User
     {
         $role = Role::query()->create(['name' => $slug, 'slug' => $slug]);

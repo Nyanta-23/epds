@@ -25,6 +25,10 @@ Semua perubahan penting pada **Skrining EPDS (Edinburgh Postnatal Depression Sca
 - Notifikasi skrining EPDS terlewat hanya dikirim kepada bidan yang bertugas di fasilitas skrining terkait, serta admin dan super admin.
 - Form manajemen pengguna yang diakses bidan hanya menampilkan fasilitas penugasannya.
 - Form pengguna tidak lagi meminta wilayah kerja, jenis instansi, atau nama instansi terpisah untuk bidan; penugasan fasilitas menjadi acuan dan wajib untuk akun bidan baru atau yang diperbarui. Kolom data wilayah lama di database tetap dipertahankan.
+- API publik `GET /api/v1/region/provinces`, `/regencies/{provinceCode}`, `/districts/{regencyCode}`, dan `/villages/{districtCode}` menyediakan pilihan wilayah berjenjang dari tabel lokal dengan format respons yang konsisten.
+- API publik `GET /api/v1/facilities?regency_id={code}` menyediakan fasilitas aktif beserta jenisnya untuk kabupaten/kota yang dipilih.
+- Profil pasien kini menyimpan dan mengembalikan `facility_id`; fasilitas wajib dipilih saat melengkapi atau memperbarui profil, dan menjadi syarat `has_profile`.
+- Form tambah dan ubah profil di aplikasi mobile memuat wilayah dari API lokal serta meminta pilihan fasilitas kesehatan yang aktif.
 
 ### Security
 

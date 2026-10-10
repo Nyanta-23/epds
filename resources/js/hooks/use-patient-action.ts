@@ -30,6 +30,7 @@ export function usePatientAction(patient?: Patient) {
         city_or_district_id: patient?.city_or_district_id ?? '',
         subdistrict_id: patient?.subdistrict_id ?? '',
         village_id: patient?.village_id ?? '',
+        facility_id: patient?.facility_id ?? '',
 
         address: patient?.address ?? '',
         is_verified: patient?.is_verified ?? false,

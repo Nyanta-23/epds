@@ -6,7 +6,19 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
+
+interface RegionOption {
+    code: string;
+    name: string;
+}
+
+interface FacilityOption {
+    id: string;
+    name: string;
+    facility_type: string | null;
+}
 
 interface SelectLocationProps {
     value: {
@@ -18,10 +30,16 @@ interface SelectLocationProps {
         subdistrict_id?: string;
         village: string;
         village_id?: string;
+        facility_id?: string;
     };
     onChange: (value: SelectLocationProps['value']) => void;
     errors?: Record<string, string | undefined>;
     identityErrorClassName?: (field: string) => string;
+}
+
+async function fetchOptions<T>(url: string): Promise<T[]> {
+    const response = await axios.get<{ data: T[] }>(url);
+    return response.data.data;
 }
 
 export default function SelectLocationApi({
@@ -30,119 +48,202 @@ export default function SelectLocationApi({
     errors = {},
     identityErrorClassName = () => '',
 }: SelectLocationProps) {
-    const apiLocation = 'https://www.emsifa.com/api-wilayah-indonesia/api';
-
-    const [provinces, setProvinces] = useState<any[]>([]);
-    const [regencies, setRegencies] = useState<any[]>([]);
-    const [districts, setDistricts] = useState<any[]>([]);
-    const [villages, setVillages] = useState<any[]>([]);
-
+    const [provinces, setProvinces] = useState<RegionOption[]>([]);
+    const [regencies, setRegencies] = useState<RegionOption[]>([]);
+    const [districts, setDistricts] = useState<RegionOption[]>([]);
+    const [villages, setVillages] = useState<RegionOption[]>([]);
+    const [facilities, setFacilities] = useState<FacilityOption[]>([]);
     const [loading, setLoading] = useState({
         provinces: false,
         regencies: false,
         districts: false,
         villages: false,
+        facilities: false,
     });
+    const [loadError, setLoadError] = useState<string | null>(null);
 
-    // Fetch provinces
     useEffect(() => {
-        setLoading((p) => ({ ...p, provinces: true }));
-        fetch(`${apiLocation}/provinces.json`)
-            .then((res) => res.json())
-            .then(setProvinces)
-            .finally(() => setLoading((p) => ({ ...p, provinces: false })));
+        let active = true;
+
+        fetchOptions<RegionOption>('/api/v1/region/provinces')
+            .then((options) => {
+                if (active) {
+                    setProvinces(options);
+                    setLoadError(null);
+                }
+            })
+            .catch(() => {
+                if (active) {
+                    setLoadError('Daftar provinsi gagal dimuat. Coba muat ulang halaman.');
+                }
+            })
+            .finally(() => {
+                if (active) {
+                    setLoading((current) => ({ ...current, provinces: false }));
+                }
+            });
+
+        return () => {
+            active = false;
+        };
     }, []);
 
-    // Fetch regencies
     useEffect(() => {
         if (!value.province_id) {
-            setRegencies([]);
             return;
         }
-        setLoading((p) => ({ ...p, regencies: true }));
-        fetch(`${apiLocation}/regencies/${value.province_id}.json`)
-            .then((res) => res.json())
-            .then(setRegencies)
-            .finally(() => setLoading((p) => ({ ...p, regencies: false })));
+
+        let active = true;
+
+        fetchOptions<RegionOption>(
+            `/api/v1/region/regencies/${encodeURIComponent(value.province_id)}`,
+        )
+            .then((options) => {
+                if (active) setRegencies(options);
+            })
+            .catch(() => {
+                if (active) {
+                    setLoadError('Daftar kabupaten/kota gagal dimuat.');
+                }
+            })
+            .finally(() => {
+                if (active) {
+                    setLoading((current) => ({ ...current, regencies: false }));
+                }
+            });
+
+        return () => {
+            active = false;
+        };
     }, [value.province_id]);
 
-    // Fetch districts
     useEffect(() => {
         if (!value.city_or_district_id) {
-            setDistricts([]);
             return;
         }
-        setLoading((p) => ({ ...p, districts: true }));
-        fetch(`${apiLocation}/districts/${value.city_or_district_id}.json`)
-            .then((res) => res.json())
-            .then(setDistricts)
-            .finally(() => setLoading((p) => ({ ...p, districts: false })));
+
+        let active = true;
+
+        Promise.all([
+            fetchOptions<RegionOption>(
+                `/api/v1/region/districts/${encodeURIComponent(value.city_or_district_id)}`,
+            ),
+            fetchOptions<FacilityOption>(
+                `/api/v1/facilities?regency_id=${encodeURIComponent(value.city_or_district_id)}`,
+            ),
+        ])
+            .then(([districtOptions, facilityOptions]) => {
+                if (active) {
+                    setDistricts(districtOptions);
+                    setFacilities(facilityOptions);
+                    setLoadError(null);
+                }
+            })
+            .catch(() => {
+                if (active) {
+                    setLoadError('Daftar kecamatan atau fasilitas gagal dimuat.');
+                }
+            })
+            .finally(() => {
+                if (active) {
+                    setLoading((current) => ({
+                        ...current,
+                        districts: false,
+                        facilities: false,
+                    }));
+                }
+            });
+
+        return () => {
+            active = false;
+        };
     }, [value.city_or_district_id]);
 
-    // Fetch villages
     useEffect(() => {
         if (!value.subdistrict_id) {
-            setVillages([]);
             return;
         }
-        setLoading((p) => ({ ...p, villages: true }));
-        fetch(`${apiLocation}/villages/${value.subdistrict_id}.json`)
-            .then((res) => res.json())
-            .then(setVillages)
-            .finally(() => setLoading((p) => ({ ...p, villages: false })));
+
+        let active = true;
+
+        fetchOptions<RegionOption>(
+            `/api/v1/region/villages/${encodeURIComponent(value.subdistrict_id)}`,
+        )
+            .then((options) => {
+                if (active) setVillages(options);
+            })
+            .catch(() => {
+                if (active) setLoadError('Daftar desa/kelurahan gagal dimuat.');
+            })
+            .finally(() => {
+                if (active) {
+                    setLoading((current) => ({ ...current, villages: false }));
+                }
+            });
+
+        return () => {
+            active = false;
+        };
     }, [value.subdistrict_id]);
 
-    // Handlers
     function handleProvinceChange(id: string) {
-        const province = provinces.find((p) => p.id === id);
+        const province = provinces.find((option) => option.code === id);
+        setLoading((current) => ({ ...current, regencies: true }));
         onChange({
             province_id: id,
-            province: province?.name || '',
+            province: province?.name ?? '',
             city_or_district_id: '',
             city_or_district: '',
             subdistrict_id: '',
             subdistrict: '',
             village_id: '',
             village: '',
+            facility_id: '',
         });
     }
 
     function handleRegencyChange(id: string) {
-        const regency = regencies.find((r) => r.id === id);
+        const regency = regencies.find((option) => option.code === id);
+        setLoading((current) => ({
+            ...current,
+            districts: true,
+            facilities: true,
+        }));
         onChange({
             ...value,
             city_or_district_id: id,
-            city_or_district: regency?.name || '',
+            city_or_district: regency?.name ?? '',
             subdistrict_id: '',
             subdistrict: '',
             village_id: '',
             village: '',
+            facility_id: '',
         });
     }
 
     function handleDistrictChange(id: string) {
-        const district = districts.find((d) => d.id === id);
+        const district = districts.find((option) => option.code === id);
+        setLoading((current) => ({ ...current, villages: true }));
         onChange({
             ...value,
             subdistrict_id: id,
-            subdistrict: district?.name || '',
+            subdistrict: district?.name ?? '',
             village_id: '',
             village: '',
         });
     }
 
     function handleVillageChange(id: string) {
-        const village = villages.find((v) => v.id === id);
+        const village = villages.find((option) => option.code === id);
         onChange({
             ...value,
             village_id: id,
-            village: village?.name || '',
+            village: village?.name ?? '',
         });
     }
 
     return (
         <div className="grid gap-4">
-            {/* Provinsi */}
             <div>
                 <Label className="mb-2 block text-sm font-medium">
                     Provinsi <span className="text-red-500">*</span>
@@ -152,31 +253,20 @@ export default function SelectLocationApi({
                     value={value.province_id || ''}
                     disabled={loading.provinces}
                 >
-                    <SelectTrigger
-                        className={`${identityErrorClassName('province')} cursor-pointer`}
-                    >
+                    <SelectTrigger className={`${identityErrorClassName('province_id')} cursor-pointer`}>
                         <SelectValue placeholder="Pilih provinsi" />
                     </SelectTrigger>
                     <SelectContent>
-                        {provinces.map((p) => (
-                            <SelectItem
-                                className={'cursor-pointer'}
-                                key={p.id}
-                                value={p.id}
-                            >
-                                {p.name}
+                        {provinces.map((province) => (
+                            <SelectItem key={province.code} value={province.code}>
+                                {province.name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
-                {errors.province && (
-                    <p className="mt-1 text-sm text-red-500">
-                        {errors.province}
-                    </p>
-                )}
+                {errors.province_id && <p className="mt-1 text-sm text-red-500">{errors.province_id}</p>}
             </div>
 
-            {/* Kabupaten / Kota */}
             <div>
                 <Label className="mb-2 block text-sm font-medium">
                     Kabupaten / Kota <span className="text-red-500">*</span>
@@ -186,31 +276,20 @@ export default function SelectLocationApi({
                     value={value.city_or_district_id || ''}
                     disabled={!value.province_id || loading.regencies}
                 >
-                    <SelectTrigger
-                        className={`${identityErrorClassName('city_or_district')} cursor-pointer`}
-                    >
+                    <SelectTrigger className={`${identityErrorClassName('city_or_district_id')} cursor-pointer`}>
                         <SelectValue placeholder="Pilih kabupaten / kota" />
                     </SelectTrigger>
                     <SelectContent>
-                        {regencies.map((r) => (
-                            <SelectItem
-                                className={'cursor-pointer'}
-                                key={r.id}
-                                value={r.id}
-                            >
-                                {r.name}
+                        {regencies.map((regency) => (
+                            <SelectItem key={regency.code} value={regency.code}>
+                                {regency.name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
-                {errors.city_or_district && (
-                    <p className="mt-1 text-sm text-red-500">
-                        {errors.city_or_district}
-                    </p>
-                )}
+                {errors.city_or_district_id && <p className="mt-1 text-sm text-red-500">{errors.city_or_district_id}</p>}
             </div>
 
-            {/* Kecamatan */}
             <div>
                 <Label className="mb-2 block text-sm font-medium">
                     Kecamatan <span className="text-red-500">*</span>
@@ -220,31 +299,20 @@ export default function SelectLocationApi({
                     value={value.subdistrict_id || ''}
                     disabled={!value.city_or_district_id || loading.districts}
                 >
-                    <SelectTrigger
-                        className={`${identityErrorClassName('subdistrict')} cursor-pointer`}
-                    >
+                    <SelectTrigger className={`${identityErrorClassName('subdistrict_id')} cursor-pointer`}>
                         <SelectValue placeholder="Pilih kecamatan" />
                     </SelectTrigger>
                     <SelectContent>
-                        {districts.map((d) => (
-                            <SelectItem
-                                className={'cursor-pointer'}
-                                key={d.id}
-                                value={d.id}
-                            >
-                                {d.name}
+                        {districts.map((district) => (
+                            <SelectItem key={district.code} value={district.code}>
+                                {district.name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
-                {errors.subdistrict && (
-                    <p className="mt-1 text-sm text-red-500">
-                        {errors.subdistrict}
-                    </p>
-                )}
+                {errors.subdistrict_id && <p className="mt-1 text-sm text-red-500">{errors.subdistrict_id}</p>}
             </div>
 
-            {/* Desa / Kelurahan */}
             <div>
                 <Label className="mb-2 block text-sm font-medium">
                     Desa / Kelurahan <span className="text-red-500">*</span>
@@ -254,29 +322,47 @@ export default function SelectLocationApi({
                     value={value.village_id || ''}
                     disabled={!value.subdistrict_id || loading.villages}
                 >
-                    <SelectTrigger
-                        className={`${identityErrorClassName('village')} cursor-pointer`}
-                    >
+                    <SelectTrigger className={`${identityErrorClassName('village_id')} cursor-pointer`}>
                         <SelectValue placeholder="Pilih desa / kelurahan" />
                     </SelectTrigger>
                     <SelectContent>
-                        {villages.map((v) => (
-                            <SelectItem
-                                className={'cursor-pointer'}
-                                key={v.id}
-                                value={v.id}
-                            >
-                                {v.name}
+                        {villages.map((village) => (
+                            <SelectItem key={village.code} value={village.code}>
+                                {village.name}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
-                {errors.village && (
-                    <p className="mt-1 text-sm text-red-500">
-                        {errors.village}
-                    </p>
-                )}
+                {errors.village_id && <p className="mt-1 text-sm text-red-500">{errors.village_id}</p>}
             </div>
+
+            <div>
+                <Label className="mb-2 block text-sm font-medium">
+                    Fasilitas Kesehatan <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                    onValueChange={(facilityId) =>
+                        onChange({ ...value, facility_id: facilityId })
+                    }
+                    value={value.facility_id || ''}
+                    disabled={!value.city_or_district_id || loading.facilities}
+                >
+                    <SelectTrigger className={`${identityErrorClassName('facility_id')} cursor-pointer`}>
+                        <SelectValue placeholder="Pilih fasilitas kesehatan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {facilities.map((facility) => (
+                            <SelectItem key={facility.id} value={facility.id}>
+                                {facility.name}
+                                {facility.facility_type ? ` (${facility.facility_type})` : ''}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {errors.facility_id && <p className="mt-1 text-sm text-red-500">{errors.facility_id}</p>}
+            </div>
+
+            {loadError && <p role="alert" className="text-sm text-red-500">{loadError}</p>}
         </div>
     );
 }

@@ -56,6 +56,8 @@ export interface Patient {
     village_id: string;
 
     address: string;
+    facility_id: string | null;
+    facility?: string | null;
     is_verified: boolean;
     is_can_visit: boolean;
 

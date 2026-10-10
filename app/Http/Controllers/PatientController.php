@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\DTO\Request\Patient\PatientUpdateAttributeRequest;
 use App\Http\Requests\Patient\PatientUpdateRequestValidator;
 use App\Http\Resources\PatientResource;
-use App\Http\Resources\Utils\VerifiedResource;
 use App\Models\User;
 use App\Service\Patient\PatientService;
 use Illuminate\Http\Request;
@@ -14,7 +13,6 @@ use Log;
 
 class PatientController extends Controller
 {
-
     public function __construct(
         private PatientService $patientService,
     ) {}
@@ -27,9 +25,9 @@ class PatientController extends Controller
             'filter_list' => [
                 'select_filter' => [
                     'is_verified' => $request->input('is_verified'),
-                    'is_can_visit' => $request->input('is_can_visit')
+                    'is_can_visit' => $request->input('is_can_visit'),
                 ],
-            ]
+            ],
         ];
 
         $patients = $this->patientService->index($filters);
@@ -37,8 +35,8 @@ class PatientController extends Controller
         return Inertia::render('patient', [
             'patients' => PatientResource::collection($patients),
             'page_prop' => [
-                'filter' => $filters
-            ]
+                'filter' => $filters,
+            ],
         ]);
     }
 
@@ -47,11 +45,10 @@ class PatientController extends Controller
         return Inertia::render(
             'patient/action/patient-show',
             [
-                'patient' => new PatientResource($user)
+                'patient' => new PatientResource($user),
             ]
         );
     }
-
 
     public function edit(User $user)
     {
@@ -69,7 +66,7 @@ class PatientController extends Controller
 
             Log::info('request update patient', ['request' => $request->validated()]);
 
-            $patientReq = new PatientUpdateAttributeRequest();
+            $patientReq = new PatientUpdateAttributeRequest;
 
             $patientReq->name = $request->input('name');
             $patientReq->phone_number = $request->input('phone_number');
@@ -89,20 +86,20 @@ class PatientController extends Controller
             $patientReq->subdistrict_id = $request->input('subdistrict_id');
             $patientReq->village_id = $request->input('village_id');
             $patientReq->number_patient = $request->input('number_patient');
+            $patientReq->facility_id = $request->input('facility_id');
 
             $patientReq->address = $request->input('address');
 
             $this->patientService->update($patientReq, $user->id);
 
-            return redirect()->route('patient')->with('success', 'User with email ' . $user->email . ', has been updated.');
+            return redirect()->route('patient')->with('success', 'User with email '.$user->email.', has been updated.');
         } catch (\Throwable $th) {
 
-           Log::error('error', ['error' => $th->getMessage()]);
+            Log::error('error', ['error' => $th->getMessage()]);
 
             return redirect()->back()->with('error', 'An internal server error.');
         }
     }
-
 
     public function visit(User $user)
     {
@@ -112,7 +109,7 @@ class PatientController extends Controller
 
             $message = $result->is_can_visit ? 'can visit' : 'can\'t visit';
 
-            return redirect()->route('patient')->with('success', 'User with email ' . $user->email . ', now ' . $message . '.');
+            return redirect()->route('patient')->with('success', 'User with email '.$user->email.', now '.$message.'.');
         } catch (\Throwable $th) {
 
             dump($th->getMessage());
@@ -130,7 +127,7 @@ class PatientController extends Controller
 
             $message = $result->is_can_visit ? 'verified' : 'unverified';
 
-            return redirect()->route('patient')->with('success', 'User with email ' . $user->email . ', now is ' . $message . '.');
+            return redirect()->route('patient')->with('success', 'User with email '.$user->email.', now is '.$message.'.');
         } catch (\Throwable $th) {
 
             dump($th->getMessage());

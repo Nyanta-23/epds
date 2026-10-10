@@ -26,10 +26,15 @@ export interface FormPatient {
     job: string; // input
     married_status: string; // select
     highest_education: string; // select
-    province: string; // select api
-    city_or_district: string; // select api
-    subdistrict: string; // select api
-    village: string; // select api
+    province: string;
+    city_or_district: string;
+    subdistrict: string;
+    village: string;
+    province_id: string;
+    city_or_district_id: string;
+    subdistrict_id: string;
+    village_id: string;
+    facility_id: string;
     address: string; // text
     number_patient: string;
     [key: string]: any;

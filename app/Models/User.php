@@ -93,6 +93,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Facility::class);
     }
 
+    public function provinceMigration(): BelongsTo
+    {
+        return $this->belongsTo(Province::class, 'province_migrate_id');
+    }
+
+    public function regencyMigration(): BelongsTo
+    {
+        return $this->belongsTo(Regency::class, 'regency_migrate_id');
+    }
+
+    public function districtMigration(): BelongsTo
+    {
+        return $this->belongsTo(District::class, 'district_migrate_id');
+    }
+
+    public function villageMigration(): BelongsTo
+    {
+        return $this->belongsTo(Village::class, 'village_migrate_id');
+    }
+
     protected static function booted(): void
     {
         static::addGlobalScope(new FacilityAccessScope);
