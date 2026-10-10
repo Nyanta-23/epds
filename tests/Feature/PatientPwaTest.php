@@ -31,6 +31,7 @@ class PatientPwaTest extends TestCase
             ->assertOk()
             ->assertHeader('Content-Type', 'application/javascript; charset=utf-8')
             ->assertSee('epds-patient-shell-v1')
+            ->assertSee('if (payload.notification) return;')
             ->assertSee('requireInteraction');
     }
 }

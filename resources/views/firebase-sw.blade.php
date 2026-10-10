@@ -80,6 +80,8 @@ if (/\.(?:css|js|svg|png|woff2?)$/i.test(url.pathname)) {
 messaging.onBackgroundMessage((payload) => {
 console.log('[firebase-messaging-sw.js] Background message received:', payload);
 
+if (payload.notification) return;
+
 const title = payload.data?.title ?? payload.notification?.title ?? 'Notifikasi EPDS';
 const body = payload.data?.body ?? payload.notification?.body ?? '';
 const url = new URL(

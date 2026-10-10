@@ -120,22 +120,20 @@ class PostpartumVisitAnswerController extends Controller
 
                 $recommendationData = generate_dummy_recommendation($totalScore);
 
-                $midwives = User::whereHas('role', function ($query) {
-                    $query->where('name', 'Midwife');
-                })
-                    ->where('city_or_district_id', $user->city_or_district_id)
-                    ->get();
-
-                /* Fallback: if no midwife in the same city, notify all midwives */
-                if ($midwives->isEmpty()) {
-                    $midwives = User::whereHas('role', function ($query) {
+                $midwives = filled($user->facility_id)
+                    ? User::whereHas('role', function ($query) {
                         $query->where('name', 'Midwife');
-                    })->get();
+                    })
+                        ->where('facility_id', $user->facility_id)
+                        ->get()
+                    : collect();
+
+                if ($midwives->isNotEmpty()) {
+                    Notification::send(
+                        $midwives,
+                        new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id)
+                    );
                 }
-
-                Log::info('midwife', ['midwife' => $midwives]);
-
-                Notification::send($midwives, new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id));
 
                 return response()->json([
                     'message' => 'Successfully store data',
