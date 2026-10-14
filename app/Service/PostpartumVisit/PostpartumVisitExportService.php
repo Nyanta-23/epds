@@ -10,7 +10,7 @@ class PostpartumVisitExportService
   public function exportByDateRange(?string $start, ?string $end)
   {
     $query = PostpartumVisit::query()
-      ->with(['mother', 'baby']);
+      ->with(['mother', 'baby', 'result']);
 
     $query->when($start || $end, function ($q) use ($start, $end) {
       if ($start && $end) {
@@ -31,6 +31,7 @@ class PostpartumVisitExportService
       ->map(fn($item, $index) => [
         'No' => ($index + 1),
         'Ibu' => $item->mother?->name,
+        'Skor Skrinning' => $item->result->total_score,
 
         'Anak Ke' => $item->baby?->which_child,
         'Kondisi Bayi' => $item->baby?->baby_condition->label_id(),
@@ -55,7 +56,7 @@ class PostpartumVisitExportService
 
         'Komplikasi Persalinan' => $item->last_comp ? 'Ya' : 'Tidak',
         'Catatan Komplikasi Persalinan' => $item->last_comp ? $item->last_comp_note : '-',
-        'Komplikasi Saat Menggandung' => $item->preg_comp_history ? 'Ya' : 'Tidak',
+        'Komplikasi Saat Mengandung' => $item->preg_comp_history ? 'Ya' : 'Tidak',
         'Kehamilan Direncanakan' => $item->pregnancy_planned?->label_id() ?? '-',
         'Jumlah Mengandung' => $item->parity_count,
 

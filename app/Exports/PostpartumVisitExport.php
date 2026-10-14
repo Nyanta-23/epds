@@ -15,7 +15,8 @@ class PostpartumVisitExport implements FromCollection, WithHeadings, WithStyles,
 {
     public function __construct(
         protected Collection $data
-    ) {}
+    ) {
+    }
 
     public function collection(): Collection
     {
@@ -27,6 +28,7 @@ class PostpartumVisitExport implements FromCollection, WithHeadings, WithStyles,
         return [
             'No',
             'Ibu',
+            'Skor Skrinning',
 
             'Anak Ke',
             'Kondisi Bayi',
@@ -47,11 +49,13 @@ class PostpartumVisitExport implements FromCollection, WithHeadings, WithStyles,
             'Riwayat Psikologis',
             'Pengobatan Psikologis',
             'Trauma Psikologis',
+            'Merasa Tidak Aman',
 
             'Komplikasi Persalinan',
             'Catatan Komplikasi Persalinan',
 
-            'Komplikasi Saat Menggandung',
+            'Komplikasi Saat Mengandung',
+            'Kehamilan Direncanakan',
             'Jumlah Mengandung',
 
             'Bayi Sehat',
