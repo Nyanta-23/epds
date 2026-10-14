@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\PostpartumVisit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,18 +10,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ResultFactory extends Factory
 {
-  /**
-   * Define the model's default state.
-   *
-   * @return array<string, mixed>
-   */
-  public function definition(): array
-  {
-    return [
-      'postpartum_visit_id' => PostpartumVisit::factory(),
-      'total_score' => fake()->numberBetween(0, 30),
-      // 'followup_status' => fake()->randomElement(['belum_ada_tindakan', 'tpmb', 'refer_psychologist', 'refer_psyichiatrist']),
-      'followup_status' => rand(0, 3)
-    ];
-  }
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'postpartum_visit_id' => PostpartumVisit::factory(),
+            'total_score' => fake()->numberBetween(0, 30),
+            // 'followup_status' => fake()->randomElement(['belum_ada_tindakan', 'tpmb', 'refer_psychologist', 'refer_psyichiatrist']),
+            'followup_status' => rand(0, 3),
+        ];
+    }
 }

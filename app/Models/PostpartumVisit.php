@@ -89,6 +89,11 @@ class PostpartumVisit extends Model
         return $this->hasOne(Result::class);
     }
 
+    public function results(): HasMany
+    {
+        return $this->hasMany(Result::class);
+    }
+
     public function answers(): HasMany
     {
         return $this->hasMany(Answer::class);

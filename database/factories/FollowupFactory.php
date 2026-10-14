@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Result;
+use App\Models\PostpartumVisit;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,12 +19,11 @@ class FollowupFactory extends Factory
     public function definition(): array
     {
         return [
-            // 'type' => fake()->randomElement(['education', 'reference', 'monitoring']),
             'type' => rand(0, 2),
             'notes' => fake()->text(),
             'date_filled' => fake()->dateTime(),
             'midwife_id' => User::factory(),
-            'result_id' => Result::factory()
+            'postpartum_visit_id' => PostpartumVisit::factory(),
         ];
     }
 }

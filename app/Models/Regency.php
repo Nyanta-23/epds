@@ -10,6 +10,7 @@
 namespace App\Models;
 
 use AzisHapidin\IndoRegion\Traits\RegencyTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Regency extends Model
 {
-    use RegencyTrait;
+    use HasFactory, RegencyTrait;
 
     /**
      * Table name.
@@ -26,13 +27,19 @@ class Regency extends Model
      */
     protected $table = 'regencies';
 
+    public $timestamps = false;
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
     protected $hidden = [
-        'province_id'
+        'province_id',
     ];
 
     /**

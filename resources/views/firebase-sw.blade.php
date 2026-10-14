@@ -16,12 +16,20 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-com
 firebase.initializeApp(@json(config('firebase.web')));
 
 const messaging = firebase.messaging();
-const SHELL_CACHE = 'epds-patient-shell-v1';
+const SHELL_CACHE = 'epds-patient-shell-v4';
+const PATIENT_APP_PAGES = [
+  '/patient-app',
+  '/patient-app/home',
+  '/patient-app/profile',
+  '/patient-app/baby',
+  '/patient-app/screening',
+  '/patient-app/history',
+];
 
 self.addEventListener('install', (event) => {
 event.waitUntil(
   caches.open(SHELL_CACHE).then((cache) =>
-    cache.addAll(['/patient-app', '/manifest.webmanifest', '/pwa-icon.svg'])
+    cache.addAll([...PATIENT_APP_PAGES, '/manifest.webmanifest', '/pwa-icon.svg'])
   )
 );
 self.skipWaiting();
@@ -48,17 +56,21 @@ const url = new URL(request.url);
 
 if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-if (request.mode === 'navigate' && url.pathname === '/patient-app') {
+if (request.mode === 'navigate' && PATIENT_APP_PAGES.includes(url.pathname)) {
   event.respondWith(
     fetch(request)
       .then((response) => {
         if (!response.ok) return response;
 
         return caches.open(SHELL_CACHE)
-          .then((cache) => cache.put('/patient-app', response.clone()))
+          .then((cache) => cache.put(url.pathname, response.clone()))
           .then(() => response);
       })
-      .catch(() => caches.match('/patient-app'))
+      .catch(() =>
+        caches.match(url.pathname).then((response) =>
+          response ?? caches.match('/patient-app')
+        )
+      )
   );
   return;
 }

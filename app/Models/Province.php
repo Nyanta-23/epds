@@ -10,6 +10,7 @@
 namespace App\Models;
 
 use AzisHapidin\IndoRegion\Traits\ProvinceTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,13 +18,20 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Province extends Model
 {
-    use ProvinceTrait;
+    use HasFactory, ProvinceTrait;
+
     /**
      * Table name.
      *
      * @var string
      */
     protected $table = 'provinces';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
+    public $timestamps = false;
 
     /**
      * Province has many regencies.

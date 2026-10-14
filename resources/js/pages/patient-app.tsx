@@ -1,19 +1,15 @@
+import { PatientAppNavbar } from '@/components/patient-app-navbar';
 import { requestFcmPermission, useFcm } from '@/hooks/use-fcm';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios, { AxiosError } from 'axios';
 import {
-    Activity,
     Baby as BabyIcon,
     Bell,
     CalendarDays,
     ChevronRight,
-    ClipboardList,
     Heart,
-    Home,
     LogOut,
     Plus,
-    ShieldCheck,
-    UserRound,
 } from 'lucide-react';
 import type * as React from 'react';
 import {
@@ -26,6 +22,7 @@ import {
 } from 'react';
 
 const TOKEN_KEY = 'epds_patient_token';
+const RECENT_RESULT_KEY = 'epds_patient_recent_screening_result';
 const API_URL = '/api/v1';
 
 interface ApiResponse<T> {
@@ -284,6 +281,64 @@ function valueOf(value: number | { value: number }): number {
     return typeof value === 'number' ? value : value.value;
 }
 
+function isPatientProfileComplete(patient: Patient): boolean {
+    return [
+        patient.phone_number,
+        patient.birthplace,
+        patient.date_of_birth,
+        patient.job,
+        patient.married_status,
+        patient.highest_education,
+        patient.province_id,
+        patient.city_or_district_id,
+        patient.subdistrict_id,
+        patient.village_id,
+        patient.address,
+        patient.facility_id,
+    ].every(Boolean);
+}
+
+function takeRecentScreeningResult(): Result | null {
+    if (typeof window === 'undefined') return null;
+
+    const storedResult = window.sessionStorage.getItem(RECENT_RESULT_KEY);
+    if (!storedResult) return null;
+    window.sessionStorage.removeItem(RECENT_RESULT_KEY);
+
+    try {
+        const result: unknown = JSON.parse(storedResult);
+        if (
+            typeof result === 'object' &&
+            result !== null &&
+            'postpartum_visit_id' in result &&
+            typeof result.postpartum_visit_id === 'string' &&
+            'visit_number' in result &&
+            typeof result.visit_number === 'number' &&
+            'visit_label' in result &&
+            typeof result.visit_label === 'string' &&
+            'total_score' in result &&
+            typeof result.total_score === 'number' &&
+            'recommendation' in result &&
+            typeof result.recommendation === 'string' &&
+            'pesan_penguatan' in result &&
+            typeof result.pesan_penguatan === 'string'
+        ) {
+            return {
+                postpartum_visit_id: result.postpartum_visit_id,
+                visit_number: result.visit_number,
+                visit_label: result.visit_label,
+                total_score: result.total_score,
+                recommendation: result.recommendation,
+                pesan_penguatan: result.pesan_penguatan,
+            };
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
+
 function toDateTimeLocalValue(value: string): string {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return '';
@@ -379,13 +434,35 @@ function AppButton({
     );
 }
 
-export default function PatientApp() {
+export default function PatientApp({
+    initialSection,
+}: {
+    initialSection?: Section;
+} = {}) {
     useFcm();
     const [token, setToken] = useState<string | null>(() =>
         typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY),
     );
     const [patient, setPatient] = useState<Patient | null>(null);
-    const [section, setSection] = useState<Section>('home');
+    const [section, setSection] = useState<Section>(() => {
+        if (initialSection) return initialSection;
+        if (typeof window === 'undefined') return 'home';
+        const requestedSection = new URLSearchParams(
+            window.location.search,
+        ).get('section');
+        const sections: Section[] = [
+            'home',
+            'profile',
+            'baby',
+            'screening',
+            'history',
+            'notifications',
+        ];
+
+        return sections.includes(requestedSection as Section)
+            ? (requestedSection as Section)
+            : 'home';
+    });
     const [loading, setLoading] = useState(true);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
@@ -401,7 +478,9 @@ export default function PatientApp() {
         [],
     );
     const [unreadCount, setUnreadCount] = useState(0);
-    const [result, setResult] = useState<Result | null>(null);
+    const [result, setResult] = useState<Result | null>(
+        takeRecentScreeningResult,
+    );
     const [profile, setProfile] = useState<ProfileForm>(emptyProfile);
     const [babyForm, setBabyForm] = useState<BabyForm>(emptyBaby);
     const [editingBabyId, setEditingBabyId] = useState<string | null>(null);
@@ -417,8 +496,6 @@ export default function PatientApp() {
     );
     const [condition, setCondition] = useState<ConditionForm>(emptyCondition);
     const [answers, setAnswers] = useState<Record<string, string>>({});
-    const [installPrompt, setInstallPrompt] =
-        useState<BeforeInstallPromptEvent | null>(null);
     const [pushEnabled, setPushEnabled] = useState(
         typeof window !== 'undefined' && Notification.permission === 'granted',
     );
@@ -457,11 +534,7 @@ export default function PatientApp() {
 
             const currentPatient = profileResponse.data.data;
             setPatient(currentPatient);
-            setProfileComplete(
-                Boolean(
-                    currentPatient.phone_number && currentPatient.facility_id,
-                ),
-            );
+            setProfileComplete(isPatientProfileComplete(currentPatient));
             setProfile({
                 name: currentPatient.name ?? '',
                 phone_number: currentPatient.phone_number ?? '',
@@ -554,6 +627,17 @@ export default function PatientApp() {
     }, [patient?.id, loadPatientData]);
 
     useEffect(() => {
+        if (
+            !loading &&
+            patient &&
+            window.location.pathname === '/patient-app' &&
+            (section === 'home' || !profileComplete)
+        ) {
+            router.visit('/patient-app/home', { replace: true });
+        }
+    }, [loading, patient, profileComplete, section]);
+
+    useEffect(() => {
         if (!patient?.id) return;
 
         const refreshWhenVisible = () => {
@@ -561,7 +645,7 @@ export default function PatientApp() {
                 void refreshSchedule();
             }
         };
-        const interval = window.setInterval(refreshWhenVisible, 30_000);
+        const interval = window.setInterval(refreshWhenVisible, 15_000);
         window.addEventListener('focus', refreshWhenVisible);
         document.addEventListener('visibilitychange', refreshWhenVisible);
 
@@ -584,7 +668,7 @@ export default function PatientApp() {
         const pushKey = `epds_fcm_token:/api/v1/web-push-subscriptions:${patient.id}`;
         setPushEnabled(
             Notification.permission === 'granted' &&
-                Boolean(localStorage.getItem(pushKey)),
+            Boolean(localStorage.getItem(pushKey)),
         );
     }, [patient?.id]);
 
@@ -598,8 +682,8 @@ export default function PatientApp() {
             if (Notification.permission === 'granted') {
                 new Notification(
                     payload.notification?.title ??
-                        payload.data?.title ??
-                        'EPDS Sahabat Ibu',
+                    payload.data?.title ??
+                    'EPDS Sahabat Ibu',
                     {
                         body:
                             payload.notification?.body ??
@@ -614,15 +698,6 @@ export default function PatientApp() {
         window.addEventListener('fcm:foreground', handler);
         return () => window.removeEventListener('fcm:foreground', handler);
     }, [loadPatientData]);
-
-    useEffect(() => {
-        const handler = (event: Event) => {
-            event.preventDefault();
-            setInstallPrompt(event as BeforeInstallPromptEvent);
-        };
-        window.addEventListener('beforeinstallprompt', handler);
-        return () => window.removeEventListener('beforeinstallprompt', handler);
-    }, []);
 
     async function submitAuth(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -653,13 +728,7 @@ export default function PatientApp() {
                 );
             }
             localStorage.setItem(TOKEN_KEY, authenticated.token);
-            setToken(authenticated.token);
-            setPatient({
-                id: authenticated.id,
-                name: authenticated.name,
-                email: authenticated.email,
-            });
-            setSuccess('Berhasil masuk. Selamat datang kembali.');
+            router.visit('/patient-app/home');
         } catch (authError) {
             setError(errorMessage(authError));
         } finally {
@@ -817,7 +886,15 @@ export default function PatientApp() {
                 },
             );
             setResult(response.data.data);
-            setSection('history');
+            if (window.location.pathname === '/patient-app/screening') {
+                window.sessionStorage.setItem(
+                    RECENT_RESULT_KEY,
+                    JSON.stringify(response.data.data),
+                );
+                router.visit('/patient-app/history');
+            } else {
+                setSection('history');
+            }
             setScreeningStep('condition');
             setCondition(emptyCondition);
             setAnswers({});
@@ -873,13 +950,6 @@ export default function PatientApp() {
         }
     }
 
-    async function installApp() {
-        if (!installPrompt) return;
-        await installPrompt.prompt();
-        await installPrompt.userChoice;
-        setInstallPrompt(null);
-    }
-
     const babies = patient?.babies ?? [];
     const screenTitle = {
         home: 'Beranda',
@@ -926,7 +996,7 @@ export default function PatientApp() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-semibold tracking-[0.18em] text-rose-400 uppercase">
-                                        EPDS Sahabat Ibu
+                                        Simponi
                                     </p>
                                     <h1 className="text-xl font-bold">
                                         {screenTitle}
@@ -963,26 +1033,6 @@ export default function PatientApp() {
                                     tone="success"
                                     text={success}
                                     onClose={() => setSuccess('')}
-                                />
-                            )}
-
-                            {section === 'home' && (
-                                <HomeScreen
-                                    patient={patient}
-                                    schedule={schedule}
-                                    babies={babies}
-                                    profileComplete={profileComplete}
-                                    pushEnabled={pushEnabled}
-                                    installPrompt={Boolean(installPrompt)}
-                                    onScreening={() => setSection('screening')}
-                                    onProfile={() => {
-                                        setEditingProfile(true);
-                                        setSection('profile');
-                                    }}
-                                    onEnablePush={enableNotifications}
-                                    onInstall={installApp}
-                                    onBaby={() => setSection('baby')}
-                                    onHistory={() => setSection('history')}
                                 />
                             )}
 
@@ -1030,7 +1080,9 @@ export default function PatientApp() {
                                     setAnswers={setAnswers}
                                     onSubmit={submitScreening}
                                     busy={busy}
-                                    onBack={() => setSection('home')}
+                                    onBack={() =>
+                                        router.visit('/patient-app/home')
+                                    }
                                 />
                             )}
 
@@ -1039,7 +1091,9 @@ export default function PatientApp() {
                                     items={history}
                                     previousVisit={previousVisit}
                                     result={result}
-                                    onScreening={() => setSection('screening')}
+                                    onScreening={() =>
+                                        router.visit('/patient-app/screening')
+                                    }
                                     canFill={Boolean(schedule?.canFill)}
                                 />
                             )}
@@ -1060,51 +1114,12 @@ export default function PatientApp() {
                             )}
                         </div>
 
-                        <nav className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-xl justify-around border-t border-rose-100 bg-white/95 px-2 pt-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] backdrop-blur">
-                            <NavButton
-                                active={section === 'home'}
-                                label="Beranda"
-                                icon={<Home size={20} />}
-                                onClick={() => setSection('home')}
-                            />
-                            <NavButton
-                                active={section === 'baby'}
-                                label="Bayi"
-                                icon={<BabyIcon size={20} />}
-                                onClick={() => setSection('baby')}
-                            />
-                            <NavButton
-                                active={section === 'screening'}
-                                label="Skrining"
-                                icon={<ClipboardList size={20} />}
-                                onClick={() => setSection('screening')}
-                            />
-                            <NavButton
-                                active={section === 'history'}
-                                label="Riwayat"
-                                icon={<Activity size={20} />}
-                                onClick={() => setSection('history')}
-                            />
-                            <NavButton
-                                active={section === 'profile'}
-                                label="Profil"
-                                icon={<UserRound size={20} />}
-                                onClick={() => setSection('profile')}
-                            />
-                        </nav>
+                        <PatientAppNavbar active={section} />
                     </div>
                 )}
             </main>
         </>
     );
-}
-
-interface BeforeInstallPromptEvent extends Event {
-    prompt(): Promise<void>;
-    userChoice: Promise<{
-        outcome: 'accepted' | 'dismissed';
-        platform: string;
-    }>;
 }
 
 function LoadingScreen() {
@@ -1162,13 +1177,13 @@ function AuthScreen(props: {
         <div className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-10">
             <div className="mb-8 text-center">
                 <div className="mx-auto mb-5 grid size-24 place-items-center rounded-[2rem] bg-rose-200 text-rose-600 shadow-lg shadow-rose-100">
-                    <Heart size={42} fill="currentColor" />
+                    <img src='/pwa-icon.png' width={72} />
                 </div>
                 <p className="text-sm font-bold tracking-[0.2em] text-rose-500 uppercase">
-                    EPDS Sahabat Ibu
+                    Simponi
                 </p>
                 <h1 className="mt-2 text-3xl font-bold text-slate-800">
-                    Temani masa nifas dengan lebih tenang
+                    Sistem Monitoring Psikologi Nifas
                 </h1>
                 <p className="mt-3 text-sm leading-6 text-slate-500">
                     Pantau jadwal, isi skrining, dan lihat dukungan kesehatan
@@ -1235,8 +1250,8 @@ function AuthScreen(props: {
                     {props.busy
                         ? 'Memproses…'
                         : props.mode === 'login'
-                          ? 'Masuk'
-                          : 'Daftar sebagai pasien'}
+                            ? 'Masuk'
+                            : 'Daftar sebagai pasien'}
                 </AppButton>
                 <button
                     type="button"
@@ -1257,162 +1272,6 @@ function AuthScreen(props: {
                 </p>
             </form>
         </div>
-    );
-}
-
-function HomeScreen(props: {
-    patient: Patient;
-    schedule: Schedule | null;
-    babies: Baby[];
-    profileComplete: boolean;
-    pushEnabled: boolean;
-    installPrompt: boolean;
-    onScreening: () => void;
-    onProfile: () => void;
-    onEnablePush: () => void;
-    onInstall: () => void;
-    onBaby: () => void;
-    onHistory: () => void;
-}) {
-    const scheduleDate = props.schedule?.nextVisitDate
-        ? new Date(props.schedule.nextVisitDate).toLocaleString('id-ID', {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-          })
-        : null;
-    const newestBaby = props.babies[0];
-
-    return (
-        <>
-            <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-rose-400 to-pink-300 p-6 text-white shadow-xl shadow-rose-200">
-                <p className="text-sm font-medium text-white/80">
-                    Halo, {props.patient.name.split(' ')[0]} 👋
-                </p>
-                <h2 className="mt-2 max-w-xs text-2xl leading-tight font-bold">
-                    Ibu yang sehat, awal yang baik untuk keluarga.
-                </h2>
-                <p className="mt-3 text-sm text-white/85">
-                    Satu langkah kecil hari ini berarti banyak untuk kesehatan
-                    Anda.
-                </p>
-                <div className="mt-6 flex items-center gap-3 rounded-2xl bg-white/20 p-4 backdrop-blur">
-                    <CalendarDays size={22} />
-                    <div className="min-w-0 flex-1">
-                        <p className="text-xs text-white/75">Jadwal skrining</p>
-                        <p className="font-semibold">
-                            {props.schedule?.label ?? 'Memuat jadwal…'}
-                        </p>
-                        {scheduleDate && (
-                            <p className="text-xs text-white/80">
-                                {scheduleDate}
-                            </p>
-                        )}
-                    </div>
-                    {props.schedule?.canFill && (
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-rose-500">
-                            Tersedia
-                        </span>
-                    )}
-                </div>
-                {props.schedule?.canFill && (
-                    <AppButton
-                        onClick={props.onScreening}
-                        className="mt-4 w-full bg-white text-rose-600 shadow-none hover:bg-rose-50"
-                    >
-                        Mulai skrining <ChevronRight size={18} />
-                    </AppButton>
-                )}
-            </section>
-
-            {!props.profileComplete && (
-                <ActionCard
-                    icon={<UserRound size={21} />}
-                    title="Lengkapi profil ibu"
-                    detail="Isi data diri dan fasilitas kesehatan agar pemantauan lebih sesuai."
-                    action="Lengkapi profil"
-                    onClick={props.onProfile}
-                />
-            )}
-
-            <section className="grid grid-cols-2 gap-3">
-                <QuickCard
-                    icon={<BabyIcon size={20} />}
-                    label="Data bayi"
-                    value={
-                        newestBaby
-                            ? `Anak ke-${newestBaby.which_child}`
-                            : 'Belum ada bayi'
-                    }
-                    onClick={props.onBaby}
-                />
-                <QuickCard
-                    icon={<Activity size={20} />}
-                    label="Riwayat skrining"
-                    value="Lihat hasil sebelumnya"
-                    onClick={props.onHistory}
-                />
-            </section>
-
-            {!props.pushEnabled && (
-                <ActionCard
-                    icon={<Bell size={21} />}
-                    title="Aktifkan pengingat penting"
-                    detail="Dapatkan notifikasi jadwal skrining meski aplikasi tidak sedang dibuka."
-                    action="Aktifkan notifikasi"
-                    onClick={props.onEnablePush}
-                />
-            )}
-            {props.installPrompt && (
-                <ActionCard
-                    icon={<Home size={21} />}
-                    title="Pasang di perangkat"
-                    detail="Buka EPDS lebih cepat dari layar utama."
-                    action="Pasang aplikasi"
-                    onClick={props.onInstall}
-                />
-            )}
-
-            <section className="rounded-[1.75rem] border border-rose-100 bg-white p-5">
-                <div className="flex items-center gap-3">
-                    <div className="grid size-11 place-items-center rounded-2xl bg-rose-50 text-rose-500">
-                        <ShieldCheck size={22} />
-                    </div>
-                    <div>
-                        <h3 className="font-bold">Anda tidak sendiri</h3>
-                        <p className="text-sm text-slate-500">
-                            Skrining membantu memantau perasaan ibu setelah
-                            melahirkan.
-                        </p>
-                    </div>
-                </div>
-            </section>
-        </>
-    );
-}
-
-function QuickCard({
-    icon,
-    label,
-    value,
-    onClick,
-}: {
-    icon: ReactNode;
-    label: string;
-    value: string;
-    onClick: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className="min-h-32 rounded-[1.5rem] border border-rose-100 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
-        >
-            <span className="mb-3 grid size-10 place-items-center rounded-2xl bg-rose-50 text-rose-500">
-                {icon}
-            </span>
-            <span className="block text-xs text-slate-500">{label}</span>
-            <span className="mt-1 block text-sm font-bold">{value}</span>
-        </button>
     );
 }
 
@@ -2093,17 +1952,17 @@ function BabyScreen(props: {
                                         );
                                         const isFutureHour =
                                             props.form.birth_date ===
-                                                currentDateTimeLocalValue().slice(
-                                                    0,
-                                                    10,
-                                                ) &&
+                                            currentDateTimeLocalValue().slice(
+                                                0,
+                                                10,
+                                            ) &&
                                             hour >
-                                                Number(
-                                                    currentDateTimeLocalValue().slice(
-                                                        11,
-                                                        13,
-                                                    ),
-                                                );
+                                            Number(
+                                                currentDateTimeLocalValue().slice(
+                                                    11,
+                                                    13,
+                                                ),
+                                            );
 
                                         return {
                                             value,
@@ -2134,10 +1993,13 @@ function BabyScreen(props: {
                                             currentDateTimeLocalValue();
                                         const isFutureMinute =
                                             props.form.birth_date ===
-                                                currentTime.slice(0, 10) &&
+                                            currentTime.slice(0, 10) &&
                                             props.form.birth_hour ===
-                                                currentTime.slice(11, 13) &&
-                                            minute > Number(currentTime.slice(14, 16));
+                                            currentTime.slice(11, 13) &&
+                                            minute >
+                                            Number(
+                                                currentTime.slice(14, 16),
+                                            );
 
                                         return {
                                             value,
@@ -2433,18 +2295,18 @@ function ScreeningScreen(props: {
                                                                 event.target
                                                                     .checked
                                                                     ? [
-                                                                          ...(current.baby_caregiver as string[]),
-                                                                          item.value,
-                                                                      ]
+                                                                        ...(current.baby_caregiver as string[]),
+                                                                        item.value,
+                                                                    ]
                                                                     : (
-                                                                          current.baby_caregiver as string[]
-                                                                      ).filter(
-                                                                          (
-                                                                              value,
-                                                                          ) =>
-                                                                              value !==
-                                                                              item.value,
-                                                                      ),
+                                                                        current.baby_caregiver as string[]
+                                                                    ).filter(
+                                                                        (
+                                                                            value,
+                                                                        ) =>
+                                                                            value !==
+                                                                            item.value,
+                                                                    ),
                                                         }),
                                                     )
                                                 }
@@ -2528,7 +2390,7 @@ function ScreeningScreen(props: {
                                     props.busy ||
                                     !props.questions.length ||
                                     Object.keys(props.answers).length !==
-                                        props.questions.length
+                                    props.questions.length
                                 }
                             >
                                 {props.busy ? 'Mengirim…' : 'Kirim skrining'}
@@ -2638,24 +2500,24 @@ function HistoryScreen(props: {
                                     <p className="font-bold">
                                         {String(
                                             item.parameter ??
-                                                `Skrining ${index + 1}`,
+                                            `Skrining ${index + 1}`,
                                         )}
                                     </p>
                                     <p className="text-xs text-slate-500">
                                         {item.date_filled
                                             ? new Date(
-                                                  String(item.date_filled),
-                                              ).toLocaleDateString('id-ID', {
-                                                  dateStyle: 'long',
-                                              })
+                                                String(item.date_filled),
+                                            ).toLocaleDateString('id-ID', {
+                                                dateStyle: 'long',
+                                            })
                                             : 'Tanggal tidak tersedia'}
                                     </p>
                                 </div>
                                 <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-rose-600">
                                     {String(
                                         item.risk_category ??
-                                            item.value ??
-                                            'Tercatat',
+                                        item.value ??
+                                        'Tercatat',
                                     )}
                                 </span>
                             </div>
@@ -2779,28 +2641,5 @@ function EmptyState({
                 {detail}
             </p>
         </section>
-    );
-}
-
-function NavButton({
-    active,
-    label,
-    icon,
-    onClick,
-}: {
-    active: boolean;
-    label: string;
-    icon: ReactNode;
-    onClick: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={`flex min-w-14 flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[10px] font-semibold ${active ? 'text-rose-500' : 'text-slate-400'}`}
-        >
-            {icon}
-            {label}
-        </button>
     );
 }

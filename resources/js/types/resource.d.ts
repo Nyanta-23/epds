@@ -224,3 +224,70 @@ export interface UserManagementExtra {
     roles: { data: Role[] };
     facilities: FacilityOption[];
 }
+
+export interface Recapitulation {
+    id: string | null;
+    name: string | null;
+    facility_type: string | null;
+    address: string | null;
+    children: Recapitulation[];
+}
+
+export interface FacilityRecapDetail {
+    id: string;
+    name: string;
+    facility_type: string;
+    address: string;
+}
+
+export interface VolumeCoverageMatrix {
+    total_target: number;
+    total_screened: number;
+    coverage_percentage: number;
+}
+
+export interface RecapitulationMetrics {
+    normalScoreCount: number;
+    lowRiskScoreCount: number;
+    highRiskScoreCount: number;
+    highRiskInterventionRatio: number;
+    volumeCoverageMatrix: VolumeCoverageMatrix;
+}
+
+export interface AnonymizedFollowup {
+    has_followup: boolean;
+    type: string;
+    date_filled: string;
+    notes: string;
+}
+
+export interface AnonymizedVisit {
+    id: string;
+    anonymous_patient_id: string;
+    visit_number: number;
+    date_filled: string;
+    score: number | string;
+    risk_category: string;
+    followup: AnonymizedFollowup;
+}
+
+export interface PaginatedVisits {
+    data: AnonymizedVisit[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+}
+
+export interface RecapitulationFilter {
+    preset: 'all' | 'week' | 'month' | 'year' | 'custom';
+    date_from?: string;
+    date_to?: string;
+}

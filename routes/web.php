@@ -27,6 +27,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/patient-app', fn () => Inertia::render('patient-app'))->name('patient.pwa');
+Route::get('/patient-app/home', fn () => Inertia::render('patient-app/home'))->name('patient.pwa.home');
+Route::get('/patient-app/profile', fn () => Inertia::render('patient-app/profile'))->name('patient.pwa.profile');
+Route::get('/patient-app/baby', fn () => Inertia::render('patient-app/baby'))->name('patient.pwa.baby');
+Route::get('/patient-app/screening', fn () => Inertia::render('patient-app/screening'))->name('patient.pwa.screening');
+Route::get('/patient-app/history', fn () => Inertia::render('patient-app/history'))->name('patient.pwa.history');
 
 // Firebase Messaging Service Worker — served dynamically so config comes from .env
 Route::get('/firebase-messaging-sw.js', function () {
@@ -169,6 +174,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Edit Skrining? Hati-hati, biasanya hasil medis tidak boleh diedit sembarangan.
             Route::get('/{postpartum}/edit', [PostpartumVisitController::class, 'edit'])->name('postpartum.edit');
             Route::put('/{postpartum}', [PostpartumVisitController::class, 'update'])->name('postpartum.update');
+        });
+
+        Route::prefix('recapitulation')->group(function () {
+            Route::get('/', [\App\Http\Controllers\RecapitulationController::class, 'index'])->name('recapitulation');
+            Route::get('/{facilityId}', [\App\Http\Controllers\RecapitulationController::class, 'show'])->name('recapitulation.show');
         });
     });
 

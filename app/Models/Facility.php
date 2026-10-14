@@ -46,6 +46,11 @@ class Facility extends Model
         return $this->hasMany(self::class, 'parent_id');
     }
 
+    public function allChildren(): HasMany
+    {
+        return $this->children()->with('allChildren');
+    }
+
     public function province(): BelongsTo
     {
         return $this->belongsTo(Province::class);

@@ -129,10 +129,15 @@ class PostpartumVisitAnswerController extends Controller
                     : collect();
 
                 if ($midwives->isNotEmpty()) {
-                    Notification::send(
-                        $midwives,
-                        new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id)
-                    );
+                    $notification = new NewScreeningResultNotification($result, $user->name, $postpartumVisit->id);
+                    Notification::send($midwives, $notification);
+
+                    // Keep external FCM requests from delaying the patient's result response.
+                    app()->terminating(function () use ($midwives, $notification): void {
+                        foreach ($midwives as $midwife) {
+                            $notification->sendPush($midwife);
+                        }
+                    });
                 }
 
                 return response()->json([

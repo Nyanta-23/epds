@@ -10,16 +10,15 @@
 namespace App\Models;
 
 use AzisHapidin\IndoRegion\Traits\DistrictTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Regency;
-use App\Models\Village;
 
 /**
  * District Model.
  */
 class District extends Model
 {
-    use DistrictTrait;
+    use DistrictTrait, HasFactory;
 
     /**
      * Table name.
@@ -28,13 +27,19 @@ class District extends Model
      */
     protected $table = 'districts';
 
+    public $timestamps = false;
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
     protected $hidden = [
-        'regency_id'
+        'regency_id',
     ];
 
     /**

@@ -62,6 +62,12 @@ const mainNavItems: NavItem[] = [
         canAccess: ['super_admin', 'admin', 'midwife'],
     },
     {
+        title: 'Anak Faskes',
+        href: '/recapitulation',
+        icon: ScanHeart,
+        canAccess: ['super_admin', 'admin', 'midwife'],
+    },
+    {
         title: 'Pertanyaan Kuesioner',
         href: '/question',
         icon: FileQuestion,

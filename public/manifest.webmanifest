@@ -4,7 +4,7 @@
     "short_name": "EPDS Ibu",
     "description": "Pantau kesehatan ibu nifas dan jadwal skrining EPDS.",
     "lang": "id-ID",
-    "start_url": "/patient-app",
+    "start_url": "/patient-app/home",
     "scope": "/patient-app",
     "display": "standalone",
     "orientation": "portrait",
