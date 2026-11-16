@@ -1,9 +1,13 @@
 import axios from 'axios';
 import { getApps, initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import {
+    getMessaging,
+    getToken,
+    isSupported,
+    onMessage,
+} from 'firebase/messaging';
 import { useEffect } from 'react';
 
-/* ── Firebase config from Vite env ─────────────────────────────────── */
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
@@ -17,6 +21,7 @@ const firebaseConfig = {
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string;
 const LS_TOKEN_KEY = 'epds_fcm_token';
+
 interface FcmRegistrationOptions {
     endpoint?: string;
     apiToken?: string;
@@ -24,7 +29,8 @@ interface FcmRegistrationOptions {
     throwOnError?: boolean;
 }
 
-function getFirebaseMessaging() {
+async function getFirebaseMessagingSafe() {
+    if (!(await isSupported())) return null;
     const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
     return getMessaging(app);
 }
@@ -99,12 +105,9 @@ async function saveTokenToBackend(
 export async function requestFcmPermission(
     options: FcmRegistrationOptions = {},
 ): Promise<boolean> {
-    console.log(
-        '[FCM] requestFcmPermission called — current permission:',
-        Notification.permission,
-    );
-
+    // 1. Cek dukungan browser DULU sebelum menyentuh Notification.permission
     if (
+        typeof window === 'undefined' ||
         !('Notification' in window) ||
         !('serviceWorker' in navigator) ||
         !VAPID_KEY
@@ -112,17 +115,28 @@ export async function requestFcmPermission(
         console.warn('[FCM] Notifications not supported or VAPID key missing.');
         if (options.throwOnError) {
             throw new Error(
-                'Notifikasi web belum tersedia. Periksa dukungan browser dan konfigurasi VAPID.',
+                'Notifikasi web belum tersedia. Di iPhone, pastikan aplikasi sudah ditambahkan ke Layar Utama (Add to Home Screen).',
             );
         }
         return false;
     }
 
-    /* Already granted — just refresh the token silently */
+    const messaging = await getFirebaseMessagingSafe();
+    if (!messaging) {
+        if (options.throwOnError) {
+            throw new Error(
+                'Browser/perangkat ini tidak mendukung Firebase Messaging.',
+            );
+        }
+        return false;
+    }
+
+    console.log('[FCM] Current permission:', Notification.permission);
+
     if (Notification.permission === 'granted') {
         try {
             const sw = await registerServiceWorker();
-            const token = await getToken(getFirebaseMessaging(), {
+            const token = await getToken(messaging, {
                 vapidKey: VAPID_KEY,
                 serviceWorkerRegistration: sw,
             });
@@ -137,30 +151,21 @@ export async function requestFcmPermission(
         return true;
     }
 
-    /* Already denied — cannot ask again programmatically */
     if (Notification.permission === 'denied') {
-        console.warn('[useFcm] Notification permission was denied by user.');
         if (options.throwOnError) {
             throw new Error(
-                'Izin notifikasi diblokir. Aktifkan notifikasi melalui pengaturan browser.',
+                'Izin notifikasi diblokir. Aktifkan melalui pengaturan browser.',
             );
         }
         return false;
     }
 
-    /* default — show the browser prompt (requires user gesture to work) */
     const result = await Notification.requestPermission();
-    if (result !== 'granted') {
-        console.info(
-            '[useFcm] User dismissed or denied notification permission.',
-        );
-        return false;
-    }
+    if (result !== 'granted') return false;
 
-    /* Permission just granted — register SW and obtain token */
     try {
         const sw = await registerServiceWorker();
-        const token = await getToken(getFirebaseMessaging(), {
+        const token = await getToken(messaging, {
             vapidKey: VAPID_KEY,
             serviceWorkerRegistration: sw,
         });
@@ -169,48 +174,35 @@ export async function requestFcmPermission(
             throw new Error('Token notifikasi tidak berhasil dibuat.');
         }
     } catch (e) {
-        console.error(
-            '[useFcm] Error obtaining FCM token after permission grant:',
-            e,
-        );
+        console.error('[useFcm] Error obtaining FCM token:', e);
         if (options.throwOnError) throw e;
     }
 
     return true;
 }
 
-/* ────────────────────────────────────────────────────────────────────
- * useFcm()
- *
- * Mount-time hook. ONLY wires up the foreground push listener.
- *
- * Token registration is handled exclusively by requestFcmPermission()
- * (called from a user gesture). This hook never touches the backend.
- * ──────────────────────────────────────────────────────────────────── */
 export function useFcm(): void {
     useEffect(() => {
         if (
             typeof window === 'undefined' ||
             !('serviceWorker' in navigator) ||
             !('Notification' in window) ||
-            !VAPID_KEY
+            !VAPID_KEY ||
+            Notification.permission !== 'granted'
         ) {
             return;
         }
-
-        /* Only set up the listener if permission is already granted */
-        if (Notification.permission !== 'granted') return;
 
         let unsubscribe: (() => void) | undefined;
 
         (async () => {
             try {
-                /* Register SW so getMessaging() can attach to it */
+                const messaging = await getFirebaseMessagingSafe();
+                if (!messaging) return;
+
                 await registerServiceWorker();
 
-                /* Foreground push listener — tab is active, browser won't show
-                 * native notification, so we dispatch a custom event instead   */
-                unsubscribe = onMessage(getFirebaseMessaging(), (payload) => {
+                unsubscribe = onMessage(messaging, (payload) => {
                     console.info('[useFcm] Foreground message:', payload);
                     window.dispatchEvent(
                         new CustomEvent('fcm:foreground', { detail: payload }),

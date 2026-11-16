@@ -40,6 +40,24 @@
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+  <script>
+    window.addEventListener('error', function (e) {
+      document.documentElement.classList.remove('dark');
+      document.body.innerHTML =
+        '<div style="background:#FEF6F7;color:#991B1B;padding:20px;font-family:monospace;font-size:13px;min-height:100vh;">' +
+        '<b>Gagal memuat aplikasi:</b><br>' + (e.message || 'Script error') +
+        '</div>';
+    }, true);
+
+    if ('caches' in window) {
+      caches.keys().then(function (keys) {
+        keys.forEach(function (key) {
+          if (key.startsWith('epds-patient-shell-')) caches.delete(key);
+        });
+      });
+    }
+  </script>
+
   @routes
   @viteReactRefresh
   @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
