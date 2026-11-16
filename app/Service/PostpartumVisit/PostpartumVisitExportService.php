@@ -10,7 +10,7 @@ class PostpartumVisitExportService
   public function exportByDateRange(?string $start, ?string $end)
   {
     $query = PostpartumVisit::query()
-      ->with(['mother', 'baby', 'result']);
+      ->with(['mother', 'baby', 'result', 'mother.facility']);
 
     $query->when($start || $end, function ($q) use ($start, $end) {
       if ($start && $end) {
@@ -30,6 +30,7 @@ class PostpartumVisitExportService
     return $query->orderBy('date_filled')->get()
       ->map(fn($item, $index) => [
         'No' => ($index + 1),
+        'Faskes' => $item->mother?->facility?->name ?? '-',
         'Ibu' => $item->mother?->name,
         'Skor Skrinning' => $item->result->total_score,
 

@@ -27,6 +27,7 @@ class PostpartumVisitExport implements FromCollection, WithHeadings, WithStyles,
     {
         return [
             'No',
+            'Faskes',
             'Ibu',
             'Skor Skrinning',
 
