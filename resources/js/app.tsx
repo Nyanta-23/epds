@@ -7,6 +7,44 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+
+class AppErrorBoundary extends Component<
+    { children: ReactNode },
+    { errorMessage: string | null }
+> {
+    state = { errorMessage: null };
+
+    static getDerivedStateFromError(error: Error) {
+        return { errorMessage: error?.message || 'Terjadi kesalahan tampilan.' };
+    }
+
+    componentDidCatch(error: Error, info: ErrorInfo) {
+        console.error('React Crash:', error, info);
+    }
+
+    render() {
+        if (this.state.errorMessage) {
+            return (
+                <div style={{ minHeight: '100vh', background: '#FEF6F7', color: '#991B1B', padding: '24px', fontFamily: 'sans-serif' }}>
+                    <h2 style={{ fontWeight: 700, fontSize: '18px' }}>Aplikasi gagal dimuat</h2>
+                    <p style={{ marginTop: '8px', fontSize: '14px', wordBreak: 'break-word' }}>
+                        {this.state.errorMessage}
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => window.location.reload()}
+                        style={{ marginTop: '16px', background: '#FB7185', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: '12px', fontWeight: 600 }}
+                    >
+                        Muat Ulang
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
 /* ── Axios global config for Laravel Sanctum SPA auth ─────────────── */
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
@@ -92,9 +130,9 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
-            <StrictMode>
+            <AppErrorBoundary>
                 <App {...props} />
-            </StrictMode>,
+            </AppErrorBoundary>
         );
     },
     progress: {

@@ -152,18 +152,22 @@ function fieldClassName(): string {
 
 export default function PatientAppHome() {
     useFcm();
-    const [token] = useState<string | null>(() =>
-        typeof window === 'undefined'
-            ? null
-            : window.localStorage.getItem(TOKEN_KEY),
-    );
+    const [token] = useState<string | null>(() => {
+        try {
+            return typeof window === 'undefined'
+                ? null
+                : window.localStorage.getItem(TOKEN_KEY);
+        } catch {
+            return null;
+        }
+    });
     const client = useMemo(
         () =>
             token
                 ? axios.create({
-                      baseURL: API_URL,
-                      headers: { Authorization: `Bearer ${token}` },
-                  })
+                    baseURL: API_URL,
+                    headers: { Authorization: `Bearer ${token}` },
+                })
                 : null,
         [token],
     );
@@ -177,8 +181,8 @@ export default function PatientAppHome() {
     const [success, setSuccess] = useState('');
     const [pushEnabled, setPushEnabled] = useState(
         typeof window !== 'undefined' &&
-            'Notification' in window &&
-            Notification.permission === 'granted',
+        'Notification' in window &&
+        Notification.permission === 'granted',
     );
     const [provinces, setProvinces] = useState<RegionOption[]>([]);
     const [regencies, setRegencies] = useState<RegionOption[]>([]);
@@ -189,8 +193,13 @@ export default function PatientAppHome() {
         useState<BeforeInstallPromptEvent | null>(null);
 
     const clearSession = useCallback(() => {
-        window.localStorage.removeItem(TOKEN_KEY);
+
+        try {
+            window.localStorage.removeItem(TOKEN_KEY);
+        } catch {
+        }
         router.visit('/patient-app', { replace: true });
+
     }, []);
 
     const refreshSchedule = useCallback(async () => {
@@ -270,10 +279,17 @@ export default function PatientAppHome() {
         if (!patient?.id) return;
 
         const pushKey = `epds_fcm_token:${API_URL}/web-push-subscriptions:${patient.id}`;
+        let hasStoredPushToken = false;
+        try {
+            hasStoredPushToken = Boolean(window.localStorage.getItem(pushKey));
+        } catch {
+            hasStoredPushToken = false;
+        }
+
         setPushEnabled(
             typeof Notification !== 'undefined' &&
-                Notification.permission === 'granted' &&
-                Boolean(window.localStorage.getItem(pushKey)),
+            Notification.permission === 'granted' &&
+            hasStoredPushToken,
         );
 
         const refreshWhenVisible = () => {
@@ -485,10 +501,10 @@ export default function PatientAppHome() {
     }
 
     const scheduleDate = schedule?.nextVisitDate
-        ? new Date(schedule.nextVisitDate).toLocaleString('id-ID', {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-          })
+        ? new Date(schedule.nextVisitDate.replace(' ', 'T')).toLocaleString('id-ID', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        })
         : null;
     const latestBaby = patient.babies?.[0];
 
@@ -860,18 +876,18 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  province_id: value,
-                                                  province:
-                                                      selected?.name ?? '',
-                                                  city_or_district_id: '',
-                                                  city_or_district: '',
-                                                  subdistrict_id: '',
-                                                  subdistrict: '',
-                                                  village_id: '',
-                                                  village: '',
-                                                  facility_id: '',
-                                              }
+                                                ...current,
+                                                province_id: value,
+                                                province:
+                                                    selected?.name ?? '',
+                                                city_or_district_id: '',
+                                                city_or_district: '',
+                                                subdistrict_id: '',
+                                                subdistrict: '',
+                                                village_id: '',
+                                                village: '',
+                                                facility_id: '',
+                                            }
                                             : current,
                                     );
                                 }}
@@ -888,16 +904,16 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  city_or_district_id: value,
-                                                  city_or_district:
-                                                      selected?.name ?? '',
-                                                  subdistrict_id: '',
-                                                  subdistrict: '',
-                                                  village_id: '',
-                                                  village: '',
-                                                  facility_id: '',
-                                              }
+                                                ...current,
+                                                city_or_district_id: value,
+                                                city_or_district:
+                                                    selected?.name ?? '',
+                                                subdistrict_id: '',
+                                                subdistrict: '',
+                                                village_id: '',
+                                                village: '',
+                                                facility_id: '',
+                                            }
                                             : current,
                                     );
                                 }}
@@ -914,13 +930,13 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  subdistrict_id: value,
-                                                  subdistrict:
-                                                      selected?.name ?? '',
-                                                  village_id: '',
-                                                  village: '',
-                                              }
+                                                ...current,
+                                                subdistrict_id: value,
+                                                subdistrict:
+                                                    selected?.name ?? '',
+                                                village_id: '',
+                                                village: '',
+                                            }
                                             : current,
                                     );
                                 }}
@@ -937,10 +953,10 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  village_id: value,
-                                                  village: selected?.name ?? '',
-                                              }
+                                                ...current,
+                                                village_id: value,
+                                                village: selected?.name ?? '',
+                                            }
                                             : current,
                                     );
                                 }}

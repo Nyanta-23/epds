@@ -2,6 +2,21 @@ import { useCallback, useEffect, useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
+function safeGetAppearance(): Appearance {
+    try {
+        return (localStorage.getItem('appearance') as Appearance) || 'system';
+    } catch {
+        return 'system';
+    }
+}
+
+function safeSetAppearance(mode: Appearance): void {
+    try {
+        localStorage.setItem('appearance', mode);
+    } catch {
+    }
+}
+
 const prefersDark = () => {
     if (typeof window === 'undefined') {
         return false;
@@ -36,13 +51,13 @@ const mediaQuery = () => {
 };
 
 const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem('appearance') as Appearance;
+    const currentAppearance = safeGetAppearance();
     applyTheme(currentAppearance || 'system');
 };
 
 export function initializeTheme() {
     const savedAppearance =
-        (localStorage.getItem('appearance') as Appearance) || 'system';
+        safeGetAppearance();
 
     applyTheme(savedAppearance);
 
@@ -57,7 +72,7 @@ export function useAppearance() {
         setAppearance(mode);
 
         // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', mode);
+        safeSetAppearance(mode);
 
         // Store in cookie for SSR...
         setCookie('appearance', mode);
@@ -66,9 +81,7 @@ export function useAppearance() {
     }, []);
 
     useEffect(() => {
-        const savedAppearance = localStorage.getItem(
-            'appearance',
-        ) as Appearance | null;
+        const savedAppearance = safeGetAppearance();
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         updateAppearance(savedAppearance || 'system');
