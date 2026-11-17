@@ -82,6 +82,14 @@ function notifIconBg(type: string, icon?: string) {
     return 'bg-primary/10';
 }
 
+function getNotificationPermission(): NotificationPermission | 'unsupported' {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+        return 'unsupported';
+    }
+
+    return window.Notification.permission;
+}
+
 export default function NotificationDropdown() {
     const { auth } = usePage<SharedProps>().props;
     const [open, setOpen] = useState(false);
@@ -114,12 +122,18 @@ export default function NotificationDropdown() {
 
     /* ── Bell click: request FCM permission ─────────────────────────── */
     const handleBellClick = async () => {
-        const perm =
-            'Notification' in window ? Notification.permission : 'denied';
-        if (perm === 'denied') {
+        const permission = getNotificationPermission();
+
+        if (permission === 'unsupported') {
             setBlocked(true);
             return;
         }
+
+        if (permission === 'denied') {
+            setBlocked(true);
+            return;
+        }
+
         setBlocked(false);
         await requestFcmPermission();
     };
@@ -205,9 +219,10 @@ export default function NotificationDropdown() {
                                 className="mt-0.5 shrink-0 text-amber-600"
                             />
                             <p className="text-xs leading-relaxed text-amber-800">
-                                Notifikasi push <strong>diblokir</strong>{' '}
-                                browser. Buka Pengaturan Situs → Notifikasi →
-                                ubah ke <em>Izinkan</em>, lalu muat ulang.
+                                Notifikasi push tidak tersedia atau diblokir di
+                                browser ini. Di iPhone, buka situs di Safari,
+                                tambahkan ke <em>Layar Utama</em>, lalu aktifkan
+                                izin notifikasi dari pengaturan browser.
                             </p>
                         </div>
                         <Separator className="flex-shrink-0" />

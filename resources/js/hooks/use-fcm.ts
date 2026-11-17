@@ -22,6 +22,18 @@ const firebaseConfig = {
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string;
 const LS_TOKEN_KEY = 'epds_fcm_token';
 
+function isNotificationSupported(): boolean {
+    return typeof window !== 'undefined' && 'Notification' in window;
+}
+
+function getNotificationPermission(): NotificationPermission | 'unsupported' {
+    if (!isNotificationSupported()) {
+        return 'unsupported';
+    }
+
+    return window.Notification.permission;
+}
+
 interface FcmRegistrationOptions {
     endpoint?: string;
     apiToken?: string;
@@ -108,14 +120,14 @@ export async function requestFcmPermission(
     // 1. Cek dukungan browser DULU sebelum menyentuh Notification.permission
     if (
         typeof window === 'undefined' ||
-        !('Notification' in window) ||
+        !isNotificationSupported() ||
         !('serviceWorker' in navigator) ||
         !VAPID_KEY
     ) {
         console.warn('[FCM] Notifications not supported or VAPID key missing.');
         if (options.throwOnError) {
             throw new Error(
-                'Notifikasi web belum tersedia. Di iPhone, pastikan aplikasi sudah ditambahkan ke Layar Utama (Add to Home Screen).',
+                'Notifikasi web belum tersedia. Di iPhone, pastikan aplikasi sudah ditambahkan ke Layar Utama (Add to Home Screen) dan izinkan notifikasi dari browser.',
             );
         }
         return false;
@@ -131,9 +143,10 @@ export async function requestFcmPermission(
         return false;
     }
 
-    console.log('[FCM] Current permission:', Notification.permission);
+    const permission = getNotificationPermission();
+    console.log('[FCM] Current permission:', permission);
 
-    if (Notification.permission === 'granted') {
+    if (permission === 'granted') {
         try {
             const sw = await registerServiceWorker();
             const token = await getToken(messaging, {
@@ -151,16 +164,16 @@ export async function requestFcmPermission(
         return true;
     }
 
-    if (Notification.permission === 'denied') {
+    if (permission === 'denied') {
         if (options.throwOnError) {
             throw new Error(
-                'Izin notifikasi diblokir. Aktifkan melalui pengaturan browser.',
+                'Izin notifikasi diblokir. Aktifkan melalui pengaturan browser atau situs.',
             );
         }
         return false;
     }
 
-    const result = await Notification.requestPermission();
+    const result = await window.Notification.requestPermission();
     if (result !== 'granted') return false;
 
     try {
@@ -186,9 +199,9 @@ export function useFcm(): void {
         if (
             typeof window === 'undefined' ||
             !('serviceWorker' in navigator) ||
-            !('Notification' in window) ||
+            !isNotificationSupported() ||
             !VAPID_KEY ||
-            Notification.permission !== 'granted'
+            getNotificationPermission() !== 'granted'
         ) {
             return;
         }

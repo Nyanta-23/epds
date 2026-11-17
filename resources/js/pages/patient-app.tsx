@@ -7,7 +7,6 @@ import {
     Bell,
     CalendarDays,
     ChevronRight,
-    Heart,
     LogOut,
     Plus,
 } from 'lucide-react';
@@ -496,9 +495,13 @@ export default function PatientApp({
     );
     const [condition, setCondition] = useState<ConditionForm>(emptyCondition);
     const [answers, setAnswers] = useState<Record<string, string>>({});
-    const [pushEnabled, setPushEnabled] = useState(
-        typeof window !== 'undefined' && Notification.permission === 'granted',
-    );
+    const [pushEnabled, setPushEnabled] = useState(() => {
+        if (typeof window === 'undefined' || !('Notification' in window)) {
+            return false;
+        }
+
+        return window.Notification.permission === 'granted';
+    });
 
     const client = useMemo(() => (token ? apiFor(token) : null), [token]);
 
@@ -666,9 +669,13 @@ export default function PatientApp({
         }
 
         const pushKey = `epds_fcm_token:/api/v1/web-push-subscriptions:${patient.id}`;
+        const hasNotificationSupport =
+            typeof window !== 'undefined' && 'Notification' in window;
+
         setPushEnabled(
-            Notification.permission === 'granted' &&
-            Boolean(localStorage.getItem(pushKey)),
+            hasNotificationSupport &&
+                window.Notification.permission === 'granted' &&
+                Boolean(localStorage.getItem(pushKey)),
         );
     }, [patient?.id]);
 
@@ -679,11 +686,17 @@ export default function PatientApp({
                 data?: { title?: string; body?: string };
             }>;
             const payload = customEvent.detail;
-            if (Notification.permission === 'granted') {
-                new Notification(
+            const hasNotificationSupport =
+                typeof window !== 'undefined' && 'Notification' in window;
+
+            if (
+                hasNotificationSupport &&
+                window.Notification.permission === 'granted'
+            ) {
+                new window.Notification(
                     payload.notification?.title ??
-                    payload.data?.title ??
-                    'EPDS Sahabat Ibu',
+                        payload.data?.title ??
+                        'EPDS Sahabat Ibu',
                     {
                         body:
                             payload.notification?.body ??
@@ -1177,7 +1190,7 @@ function AuthScreen(props: {
         <div className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-10">
             <div className="mb-8 text-center">
                 <div className="mx-auto mb-5 grid size-24 place-items-center rounded-[2rem] bg-rose-200 text-rose-600 shadow-lg shadow-rose-100">
-                    <img src='/pwa-icon.png' width={72} />
+                    <img src="/pwa-icon.png" width={72} />
                 </div>
                 <p className="text-sm font-bold tracking-[0.2em] text-rose-500 uppercase">
                     Simponi
@@ -1250,8 +1263,8 @@ function AuthScreen(props: {
                     {props.busy
                         ? 'Memproses…'
                         : props.mode === 'login'
-                            ? 'Masuk'
-                            : 'Daftar sebagai pasien'}
+                          ? 'Masuk'
+                          : 'Daftar sebagai pasien'}
                 </AppButton>
                 <button
                     type="button"
@@ -1952,17 +1965,17 @@ function BabyScreen(props: {
                                         );
                                         const isFutureHour =
                                             props.form.birth_date ===
-                                            currentDateTimeLocalValue().slice(
-                                                0,
-                                                10,
-                                            ) &&
-                                            hour >
-                                            Number(
                                                 currentDateTimeLocalValue().slice(
-                                                    11,
-                                                    13,
-                                                ),
-                                            );
+                                                    0,
+                                                    10,
+                                                ) &&
+                                            hour >
+                                                Number(
+                                                    currentDateTimeLocalValue().slice(
+                                                        11,
+                                                        13,
+                                                    ),
+                                                );
 
                                         return {
                                             value,
@@ -1993,13 +2006,13 @@ function BabyScreen(props: {
                                             currentDateTimeLocalValue();
                                         const isFutureMinute =
                                             props.form.birth_date ===
-                                            currentTime.slice(0, 10) &&
+                                                currentTime.slice(0, 10) &&
                                             props.form.birth_hour ===
-                                            currentTime.slice(11, 13) &&
+                                                currentTime.slice(11, 13) &&
                                             minute >
-                                            Number(
-                                                currentTime.slice(14, 16),
-                                            );
+                                                Number(
+                                                    currentTime.slice(14, 16),
+                                                );
 
                                         return {
                                             value,
@@ -2295,18 +2308,18 @@ function ScreeningScreen(props: {
                                                                 event.target
                                                                     .checked
                                                                     ? [
-                                                                        ...(current.baby_caregiver as string[]),
-                                                                        item.value,
-                                                                    ]
+                                                                          ...(current.baby_caregiver as string[]),
+                                                                          item.value,
+                                                                      ]
                                                                     : (
-                                                                        current.baby_caregiver as string[]
-                                                                    ).filter(
-                                                                        (
-                                                                            value,
-                                                                        ) =>
-                                                                            value !==
-                                                                            item.value,
-                                                                    ),
+                                                                          current.baby_caregiver as string[]
+                                                                      ).filter(
+                                                                          (
+                                                                              value,
+                                                                          ) =>
+                                                                              value !==
+                                                                              item.value,
+                                                                      ),
                                                         }),
                                                     )
                                                 }
@@ -2390,7 +2403,7 @@ function ScreeningScreen(props: {
                                     props.busy ||
                                     !props.questions.length ||
                                     Object.keys(props.answers).length !==
-                                    props.questions.length
+                                        props.questions.length
                                 }
                             >
                                 {props.busy ? 'Mengirim…' : 'Kirim skrining'}
@@ -2500,24 +2513,24 @@ function HistoryScreen(props: {
                                     <p className="font-bold">
                                         {String(
                                             item.parameter ??
-                                            `Skrining ${index + 1}`,
+                                                `Skrining ${index + 1}`,
                                         )}
                                     </p>
                                     <p className="text-xs text-slate-500">
                                         {item.date_filled
                                             ? new Date(
-                                                String(item.date_filled),
-                                            ).toLocaleDateString('id-ID', {
-                                                dateStyle: 'long',
-                                            })
+                                                  String(item.date_filled),
+                                              ).toLocaleDateString('id-ID', {
+                                                  dateStyle: 'long',
+                                              })
                                             : 'Tanggal tidak tersedia'}
                                     </p>
                                 </div>
                                 <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-rose-600">
                                     {String(
                                         item.risk_category ??
-                                        item.value ??
-                                        'Tercatat',
+                                            item.value ??
+                                            'Tercatat',
                                     )}
                                 </span>
                             </div>

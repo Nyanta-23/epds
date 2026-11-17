@@ -165,9 +165,9 @@ export default function PatientAppHome() {
         () =>
             token
                 ? axios.create({
-                    baseURL: API_URL,
-                    headers: { Authorization: `Bearer ${token}` },
-                })
+                      baseURL: API_URL,
+                      headers: { Authorization: `Bearer ${token}` },
+                  })
                 : null,
         [token],
     );
@@ -179,11 +179,13 @@ export default function PatientAppHome() {
     const [savingProfile, setSavingProfile] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [pushEnabled, setPushEnabled] = useState(
-        typeof window !== 'undefined' &&
-        'Notification' in window &&
-        Notification.permission === 'granted',
-    );
+    const [pushEnabled, setPushEnabled] = useState(() => {
+        if (typeof window === 'undefined' || !('Notification' in window)) {
+            return false;
+        }
+
+        return window.Notification.permission === 'granted';
+    });
     const [provinces, setProvinces] = useState<RegionOption[]>([]);
     const [regencies, setRegencies] = useState<RegionOption[]>([]);
     const [districts, setDistricts] = useState<RegionOption[]>([]);
@@ -193,13 +195,10 @@ export default function PatientAppHome() {
         useState<BeforeInstallPromptEvent | null>(null);
 
     const clearSession = useCallback(() => {
-
         try {
             window.localStorage.removeItem(TOKEN_KEY);
-        } catch {
-        }
+        } catch {}
         router.visit('/patient-app', { replace: true });
-
     }, []);
 
     const refreshSchedule = useCallback(async () => {
@@ -287,9 +286,10 @@ export default function PatientAppHome() {
         }
 
         setPushEnabled(
-            typeof Notification !== 'undefined' &&
-            Notification.permission === 'granted' &&
-            hasStoredPushToken,
+            typeof window !== 'undefined' &&
+                'Notification' in window &&
+                window.Notification.permission === 'granted' &&
+                hasStoredPushToken,
         );
 
         const refreshWhenVisible = () => {
@@ -466,7 +466,7 @@ export default function PatientAppHome() {
         return (
             <>
                 <Head title="Menyiapkan beranda" />
-                <main className="grid min-h-screen place-items-center bg-[#FEF6F7]">
+                <main className="grid min-h-[100dvh] place-items-center bg-[#FEF6F7]">
                     <div className="text-center">
                         <div className="mx-auto mb-4 size-12 animate-pulse rounded-full bg-rose-300" />
                         <p className="font-semibold text-rose-500">
@@ -482,7 +482,7 @@ export default function PatientAppHome() {
         return (
             <>
                 <Head title="Beranda pasien" />
-                <main className="grid min-h-screen place-items-center bg-[#FEF6F7] px-5">
+                <main className="grid min-h-[100dvh] place-items-center bg-[#FEF6F7] px-5">
                     <section className="w-full max-w-md rounded-3xl bg-white p-6 text-center shadow">
                         <p className="text-sm text-red-700">
                             {error || 'Data pasien gagal dimuat.'}
@@ -501,10 +501,13 @@ export default function PatientAppHome() {
     }
 
     const scheduleDate = schedule?.nextVisitDate
-        ? new Date(schedule.nextVisitDate.replace(' ', 'T')).toLocaleString('id-ID', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-        })
+        ? new Date(schedule.nextVisitDate.replace(' ', 'T')).toLocaleString(
+              'id-ID',
+              {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+              },
+          )
         : null;
     const latestBaby = patient.babies?.[0];
 
@@ -514,8 +517,8 @@ export default function PatientAppHome() {
                 <link rel="manifest" href="/manifest.webmanifest" />
                 <meta name="theme-color" content="#FB93A4" />
             </Head>
-            <main className="min-h-screen bg-[#FEF6F7] pb-24 text-slate-800">
-                <div className="mx-auto min-h-screen max-w-xl">
+            <main className="min-h-[100dvh] bg-[#FEF6F7] pb-24 text-slate-800">
+                <div className="mx-auto min-h-[100dvh] max-w-xl">
                     <header className="sticky top-0 z-20 border-b border-rose-100 bg-[#FEF6F7]/95 px-5 py-4 backdrop-blur">
                         <div className="flex items-center justify-between">
                             <div>
@@ -876,18 +879,18 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                ...current,
-                                                province_id: value,
-                                                province:
-                                                    selected?.name ?? '',
-                                                city_or_district_id: '',
-                                                city_or_district: '',
-                                                subdistrict_id: '',
-                                                subdistrict: '',
-                                                village_id: '',
-                                                village: '',
-                                                facility_id: '',
-                                            }
+                                                  ...current,
+                                                  province_id: value,
+                                                  province:
+                                                      selected?.name ?? '',
+                                                  city_or_district_id: '',
+                                                  city_or_district: '',
+                                                  subdistrict_id: '',
+                                                  subdistrict: '',
+                                                  village_id: '',
+                                                  village: '',
+                                                  facility_id: '',
+                                              }
                                             : current,
                                     );
                                 }}
@@ -904,16 +907,16 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                ...current,
-                                                city_or_district_id: value,
-                                                city_or_district:
-                                                    selected?.name ?? '',
-                                                subdistrict_id: '',
-                                                subdistrict: '',
-                                                village_id: '',
-                                                village: '',
-                                                facility_id: '',
-                                            }
+                                                  ...current,
+                                                  city_or_district_id: value,
+                                                  city_or_district:
+                                                      selected?.name ?? '',
+                                                  subdistrict_id: '',
+                                                  subdistrict: '',
+                                                  village_id: '',
+                                                  village: '',
+                                                  facility_id: '',
+                                              }
                                             : current,
                                     );
                                 }}
@@ -930,13 +933,13 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                ...current,
-                                                subdistrict_id: value,
-                                                subdistrict:
-                                                    selected?.name ?? '',
-                                                village_id: '',
-                                                village: '',
-                                            }
+                                                  ...current,
+                                                  subdistrict_id: value,
+                                                  subdistrict:
+                                                      selected?.name ?? '',
+                                                  village_id: '',
+                                                  village: '',
+                                              }
                                             : current,
                                     );
                                 }}
@@ -953,10 +956,10 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                ...current,
-                                                village_id: value,
-                                                village: selected?.name ?? '',
-                                            }
+                                                  ...current,
+                                                  village_id: value,
+                                                  village: selected?.name ?? '',
+                                              }
                                             : current,
                                     );
                                 }}
