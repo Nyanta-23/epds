@@ -165,9 +165,9 @@ export default function PatientAppHome() {
         () =>
             token
                 ? axios.create({
-                      baseURL: API_URL,
-                      headers: { Authorization: `Bearer ${token}` },
-                  })
+                    baseURL: API_URL,
+                    headers: { Authorization: `Bearer ${token}` },
+                })
                 : null,
         [token],
     );
@@ -197,7 +197,7 @@ export default function PatientAppHome() {
     const clearSession = useCallback(() => {
         try {
             window.localStorage.removeItem(TOKEN_KEY);
-        } catch {}
+        } catch { }
         router.visit('/patient-app', { replace: true });
     }, []);
 
@@ -287,9 +287,9 @@ export default function PatientAppHome() {
 
         setPushEnabled(
             typeof window !== 'undefined' &&
-                'Notification' in window &&
-                window.Notification.permission === 'granted' &&
-                hasStoredPushToken,
+            'Notification' in window &&
+            window.Notification.permission === 'granted' &&
+            hasStoredPushToken,
         );
 
         const refreshWhenVisible = () => {
@@ -502,12 +502,12 @@ export default function PatientAppHome() {
 
     const scheduleDate = schedule?.nextVisitDate
         ? new Date(schedule.nextVisitDate.replace(' ', 'T')).toLocaleString(
-              'id-ID',
-              {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-              },
-          )
+            'id-ID',
+            {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+            },
+        )
         : null;
     const latestBaby = patient.babies?.[0];
 
@@ -717,7 +717,7 @@ export default function PatientAppHome() {
                             <div>
                                 <h2
                                     id="required-profile-title"
-                                    className="text-lg font-bold"
+                                    className="text-lg font-bold text-rose-500"
                                 >
                                     Lengkapi profil ibu
                                 </h2>
@@ -736,7 +736,7 @@ export default function PatientAppHome() {
                             </p>
                         )}
                         <form onSubmit={saveProfile} className="grid gap-3">
-                            <label className="grid gap-1.5 text-sm font-medium">
+                            <label className="grid gap-1.5 text-sm font-medium text-slate-500">
                                 Nama lengkap
                                 <input
                                     required
@@ -751,7 +751,7 @@ export default function PatientAppHome() {
                                     className={fieldClassName()}
                                 />
                             </label>
-                            <label className="grid gap-1.5 text-sm font-medium">
+                            <label className="grid gap-1.5 text-sm  text-slate-500 font-medium">
                                 Nomor telepon
                                 <input
                                     required
@@ -767,7 +767,7 @@ export default function PatientAppHome() {
                                 />
                             </label>
                             <div className="grid grid-cols-2 gap-3">
-                                <label className="grid gap-1.5 text-sm font-medium">
+                                <label className="grid gap-1.5 text-sm  text-slate-500 font-medium">
                                     Tempat lahir
                                     <input
                                         required
@@ -782,7 +782,7 @@ export default function PatientAppHome() {
                                         className={fieldClassName()}
                                     />
                                 </label>
-                                <label className="grid gap-1.5 text-sm font-medium">
+                                <label className="grid gap-1.5 text-sm  text-slate-500 font-medium">
                                     Tanggal lahir
                                     <input
                                         required
@@ -798,7 +798,7 @@ export default function PatientAppHome() {
                                     />
                                 </label>
                             </div>
-                            <label className="grid gap-1.5 text-sm font-medium">
+                            <label className="grid gap-1.5 text-sm  text-slate-500 font-medium">
                                 Pekerjaan
                                 <input
                                     required
@@ -810,7 +810,7 @@ export default function PatientAppHome() {
                                 />
                             </label>
                             <div className="grid grid-cols-2 gap-3">
-                                <label className="grid gap-1.5 text-sm font-medium">
+                                <label className="grid gap-1.5 text-sm  text-slate-500 font-medium">
                                     Status pernikahan
                                     <select
                                         required
@@ -833,7 +833,7 @@ export default function PatientAppHome() {
                                         </option>
                                     </select>
                                 </label>
-                                <label className="grid gap-1.5 text-sm font-medium">
+                                <label className="grid gap-1.5 text-sm  text-slate-500 font-medium">
                                     Pendidikan terakhir
                                     <select
                                         required
@@ -879,18 +879,18 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  province_id: value,
-                                                  province:
-                                                      selected?.name ?? '',
-                                                  city_or_district_id: '',
-                                                  city_or_district: '',
-                                                  subdistrict_id: '',
-                                                  subdistrict: '',
-                                                  village_id: '',
-                                                  village: '',
-                                                  facility_id: '',
-                                              }
+                                                ...current,
+                                                province_id: value,
+                                                province:
+                                                    selected?.name ?? '',
+                                                city_or_district_id: '',
+                                                city_or_district: '',
+                                                subdistrict_id: '',
+                                                subdistrict: '',
+                                                village_id: '',
+                                                village: '',
+                                                facility_id: '',
+                                            }
                                             : current,
                                     );
                                 }}
@@ -907,16 +907,16 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  city_or_district_id: value,
-                                                  city_or_district:
-                                                      selected?.name ?? '',
-                                                  subdistrict_id: '',
-                                                  subdistrict: '',
-                                                  village_id: '',
-                                                  village: '',
-                                                  facility_id: '',
-                                              }
+                                                ...current,
+                                                city_or_district_id: value,
+                                                city_or_district:
+                                                    selected?.name ?? '',
+                                                subdistrict_id: '',
+                                                subdistrict: '',
+                                                village_id: '',
+                                                village: '',
+                                                facility_id: '',
+                                            }
                                             : current,
                                     );
                                 }}
@@ -933,13 +933,13 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  subdistrict_id: value,
-                                                  subdistrict:
-                                                      selected?.name ?? '',
-                                                  village_id: '',
-                                                  village: '',
-                                              }
+                                                ...current,
+                                                subdistrict_id: value,
+                                                subdistrict:
+                                                    selected?.name ?? '',
+                                                village_id: '',
+                                                village: '',
+                                            }
                                             : current,
                                     );
                                 }}
@@ -956,15 +956,15 @@ export default function PatientAppHome() {
                                     setProfile((current) =>
                                         current
                                             ? {
-                                                  ...current,
-                                                  village_id: value,
-                                                  village: selected?.name ?? '',
-                                              }
+                                                ...current,
+                                                village_id: value,
+                                                village: selected?.name ?? '',
+                                            }
                                             : current,
                                     );
                                 }}
                             />
-                            <label className="grid gap-1.5 text-sm font-medium">
+                            <label className="grid gap-1.5 text-slate-500 text-sm font-medium">
                                 Fasilitas kesehatan
                                 <select
                                     required
@@ -991,7 +991,7 @@ export default function PatientAppHome() {
                                     ))}
                                 </select>
                             </label>
-                            <label className="grid gap-1.5 text-sm font-medium">
+                            <label className="grid gap-1.5 text-slate-500 text-sm font-medium">
                                 Alamat
                                 <textarea
                                     required
@@ -1030,7 +1030,7 @@ function RegionSelect(props: {
     onChange: (value: string) => void;
 }) {
     return (
-        <label className="grid gap-1.5 text-sm font-medium">
+        <label className="grid gap-1.5 text-sm font-medium text-slate-500">
             {props.label}
             <select
                 required

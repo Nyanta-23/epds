@@ -9,6 +9,7 @@ use App\Models\Followup;
 use App\Models\PostpartumVisit;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class PostpartumVisitService
@@ -32,7 +33,7 @@ class PostpartumVisitService
         ]);
 
         $query->when($search, function ($q, $search) {
-            $q->whereHas('mother', fn ($subQ) => $subQ->where('name', 'like', "%{$search}%"));
+            $q->whereHas('mother', fn($subQ) => $subQ->where('name', 'like', "%{$search}%"));
         });
 
         $query->when($startDate || $endDate, function ($q) use ($startDate, $endDate) {
@@ -161,6 +162,10 @@ class PostpartumVisitService
         $latestBaby = Baby::where('mother_id', $user->id)
             ->orderBy('date_of_birth', 'desc')
             ->first();
+
+        if (!$latestBaby) {
+            throw new Exception('mohon untuk mengisi data bayi terlebih dahulu', 400);
+        }
 
         return PostpartumVisit::where('mother_id', $user->id)->where('baby_id', $latestBaby->baby_id)->exists();
     }

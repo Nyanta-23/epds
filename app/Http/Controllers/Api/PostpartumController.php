@@ -6,13 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Service\PostpartumVisit\PostpartumScheduleService;
 use App\Service\PostpartumVisit\PostpartumVisitService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PostpartumController extends Controller
 {
     public function __construct(
         private PostpartumScheduleService $postpartumScheduleService,
         private PostpartumVisitService $postpartumVisitService
-    ) {}
+    ) {
+    }
 
     public function getSchedule(Request $request, string $motherId)
     {
@@ -45,6 +47,13 @@ class PostpartumController extends Controller
                 'data' => $previousPostpartumVisit,
             ], 200);
         } catch (\Exception $err) {
+            Log::error('postpartum api', ['message' => $err->getMessage()]);
+            if ($err->getCode() == 400) {
+                return response()->json([
+                    'message' => 'Mohon untuk mengisi data bayi terlebih dahulu',
+                    'error' => $err->getMessage(),
+                ], $err->getCode());
+            }
             return response()->json([
                 'message' => 'An error occurred.',
                 'error' => $err->getMessage(),
